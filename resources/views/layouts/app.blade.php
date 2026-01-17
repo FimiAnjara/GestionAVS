@@ -139,8 +139,59 @@
                         </a>
                     </div>
                 </li>
+
+                <div class="menu-divider"></div>
+
+                <li class="menu-title">Finance</li>
+                <!-- CAISSE MENU -->
+                <li class="has-submenu {{ request()->is('caisse*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-safe2"></i>
+                        <span class="menu-text">Caisse</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('caisse*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('caisse.create') }}"
+                            class="submenu-item {{ request()->is('caisse/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('caisse.list') }}"
+                            class="submenu-item {{ request()->is('caisse/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- MOUVEMENTS CAISSE MENU -->
+                <li class="has-submenu {{ request()->is('mvt-caisse*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span class="menu-text">Mouvements</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('mvt-caisse*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('mvt-caisse.create') }}"
+                            class="submenu-item {{ request()->is('mvt-caisse/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('mvt-caisse.list') }}"
+                            class="submenu-item {{ request()->is('mvt-caisse/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                        <a href="{{ route('mvt-caisse.etat') }}"
+                            class="submenu-item {{ request()->is('mvt-caisse/etat*') ? 'active' : '' }}">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Etat</span>
+                        </a>
+                    </div>
+                </li>
             </ul>
         </div>
+
         <div class="sidebar-footer">
             <ul style="list-style: none; padding: 0; margin: 0;">
                 <li>
@@ -163,6 +214,11 @@
                     </form>
                 </li>
             </ul>
+            <div>
+                <p style="margin-bottom: 2px; font-weight: 600;">Mon App</p>
+                <p style="font-size: 0.65rem; opacity: 0.7;">v1.0.0</p>
+                <p style="font-size: 0.65rem; margin-top: 5px; opacity: 0.6;">&copy; {{ date('Y') }}</p>
+            </div>
         </div>
     </nav>
     <div id="content">

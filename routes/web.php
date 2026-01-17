@@ -5,6 +5,8 @@ use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\UniteController;
+use App\Http\Controllers\CaisseController;
+use App\Http\Controllers\MvtCaisseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -70,6 +72,30 @@ Route::prefix('unites')->group(function () {
     Route::put('/{id}', [UniteController::class, 'update'])->name('unites.update');
     Route::delete('/{id}', [UniteController::class, 'destroy'])->name('unites.destroy');
     Route::get('/search/query', [UniteController::class, 'search'])->name('unites.search');
+});
+
+// Routes Caisse (Finance)
+Route::prefix('caisse')->group(function () {
+    Route::get('/list', [CaisseController::class, 'list'])->name('caisse.list');
+    Route::get('/create', [CaisseController::class, 'create'])->name('caisse.create');
+    Route::post('/', [CaisseController::class, 'store'])->name('caisse.store');
+    Route::get('/{id}', [CaisseController::class, 'show'])->name('caisse.show');
+    Route::get('/{id}/edit', [CaisseController::class, 'edit'])->name('caisse.edit');
+    Route::put('/{id}', [CaisseController::class, 'update'])->name('caisse.update');
+    Route::delete('/{id}', [CaisseController::class, 'destroy'])->name('caisse.destroy');
+});
+
+// Routes Mouvements Caisse
+Route::prefix('mvt-caisse')->group(function () {
+    Route::get('/list', [MvtCaisseController::class, 'list'])->name('mvt-caisse.list');
+    Route::get('/create', [MvtCaisseController::class, 'create'])->name('mvt-caisse.create');
+    Route::post('/', [MvtCaisseController::class, 'store'])->name('mvt-caisse.store');
+    Route::get('/{id}', [MvtCaisseController::class, 'show'])->name('mvt-caisse.show');
+    Route::get('/{id}/edit', [MvtCaisseController::class, 'edit'])->name('mvt-caisse.edit');
+    Route::put('/{id}', [MvtCaisseController::class, 'update'])->name('mvt-caisse.update');
+    Route::delete('/{id}', [MvtCaisseController::class, 'destroy'])->name('mvt-caisse.destroy');
+    Route::get('/etat/rapport', [MvtCaisseController::class, 'etat'])->name('mvt-caisse.etat');
+    Route::get('/etat/export-pdf', [MvtCaisseController::class, 'exportPdf'])->name('mvt-caisse.export-pdf');
 });
 
 Route::get('/about', function () {

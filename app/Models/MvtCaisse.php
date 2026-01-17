@@ -16,6 +16,10 @@ class MvtCaisse extends Model
 
     protected $fillable = ['id_mvt_caisse', 'origine', 'debit', 'credit', 'description', 'date_', 'id_caisse'];
 
+    protected $casts = [
+        'date_' => 'datetime',
+    ];
+
     public function caisse()
     {
         return $this->belongsTo(Caisse::class, 'id_caisse', 'id_caisse');

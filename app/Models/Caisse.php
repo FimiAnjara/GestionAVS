@@ -14,7 +14,7 @@ class Caisse extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_caisse', 'montant'];
+    protected $fillable = ['id_caisse', 'libelle', 'montant'];
 
     public function mvtCaisse()
     {

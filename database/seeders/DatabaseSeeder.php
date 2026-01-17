@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             FournisseurSeeder::class,
             ArticleSeeder::class,
+            CaisseSeeder::class,
         ]);
     }
 }
