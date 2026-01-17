@@ -44,7 +44,7 @@
                     @forelse($fournisseurs as $fournisseur)
                         <tr data-fournisseur-id="{{ $fournisseur->id_fournisseur }}">
                             <td class="ps-4">
-                                <span class="badge bg-info text-dark">{{ substr($fournisseur->id_fournisseur, 0, 8) }}</span>
+                                <span class="badge bg-info text-dark" style="word-break: break-all;">{{ $fournisseur->id_fournisseur }}</span>
                             </td>
                             <td><strong class="text-dark">{{ $fournisseur->nom }}</strong></td>
                             <td>

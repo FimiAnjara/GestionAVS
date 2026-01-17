@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Liste des Clients')
+@section('title', 'Liste des Articles')
 
 @section('content')
 <div class="container-fluid py-4">
     <!-- En-tête -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="bi bi-people"></i> Gestion des Clients</h2>
-            <p class="text-muted">Consultez et gérez tous vos clients</p>
+            <h2><i class="bi bi-box"></i> Gestion des Articles</h2>
+            <p class="text-muted">Consultez et gérez tous vos articles</p>
         </div>
-        <a href="{{ route('clients.create') }}" class="btn btn-primary btn-lg">
-            <i class="bi bi-plus-circle"></i> Ajouter Client
+        <a href="{{ route('articles.create') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> Ajouter Article
         </a>
     </div>
 
@@ -27,45 +27,61 @@
         </div>
     </div>
 
-    <!-- Tableau des clients -->
+    <!-- Tableau des articles -->
     <div class="card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4"><i class="bi bi-hash"></i> ID</th>
-                        <th><i class="bi bi-person"></i> Nom</th>
+                        <th><i class="bi bi-image"></i> Photo</th>
+                        <th><i class="bi bi-box"></i> Nom</th>
+                        <th><i class="bi bi-box-seam"></i> Stock</th>
+                        <th><i class="bi bi-tag"></i> Catégorie</th>
+                        <th><i class="bi bi-rulers"></i> Unité</th>
                         <th><i class="bi bi-calendar"></i> Date</th>
                         <th class="text-center"><i class="bi bi-gear"></i> Actions</th>
                     </tr>
                 </thead>
-                <tbody id="clientsTableBody">
-                    @forelse($clients as $client)
-                        <tr data-client-id="{{ $client->id_client }}">
+                <tbody id="articlesTableBody">
+                    @forelse($articles as $article)
+                        <tr data-article-id="{{ $article->id_article }}">
                             <td class="ps-4">
-                                <span class="badge bg-info text-dark" style="word-break: break-all;">{{ $client->id_client }}</span>
+                                <span class="badge bg-info text-dark" style="word-break: break-all;">{{ $article->id_article }}</span>
                             </td>
-                            <td><strong class="text-dark">{{ $client->nom }}</strong></td>
                             <td>
-                                <small class="text-muted">{{ $client->created_at->format('d/m/Y H:i') }}</small>
+                                @if($article->photo)
+                                    <img src="{{ asset('storage/' . $article->photo) }}" alt="Photo" style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px;">
+                                @else
+                                    <span class="text-muted"><i class="bi bi-image"></i></span>
+                                @endif
+                            </td>
+                            <td><strong class="text-dark">{{ $article->nom }}</strong></td>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ $article->stock }}</span>
+                            </td>
+                            <td>{{ $article->categorie->libelle ?? '-' }}</td>
+                            <td>{{ $article->unite->libelle ?? '-' }}</td>
+                            <td>
+                                <small class="text-muted">{{ $article->created_at->format('d/m/Y H:i') }}</small>
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('clients.show', $client->id_client) }}" class="btn btn-sm btn-info" title="Voir">
+                                <a href="{{ route('articles.show', $article->id_article) }}" class="btn btn-sm btn-info" title="Voir">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('clients.edit', $client->id_client) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                <a href="{{ route('articles.edit', $article->id_article) }}" class="btn btn-sm btn-warning" title="Modifier">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <button class="btn btn-sm btn-danger" onclick="deleteClient('{{ $client->id_client }}')" title="Supprimer">
+                                <button class="btn btn-sm btn-danger" onclick="deleteArticle('{{ $article->id_article }}')" title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-                                <p class="text-muted mt-3">Aucun client trouvé</p>
+                                <p class="text-muted mt-3">Aucun article trouvé</p>
                             </td>
                         </tr>
                     @endforelse
@@ -79,10 +95,10 @@
     // Recherche en temps réel
     document.getElementById('searchInput').addEventListener('keyup', function() {
         const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#clientsTableBody tr');
+        const rows = document.querySelectorAll('#articlesTableBody tr');
         
         rows.forEach(row => {
-            const nom = row.querySelector('td:nth-child(2)');
+            const nom = row.querySelector('td:nth-child(3)');
             if (nom) {
                 const isVisible = nom.textContent.toLowerCase().includes(searchValue);
                 row.style.display = isVisible ? '' : 'none';
@@ -90,9 +106,9 @@
         });
     });
 
-    function deleteClient(id) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
-            fetch('{{ route("clients.destroy", ":id") }}'.replace(':id', id), {
+    function deleteArticle(id) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+            fetch('{{ route("articles.destroy", ":id") }}'.replace(':id', id), {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

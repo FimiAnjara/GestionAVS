@@ -14,7 +14,7 @@ class Article extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_article', 'nom', 'stock', 'id_unite', 'id_categorie'];
+    protected $fillable = ['id_article', 'nom', 'stock', 'id_unite', 'id_categorie', 'photo'];
 
     public function unite()
     {

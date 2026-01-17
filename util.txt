@@ -1,3 +1,7 @@
 
 
 docker compose exec app bash -lc "composer install && php artisan key:generate --force && php artisan migrate --force || true"
+
+php artisan migrate
+
+php artisan migrate:fresh --seed

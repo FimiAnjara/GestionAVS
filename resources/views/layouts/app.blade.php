@@ -70,7 +70,62 @@
 
                 <div class="menu-divider"></div>
 
-                <li>
+                <li class="menu-title">Produits</li>
+                <!-- ARTICLE MENU -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-box"></i>
+                        <span class="menu-text">Articles</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="{{ route('articles.create') }}" class="submenu-item">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('articles.list') }}" class="submenu-item">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- CATEGORIE MENU -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-tag"></i>
+                        <span class="menu-text">Catégories</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="{{ route('categories.create') }}" class="submenu-item">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('categories.list') }}" class="submenu-item">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- UNITE MENU -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-rulers"></i>
+                        <span class="menu-text">Unités</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="{{ route('unites.create') }}" class="submenu-item">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('unites.list') }}" class="submenu-item">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <div class="menu-divider"></div>
                     <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}">
                         <i class="bi bi-question-circle"></i>
                         <span class="menu-text">Aide</span>
