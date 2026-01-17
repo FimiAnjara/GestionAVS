@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         // Charger tous les seeders
         $this->call([
+            UtilisateurSeeder::class,
             CategorieSeeder::class,
             UniteSeeder::class,
             ClientSeeder::class,

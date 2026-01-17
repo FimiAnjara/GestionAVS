@@ -53,6 +53,27 @@
                     </div>
                 </li>
 
+                <!-- BON DE COMMANDE MENU -->
+                <li class="has-submenu {{ request()->is('bon-commande*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-arrow-up"></i>
+                        <span class="menu-text">Bon de Commande</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('bon-commande*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('bon-commande.create') }}"
+                            class="submenu-item {{ request()->is('bon-commande/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('bon-commande.list') }}"
+                            class="submenu-item {{ request()->is('bon-commande/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
                 <div class="menu-divider"></div>
 
                 <li class="menu-title">Tiers</li>

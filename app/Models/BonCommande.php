@@ -16,6 +16,10 @@ class BonCommande extends Model
 
     protected $fillable = ['id_bonCommande', 'date_', 'etat', 'id_utilisateur', 'id_proformaFournisseur'];
 
+    protected $casts = [
+        'date_' => 'datetime',
+    ];
+
     public function utilisateur()
     {
         return $this->belongsTo(Utilisateur::class, 'id_utilisateur', 'id_utilisateur');

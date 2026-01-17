@@ -7,6 +7,7 @@ use App\Models\BonCommandeFille;
 use App\Models\ProformaFournisseur;
 use App\Models\Fournisseur;
 use App\Models\Article;
+use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use PDF;
 
@@ -59,17 +60,24 @@ class BonCommandeController extends Controller
         
         // Si proforma_id est passé, pré-remplir
         $proformaFournisseur = null;
+        $articlesProforma = [];
+        $descriptionProforma = '';
+        
         if ($request->has('proforma_id')) {
             $proformaFournisseur = ProformaFournisseur::find($request->proforma_id);
             if (!$proformaFournisseur || $proformaFournisseur->etat < 5) {
                 return redirect()->route('proforma-fournisseur.list')->with('error', 'Proforma invalide ou non validée par Finance');
             }
+            
+            // Récupérer les articles de la proforma
+            $articlesProforma = $proformaFournisseur->proformaFournisseurFille()->with('article')->get();
+            $descriptionProforma = $proformaFournisseur->description ?? '';
         }
         
         $proformas = ProformaFournisseur::where('etat', '>=', 5)->get();
         $articles = Article::all();
         
-        return view('bon-commande.create', compact('fournisseurs', 'proformas', 'articles', 'proformaFournisseur'));
+        return view('bon-commande.create', compact('fournisseurs', 'proformas', 'articles', 'proformaFournisseur', 'articlesProforma', 'descriptionProforma'));
     }
     
     /**
@@ -96,11 +104,13 @@ class BonCommandeController extends Controller
         
         // Créer le bon de commande
         $id = 'BC_' . uniqid();
+        $userId = auth()->check() ? auth()->user()->id : (Utilisateur::first()?->id_utilisateur ?? 'UTIL-1');
+        
         $bonCommande = BonCommande::create([
             'id_bonCommande' => $id,
             'date_' => $request->date_,
             'etat' => 1, // Créée
-            'id_utilisateur' => auth()->user()->id ?? 1,
+            'id_utilisateur' => $userId,
             'id_proformaFournisseur' => $request->id_proformaFournisseur,
         ]);
         

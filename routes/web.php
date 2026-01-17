@@ -8,6 +8,7 @@ use App\Http\Controllers\UniteController;
 use App\Http\Controllers\CaisseController;
 use App\Http\Controllers\MvtCaisseController;
 use App\Http\Controllers\ProformaFournisseurController;
+use App\Http\Controllers\BonCommandeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -110,6 +111,17 @@ Route::prefix('proforma-fournisseur')->group(function () {
     Route::get('/{id}/export-pdf', [ProformaFournisseurController::class, 'exportPdf'])->name('proforma-fournisseur.exportPdf');
     Route::post('/{id}/etat', [ProformaFournisseurController::class, 'changerEtat'])->name('proforma-fournisseur.etat');
     Route::delete('/{id}', [ProformaFournisseurController::class, 'destroy'])->name('proforma-fournisseur.destroy');
+});
+
+// Routes Bon de Commande
+Route::prefix('bon-commande')->group(function () {
+    Route::get('/list', [BonCommandeController::class, 'list'])->name('bon-commande.list');
+    Route::get('/create', [BonCommandeController::class, 'create'])->name('bon-commande.create');
+    Route::post('/', [BonCommandeController::class, 'store'])->name('bon-commande.store');
+    Route::get('/{id}', [BonCommandeController::class, 'show'])->name('bon-commande.show');
+    Route::get('/{id}/export-pdf', [BonCommandeController::class, 'exportPdf'])->name('bon-commande.exportPdf');
+    Route::post('/{id}/etat', [BonCommandeController::class, 'changerEtat'])->name('bon-commande.etat');
+    Route::delete('/{id}', [BonCommandeController::class, 'destroy'])->name('bon-commande.destroy');
 });
 
 Route::get('/about', function () {

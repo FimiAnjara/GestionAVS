@@ -166,6 +166,9 @@
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changeEtatModal">
                         <i class="bi bi-pencil me-2"></i>Valider par DG
                     </button>
+                    <a href="{{ route('bon-commande.create', ['proforma_id' => $proforma->id_proformaFournisseur]) }}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-plus me-2"></i>Créer Bon de Commande
+                    </a>
                 @endif
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                     <i class="bi bi-trash me-2"></i>Annuler

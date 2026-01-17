@@ -59,7 +59,8 @@
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
                             <i class="bi bi-search me-2"></i>Rechercher
                         </button>
-                        <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm" title="Réinitialiser les filtres">
+                        <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm"
+                            title="Réinitialiser les filtres">
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </a>
                     </div>
@@ -123,11 +124,6 @@
                                                     class="btn btn-warning  " title="Modifier">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#changeEtatModal{{ $proforma->id_proformaFournisseur }}"
-                                                    title="Changer l'état">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button> --}}
                                             @endif
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal{{ $proforma->id_proformaFournisseur }}"
@@ -145,7 +141,8 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Changer l'État</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
                                             </div>
                                             <form
                                                 action="{{ route('proforma-fournisseur.etat', $proforma->id_proformaFournisseur) }}"
@@ -212,7 +209,8 @@
                 <!-- Pagination -->
                 <div class="p-3 border-top d-flex justify-content-between align-items-center">
                     <small class="text-muted">
-                        Affichage de {{ $proformas->firstItem() }} à {{ $proformas->lastItem() }} sur {{ $proformas->total() }} proformas
+                        Affichage de {{ $proformas->firstItem() }} à {{ $proformas->lastItem() }} sur
+                        {{ $proformas->total() }} proformas
                     </small>
                     <nav aria-label="pagination">
                         {{ $proformas->links() }}
