@@ -11,7 +11,7 @@ class ClientController extends Controller
     {
         $clients = Client::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
         
         return view('clients.list', compact('clients'));
     }

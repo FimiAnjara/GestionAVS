@@ -11,7 +11,7 @@ class CategorieController extends Controller
     {
         $categories = Categorie::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
         
         return view('categories.list', compact('categories'));
     }

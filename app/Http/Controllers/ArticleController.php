@@ -12,12 +12,25 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $articles = Article::with(['categorie', 'unite'])
-            ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Article::with(['categorie', 'unite'])
+            ->whereNull('deleted_at');
         
-        return view('articles.list', compact('articles'));
+        // Filtres
+        if (request('categorie_id')) {
+            $query->where('id_categorie', request('categorie_id'));
+        }
+        
+        if (request('unite_id')) {
+            $query->where('id_unite', request('unite_id'));
+        }
+        
+        $articles = $query->orderBy('created_at', 'desc')
+            ->paginate(10);
+        
+        $categories = Categorie::whereNull('deleted_at')->get();
+        $unites = Unite::whereNull('deleted_at')->get();
+        
+        return view('articles.list', compact('articles', 'categories', 'unites'));
     }
 
     public function create()

@@ -15,7 +15,48 @@
         </a>
     </div>
 
-    <!-- Barre de recherche -->
+    <!-- Filtres -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="bi bi-funnel"></i> Filtres</h5>
+            <form method="GET" action="{{ route('articles.list') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Catégorie</label>
+                    <select name="categorie_id" class="form-select">
+                        <option value="">-- Toutes les catégories --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id_categorie }}" 
+                                {{ request('categorie_id') == $cat->id_categorie ? 'selected' : '' }}>
+                                {{ $cat->libelle }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Unité</label>
+                    <select name="unite_id" class="form-select">
+                        <option value="">-- Toutes les unités --</option>
+                        @foreach($unites as $unite)
+                            <option value="{{ $unite->id_unite }}" 
+                                {{ request('unite_id') == $unite->id_unite ? 'selected' : '' }}>
+                                {{ $unite->libelle }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Filtrer
+                    </button>
+                    <a href="{{ route('articles.list') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Barre de recherche en temps réel -->
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="input-group input-group-lg">
@@ -60,8 +101,16 @@
                             <td>
                                 <span class="badge bg-warning text-dark">{{ $article->stock }}</span>
                             </td>
-                            <td>{{ $article->categorie->libelle ?? '-' }}</td>
-                            <td>{{ $article->unite->libelle ?? '-' }}</td>
+                            <td>
+                                <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getCategoryColor($article->categorie->libelle ?? '') }}; color: white;">
+                                    {{ $article->categorie->libelle ?? '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getUnitColor($article->unite->libelle ?? '') }}; color: white;">
+                                    {{ $article->unite->libelle ?? '-' }}
+                                </span>
+                            </td>
                             <td>
                                 <small class="text-muted">{{ $article->created_at->format('d/m/Y H:i') }}</small>
                             </td>
@@ -88,6 +137,11 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $articles->links('pagination::bootstrap-4') }}
     </div>
 </div>
 

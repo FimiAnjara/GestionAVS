@@ -4,6 +4,9 @@
     --light-blue: #e7f1ff;
     --dark-blue: #003d82;
     --accent-blue: #0078d4;
+    --primary-green: #28a745;
+    --primary-red: #dc3545;
+    --primary-purple: #6f42c1;
     --white: #ffffff;
     --light-gray: #f5f7fa;
     --border-gray: #e0e5ea;
@@ -126,7 +129,7 @@ body {
 .sidebar-menu a.active {
     background: rgba(255, 255, 255, 0.2);
     color: var(--white);
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid var(--primary-green);
     font-weight: 600;
 }
 
@@ -171,8 +174,8 @@ body {
     padding: 3px 10px;
     font-size: 0.7rem;
     border-radius: 12px;
-    background: #ffc107;
-    color: var(--text-dark);
+    background: var(--primary-green);
+    color: white;
     font-weight: 600;
     margin-left: auto;
 }
@@ -198,6 +201,13 @@ body {
     margin-left: auto;
     transition: var(--transition);
     transform: rotate(0deg);
+}
+
+.has-submenu.active>a {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border-left: 4px solid var(--primary-green);
+    font-weight: 600;
 }
 
 .has-submenu.active>a::after {

@@ -11,7 +11,7 @@ class UniteController extends Controller
     {
         $unites = Unite::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
         
         return view('unites.list', compact('unites'));
     }

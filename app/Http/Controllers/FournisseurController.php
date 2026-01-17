@@ -11,7 +11,7 @@ class FournisseurController extends Controller
     {
         $fournisseurs = Fournisseur::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
         
         return view('fournisseurs.list', compact('fournisseurs'));
     }

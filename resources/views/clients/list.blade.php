@@ -73,6 +73,11 @@
             </table>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $clients->links('pagination::bootstrap-4') }}
+    </div>
 </div>
 
 <script>

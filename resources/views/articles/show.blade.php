@@ -54,14 +54,22 @@
                         </div>
                         <div class="col-md-6">
                             <label class="text-muted small">Catégorie</label>
-                            <p class="fw-bold">{{ $article->categorie->libelle ?? '-' }}</p>
+                            <p class="fw-bold">
+                                <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getCategoryColor($article->categorie->libelle ?? '') }}; color: white;">
+                                    {{ $article->categorie->libelle ?? '-' }}
+                                </span>
+                            </p>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="text-muted small">Unité</label>
-                            <p class="fw-bold">{{ $article->unite->libelle ?? '-' }}</p>
+                            <p class="fw-bold">
+                                <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getUnitColor($article->unite->libelle ?? '') }}; color: white;">
+                                    {{ $article->unite->libelle ?? '-' }}
+                                </span>
+                            </p>
                         </div>
                     </div>
 
