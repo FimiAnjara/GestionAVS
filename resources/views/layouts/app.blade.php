@@ -77,7 +77,8 @@
     </nav>
     <div id="content">
         <button type="button" id="sidebarCollapse" class="d-lg-none">
-            <i class="bi bi-list"></i>
+            <i class="bi bi-list">aa</i>
+            <h2>hha</h2>
         </button>
         <nav class="navbar navbar-expand-lg navbar-light navbar-top">
             <div class="container-fluid px-4">
@@ -88,7 +89,6 @@
                     </span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <!-- Profil utilisateur -->
                     <div class="dropdown">
                         <a href="#"
                             class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
