@@ -14,7 +14,7 @@ class BonCommandeFille extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonCommandeFille', 'quantite', 'id_bonCommande', 'id_article'];
+    protected $fillable = ['id_bonCommandeFille', 'quantite', 'prix_achat', 'id_bonCommande', 'id_article'];
 
     public function bonCommande()
     {

@@ -54,16 +54,15 @@
                     </select>
                 </div>
 
-                <div class="col-lg-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                        <i class="bi bi-search me-2"></i>Rechercher
-                    </button>
-                </div>
-
-                <div class="col-lg-1">
-                    <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm w-100" title="Réinitialiser les filtres">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    </a>
+                <div class="col-lg-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                        <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm" title="Réinitialiser les filtres">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -211,8 +210,13 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="p-3 border-top">
-                    {{ $proformas->links() }}
+                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Affichage de {{ $proformas->firstItem() }} à {{ $proformas->lastItem() }} sur {{ $proformas->total() }} proformas
+                    </small>
+                    <nav aria-label="pagination">
+                        {{ $proformas->links() }}
+                    </nav>
                 </div>
             @else
                 <div class="text-center py-5">
