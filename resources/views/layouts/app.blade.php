@@ -5,18 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Laravel App')</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Sidebar CSS -->
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
-    <!-- Styles supplémentaires -->
     @stack('styles')
 </head>
-
 <body>
-    <!-- Sidebar -->
     <nav id="sidebar">
         <div class="sidebar-header">
             <h3 class="mb-0">
@@ -28,7 +22,6 @@
 
         <div class="sidebar-menu">
             <ul>
-                <!-- Gestion -->
                 <li class="menu-title">Gestion</li>
 
                 <li>
@@ -58,9 +51,6 @@
                     </a>
                 </li>
                 <div class="menu-divider"></div>
-                <!-- Administration -->
-                <div class="menu-divider"></div>
-                <!-- Divers -->
                 <li>
                     <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}">
                         <i class="bi bi-question-circle"></i>
@@ -79,7 +69,6 @@
                 </li>
             </ul>
         </div>
-        <!-- Version et copyright -->
         <div class="sidebar-footer">
             <div class="text-center small text-muted">
                 <p class="mb-1">Version 1.0.0</p>
@@ -87,14 +76,10 @@
             </div>
         </div>
     </nav>
-    <!-- Contenu principal -->
     <div id="content">
-        <!-- Bouton toggle pour mobile -->
         <button type="button" id="sidebarCollapse" class="d-lg-none">
             <i class="bi bi-list"></i>
         </button>
-
-        <!-- Barre de navigation supérieure -->
         <nav class="navbar navbar-expand-lg navbar-light navbar-top">
             <div class="container-fluid px-4">
                 <div class="d-flex align-items-center">
