@@ -4,9 +4,9 @@
 
 @section('header-buttons')
     <div class="d-flex gap-2">
-        <button class="btn btn-info" onclick="window.print()">
-            <i class="bi bi-printer me-2"></i>Imprimer
-        </button>
+        <a href="{{ route('mvt-caisse.export-pdf') }}" class="btn btn-danger">
+            <i class="bi bi-file-pdf me-2"></i>Exporter PDF
+        </a>
         <a href="{{ route('mvt-caisse.list') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i>Retour
         </a>

@@ -135,3 +135,4 @@ class MvtCaisseController extends Controller
         
         return $pdf->download('rapport_financier_' . date('Y-m-d') . '.pdf');
     }
+}
