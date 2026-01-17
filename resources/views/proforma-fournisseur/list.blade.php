@@ -54,10 +54,16 @@
                     </select>
                 </div>
 
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <button type="submit" class="btn btn-primary btn-sm w-100">
                         <i class="bi bi-search me-2"></i>Rechercher
                     </button>
+                </div>
+
+                <div class="col-lg-1">
+                    <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm w-100" title="Réinitialiser les filtres">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
                 </div>
             </form>
         </div>

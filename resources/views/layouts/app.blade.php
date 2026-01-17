@@ -31,6 +31,30 @@
 
                 <div class="menu-divider"></div>
 
+                <li class="menu-title">Achats</li>
+                <!-- PROFORMA FOURNISSEUR MENU -->
+                <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-check"></i>
+                        <span class="menu-text">Proforma</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('proforma-fournisseur.create') }}"
+                            class="submenu-item {{ request()->is('proforma-fournisseur/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('proforma-fournisseur.list') }}"
+                            class="submenu-item {{ request()->is('proforma-fournisseur/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <div class="menu-divider"></div>
+
                 <li class="menu-title">Tiers</li>
                 <!-- CLIENT MENU -->
                 <li class="has-submenu {{ request()->is('clients*') ? 'active' : '' }}">
@@ -191,28 +215,6 @@
                 </li>
 
                 <div class="menu-divider"></div>
-
-                <li class="menu-title">Achats</li>
-                <!-- PROFORMA FOURNISSEUR MENU -->
-                <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-file-earmark-check"></i>
-                        <span class="menu-text">Proforma</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('proforma-fournisseur.create') }}"
-                            class="submenu-item {{ request()->is('proforma-fournisseur/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        <a href="{{ route('proforma-fournisseur.list') }}"
-                            class="submenu-item {{ request()->is('proforma-fournisseur/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                    </div>
-                </li>
             </ul>
         </div>
 
