@@ -38,12 +38,15 @@
                         <i class="bi bi-people"></i>
                         <span class="menu-text">Clients</span>
                     </a>
-                    <div class="sidebar-submenu" style="{{ request()->is('clients*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('clients.create') }}" class="submenu-item {{ request()->is('clients/create') ? 'active' : '' }}">
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('clients*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('clients.create') }}"
+                            class="submenu-item {{ request()->is('clients/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        <a href="{{ route('clients.list') }}" class="submenu-item {{ request()->is('clients/list') ? 'active' : '' }}">
+                        <a href="{{ route('clients.list') }}"
+                            class="submenu-item {{ request()->is('clients/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -56,12 +59,15 @@
                         <i class="bi bi-briefcase"></i>
                         <span class="menu-text">Fournisseurs</span>
                     </a>
-                    <div class="sidebar-submenu" style="{{ request()->is('fournisseurs*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('fournisseurs.create') }}" class="submenu-item {{ request()->is('fournisseurs/create') ? 'active' : '' }}">
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('fournisseurs*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('fournisseurs.create') }}"
+                            class="submenu-item {{ request()->is('fournisseurs/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        <a href="{{ route('fournisseurs.list') }}" class="submenu-item {{ request()->is('fournisseurs/list') ? 'active' : '' }}">
+                        <a href="{{ route('fournisseurs.list') }}"
+                            class="submenu-item {{ request()->is('fournisseurs/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -77,12 +83,15 @@
                         <i class="bi bi-box"></i>
                         <span class="menu-text">Articles</span>
                     </a>
-                    <div class="sidebar-submenu" style="{{ request()->is('articles*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('articles.create') }}" class="submenu-item {{ request()->is('articles/create') ? 'active' : '' }}">
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('articles*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('articles.create') }}"
+                            class="submenu-item {{ request()->is('articles/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        <a href="{{ route('articles.list') }}" class="submenu-item {{ request()->is('articles/list') ? 'active' : '' }}">
+                        <a href="{{ route('articles.list') }}"
+                            class="submenu-item {{ request()->is('articles/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -95,12 +104,15 @@
                         <i class="bi bi-tag"></i>
                         <span class="menu-text">Catégories</span>
                     </a>
-                    <div class="sidebar-submenu" style="{{ request()->is('categories*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('categories.create') }}" class="submenu-item {{ request()->is('categories/create') ? 'active' : '' }}">
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('categories*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('categories.create') }}"
+                            class="submenu-item {{ request()->is('categories/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        <a href="{{ route('categories.list') }}" class="submenu-item {{ request()->is('categories/list') ? 'active' : '' }}">
+                        <a href="{{ route('categories.list') }}"
+                            class="submenu-item {{ request()->is('categories/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -113,19 +125,25 @@
                         <i class="bi bi-rulers"></i>
                         <span class="menu-text">Unités</span>
                     </a>
-                    <div class="sidebar-submenu" style="{{ request()->is('unites*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('unites.create') }}" class="submenu-item {{ request()->is('unites/create') ? 'active' : '' }}">
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('unites*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('unites.create') }}"
+                            class="submenu-item {{ request()->is('unites/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        <a href="{{ route('unites.list') }}" class="submenu-item {{ request()->is('unites/list') ? 'active' : '' }}">
+                        <a href="{{ route('unites.list') }}"
+                            class="submenu-item {{ request()->is('unites/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
                     </div>
                 </li>
-
-                <div class="menu-divider"></div>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li>
                     <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}">
                         <i class="bi bi-question-circle"></i>
                         <span class="menu-text">Aide</span>
@@ -142,12 +160,6 @@
                     </form>
                 </li>
             </ul>
-        </div>
-        <div class="sidebar-footer">
-            <div class="text-center small text-muted">
-                <p class="mb-1">Version 1.0.0</p>
-                <p class="mb-0">&copy; {{ date('Y') }} Mon App</p>
-            </div>
         </div>
     </nav>
     <div id="content">
@@ -262,7 +274,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <span class="text-muted">
-                            © {{ date('Y') }} Laravel CRUD - Tous droits réservés
+                            © {{ date('Y') }}
                         </span>
                     </div>
                     <div class="col-md-6 text-end">
@@ -302,11 +314,11 @@
                     parent.classList.add('active');
                 } else {
                     submenu.style.display = 'none';
-                    parent.classList.add('active');  // Keep parent active even when submenu is closed
+                    parent.classList.add('active'); // Keep parent active even when submenu is closed
                 }
             });
         });
-        
+
         // On page load, open active submenus and keep parent active
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.has-submenu.active').forEach(function(menu) {
@@ -315,6 +327,21 @@
                     submenu.style.display = 'block';
                 }
             });
+        });
+
+        // Prevent scroll propagation from sidebar to main
+        const sidebar = document.getElementById('sidebar');
+        sidebar.addEventListener('wheel', function(e) {
+            const scrollTop = sidebar.scrollTop;
+            const scrollHeight = sidebar.scrollHeight;
+            const clientHeight = sidebar.clientHeight;
+
+            // Only prevent default if we can actually scroll
+            if (scrollHeight > clientHeight) {
+                e.stopPropagation();
+            }
+        }, {
+            passive: false
         });
 
         // Toggle sidebar sur mobile
