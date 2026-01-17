@@ -113,12 +113,16 @@
                                                 class="btn btn-success" title="Exporter PDF" target="_blank">
                                                 <i class="bi bi-file-pdf"></i>
                                             </a>
-                                            @if ($proforma->etat != 0)
-                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                            @if ($proforma->etat == 1)
+                                                <a href="{{ route('proforma-fournisseur.edit', $proforma->id_proformaFournisseur) }}"
+                                                    class="btn btn-warning  " title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                                     data-bs-target="#changeEtatModal{{ $proforma->id_proformaFournisseur }}"
                                                     title="Changer l'état">
                                                     <i class="bi bi-pencil"></i>
-                                                </button>
+                                                </button> --}}
                                             @endif
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal{{ $proforma->id_proformaFournisseur }}"

@@ -156,6 +156,9 @@
                     <i class="bi bi-file-pdf me-2"></i>Exporter PDF
                 </a>
                 @if($proforma->etat == 1)
+                    <a href="{{ route('proforma-fournisseur.edit', $proforma->id_proformaFournisseur) }}" class="btn btn-secondary">
+                        <i class="bi bi-pencil me-2"></i>Modifier
+                    </a>
                     <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#changeEtatModal">
                         <i class="bi bi-pencil me-2"></i>Valider par Finance
                     </button>

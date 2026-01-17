@@ -105,6 +105,8 @@ Route::prefix('proforma-fournisseur')->group(function () {
     Route::get('/create', [ProformaFournisseurController::class, 'create'])->name('proforma-fournisseur.create');
     Route::post('/', [ProformaFournisseurController::class, 'store'])->name('proforma-fournisseur.store');
     Route::get('/{id}', [ProformaFournisseurController::class, 'show'])->name('proforma-fournisseur.show');
+    Route::get('/{id}/edit', [ProformaFournisseurController::class, 'edit'])->name('proforma-fournisseur.edit');
+    Route::put('/{id}', [ProformaFournisseurController::class, 'update'])->name('proforma-fournisseur.update');
     Route::get('/{id}/export-pdf', [ProformaFournisseurController::class, 'exportPdf'])->name('proforma-fournisseur.exportPdf');
     Route::post('/{id}/etat', [ProformaFournisseurController::class, 'changerEtat'])->name('proforma-fournisseur.etat');
     Route::delete('/{id}', [ProformaFournisseurController::class, 'destroy'])->name('proforma-fournisseur.destroy');

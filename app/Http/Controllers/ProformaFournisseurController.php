@@ -135,4 +135,63 @@ class ProformaFournisseurController extends Controller
         $pdf = Pdf::loadView('proforma-fournisseur.pdf', compact('proforma', 'totalMontant'));
         return $pdf->download('Proforma_' . $proforma->id_proformaFournisseur . '.pdf');
     }
+
+    // Affiche le formulaire de modification
+    public function edit($id)
+    {
+        $proforma = ProformaFournisseur::with('proformaFournisseurFille.article', 'fournisseur')->findOrFail($id);
+        
+        // Vérifier que l'état est Créée (1)
+        if ($proforma->etat != 1) {
+            return redirect()->route('proforma-fournisseur.show', $id)->with('error', 'Seules les proformas "Créées" peuvent être modifiées!');
+        }
+
+        $fournisseurs = Fournisseur::all();
+        $articles = Article::all();
+        return view('proforma-fournisseur.edit', compact('proforma', 'fournisseurs', 'articles'));
+    }
+
+    // Stocke les modifications
+    public function update(Request $request, $id)
+    {
+        $proforma = ProformaFournisseur::findOrFail($id);
+        
+        // Vérifier que l'état est Créée (1)
+        if ($proforma->etat != 1) {
+            return redirect()->route('proforma-fournisseur.show', $id)->with('error', 'Seules les proformas "Créées" peuvent être modifiées!');
+        }
+
+        $request->validate([
+            'date_' => 'required|date',
+            'description' => 'nullable|string|max:500',
+            'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
+            'articles' => 'required|array|min:1',
+            'articles.*.id_article' => 'required|exists:article,id_article',
+            'articles.*.quantite' => 'required|numeric|min:1',
+            'articles.*.prix' => 'required|numeric|min:0',
+        ]);
+
+        // Mettre à jour la proforma
+        $proforma->update([
+            'date_' => $request->date_,
+            'description' => $request->description,
+            'id_fournisseur' => $request->id_fournisseur,
+        ]);
+
+        // Supprimer les anciens articles
+        ProformaFournisseurFille::where('id_proformaFournisseur', $id)->delete();
+
+        // Ajouter les nouveaux articles
+        foreach ($request->articles as $article) {
+            ProformaFournisseurFille::create([
+                'id_proformaFornisseurFille' => 'PF_' . strtoupper(uniqid()),
+                'prix_achat' => $article['prix'],
+                'quantite' => $article['quantite'],
+                'id_proformaFournisseur' => $id,
+                'id_article' => $article['id_article'],
+            ]);
+        }
+
+        return redirect()->route('proforma-fournisseur.show', $id)->with('success', 'Proforma modifiée avec succès!');
+    }
 }
