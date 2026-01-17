@@ -14,7 +14,31 @@ class BonReception extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonReception', 'date_', 'id_bonCommande'];
+    protected $fillable = ['id_bonReception', 'date_', 'id_bonCommande', 'etat'];
+
+    protected $casts = [
+        'date_' => 'datetime',
+    ];
+
+    public function getEtatLabelAttribute()
+    {
+        return match($this->etat) {
+            1 => 'Créée',
+            11 => 'Réceptionnée',
+            0 => 'Annulée',
+            default => 'Inconnu'
+        };
+    }
+
+    public function getEtatBadgeAttribute()
+    {
+        return match($this->etat) {
+            1 => 'warning',
+            11 => 'success',
+            0 => 'danger',
+            default => 'secondary'
+        };
+    }
 
     public function bonCommande()
     {

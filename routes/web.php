@@ -9,6 +9,8 @@ use App\Http\Controllers\CaisseController;
 use App\Http\Controllers\MvtCaisseController;
 use App\Http\Controllers\ProformaFournisseurController;
 use App\Http\Controllers\BonCommandeController;
+use App\Http\Controllers\BonReceptionController;
+use App\Http\Controllers\MvtStockController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -122,6 +124,24 @@ Route::prefix('bon-commande')->group(function () {
     Route::get('/{id}/export-pdf', [BonCommandeController::class, 'exportPdf'])->name('bon-commande.exportPdf');
     Route::post('/{id}/etat', [BonCommandeController::class, 'changerEtat'])->name('bon-commande.etat');
     Route::delete('/{id}', [BonCommandeController::class, 'destroy'])->name('bon-commande.destroy');
+});
+
+// Routes Bon de Réception
+Route::prefix('bon-reception')->group(function () {
+    Route::get('/list', [BonReceptionController::class, 'list'])->name('bon-reception.list');
+    Route::get('/create', [BonReceptionController::class, 'create'])->name('bon-reception.create');
+    Route::post('/', [BonReceptionController::class, 'store'])->name('bon-reception.store');
+    Route::get('/{id}', [BonReceptionController::class, 'show'])->name('bon-reception.show');
+    Route::get('/{id}/export-pdf', [BonReceptionController::class, 'exportPdf'])->name('bon-reception.exportPdf');
+    Route::post('/{id}/recevoir', [BonReceptionController::class, 'recevoir'])->name('bon-reception.recevoir');
+    Route::delete('/{id}', [BonReceptionController::class, 'destroy'])->name('bon-reception.destroy');
+});
+
+// Routes Mouvement de Stock
+Route::prefix('mvt-stock')->group(function () {
+    Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
+    Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
+    Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
 });
 
 Route::get('/about', function () {

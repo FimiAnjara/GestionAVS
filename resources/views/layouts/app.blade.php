@@ -74,6 +74,43 @@
                     </div>
                 </li>
 
+                <!-- BON DE RECEPTION MENU -->
+                <li class="has-submenu {{ request()->is('bon-reception*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-check"></i>
+                        <span class="menu-text">Bon de Réception</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('bon-reception*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('bon-reception.create') }}"
+                            class="submenu-item {{ request()->is('bon-reception/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('bon-reception.list') }}"
+                            class="submenu-item {{ request()->is('bon-reception/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- MOUVEMENT DE STOCK MENU -->
+                <li class="has-submenu {{ request()->is('mvt-stock*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span class="menu-text">Mouvements Stock</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('mvt-stock*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('mvt-stock.list') }}"
+                            class="submenu-item {{ request()->is('mvt-stock/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
                 <div class="menu-divider"></div>
 
                 <li class="menu-title">Tiers</li>

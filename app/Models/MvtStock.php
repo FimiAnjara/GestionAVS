@@ -14,7 +14,22 @@ class MvtStock extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_mvt_stock', 'entree', 'sortie', 'date_', 'id_emplacement', 'id_article', 'id_stock'];
+    protected $fillable = ['id_mvt_stock', 'entree', 'sortie', 'date_', 'id_emplacement', 'id_article', 'id_stock', 'id_bonCommande', 'id_bonReception', 'date_expiration'];
+
+    protected $casts = [
+        'date_' => 'datetime',
+        'date_expiration' => 'date',
+    ];
+
+    public function bonCommande()
+    {
+        return $this->belongsTo(BonCommande::class, 'id_bonCommande', 'id_bonCommande');
+    }
+
+    public function bonReception()
+    {
+        return $this->belongsTo(BonReception::class, 'id_bonReception', 'id_bonReception');
+    }
 
     public function emplacement()
     {

@@ -14,7 +14,11 @@ class BonReceptionFille extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonReceptionFille', 'quantite', 'id_bonReception', 'id_article'];
+    protected $fillable = ['id_bonReceptionFille', 'quantite', 'id_bonReception', 'id_article', 'date_expiration'];
+
+    protected $casts = [
+        'date_expiration' => 'date',
+    ];
 
     public function bonReception()
     {
