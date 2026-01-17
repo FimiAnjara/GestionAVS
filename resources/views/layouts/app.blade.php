@@ -144,18 +144,21 @@
         <div class="sidebar-footer">
             <ul style="list-style: none; padding: 0; margin: 0;">
                 <li>
-                    <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}">
+                    <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}"
+                        title="Aide et support">
                         <i class="bi bi-question-circle"></i>
                         <span class="menu-text">Aide</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ url('/deconnexion') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                        title="Se déconnecter">
                         <i class="bi bi-box-arrow-right"></i>
                         <span class="menu-text">Déconnexion</span>
                     </a>
-                    <form id="logout-form" action="{{ url('/deconnexion') }}" method="POST" style="display: none;">
+                    <form id="logout-form" action="{{ url('/deconnexion') }}" method="POST"
+                        style="display: none;">
                         @csrf
                     </form>
                 </li>
