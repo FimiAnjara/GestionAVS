@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProformaFournisseur extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'proformaFournisseur';
     protected $primaryKey = 'id_proformaFournisseur';
     protected $keyType = 'string';

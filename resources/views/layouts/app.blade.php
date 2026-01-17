@@ -10,6 +10,7 @@
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
+
 <body>
     <nav id="sidebar">
         <div class="sidebar-header">
@@ -21,35 +22,54 @@
 
         <div class="sidebar-menu">
             <ul>
-                <li class="menu-title">Gestion</li>
-
                 <li>
-                    <a href="{{ route('categories.index') }}"
-                        class="{{ request()->is('categories*') ? 'active' : '' }}">
-                        <i class="bi bi-folder"></i>
-                        <span class="menu-text">Catégories</span>
-                        @php
-                            $categoryCount = \App\Models\Category::count();
-                        @endphp
-                        @if ($categoryCount > 0)
-                            <span class="sidebar-badge">{{ $categoryCount }}</span>
-                        @endif
+                    <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i>
+                        <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="{{ route('products.index') }}" class="{{ request()->is('products*') ? 'active' : '' }}">
-                        <i class="bi bi-folder"></i>
-                        <span class="menu-text">Produits</span>
-                        @php
-                            $productCount = \App\Models\Product::count();
-                        @endphp
-                        @if ($productCount > 0)
-                            <span class="sidebar-badge">{{ $productCount }}</span>
-                        @endif
-                    </a>
-                </li>
                 <div class="menu-divider"></div>
+
+                <li class="menu-title">Tiers</li>
+                <!-- CLIENT MENU -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-people"></i>
+                        <span class="menu-text">Clients</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="{{ route('clients.create') }}" class="submenu-item">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('clients.list') }}" class="submenu-item">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- FOURNISSEUR MENU -->
+                <li class="has-submenu">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-briefcase"></i>
+                        <span class="menu-text">Fournisseurs</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="{{ route('fournisseurs.create') }}" class="submenu-item">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('fournisseurs.list') }}" class="submenu-item">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <div class="menu-divider"></div>
+
                 <li>
                     <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}">
                         <i class="bi bi-question-circle"></i>
@@ -77,8 +97,7 @@
     </nav>
     <div id="content">
         <button type="button" id="sidebarCollapse" class="d-lg-none">
-            <i class="bi bi-list">aa</i>
-            <h2>hha</h2>
+            <i class="bi bi-list"></i>
         </button>
         <nav class="navbar navbar-expand-lg navbar-light navbar-top">
             <div class="container-fluid px-4">
@@ -207,6 +226,31 @@
 
     <!-- Scripts Sidebar -->
     <script>
+        // Toggle submenu
+        document.querySelectorAll('.toggle-submenu').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.closest('.has-submenu');
+                const submenu = parent.querySelector('.sidebar-submenu');
+
+                // Close other submenus
+                document.querySelectorAll('.has-submenu').forEach(function(menu) {
+                    if (menu !== parent) {
+                        menu.classList.remove('active');
+                        menu.querySelector('.sidebar-submenu').style.display = 'none';
+                    }
+                });
+
+                // Toggle current submenu
+                parent.classList.toggle('active');
+                if (submenu.style.display === 'none' || !submenu.style.display) {
+                    submenu.style.display = 'block';
+                } else {
+                    submenu.style.display = 'none';
+                }
+            });
+        });
+
         // Toggle sidebar sur mobile
         document.getElementById('sidebarCollapse').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');

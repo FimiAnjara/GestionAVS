@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MvtStock extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'mvt_stock';
     protected $primaryKey = 'id_mvt_stock';
     protected $keyType = 'string';

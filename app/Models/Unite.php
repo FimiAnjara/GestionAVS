@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Unite extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'unite';
     protected $primaryKey = 'id_unite';
     protected $keyType = 'string';

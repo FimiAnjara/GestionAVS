@@ -148,6 +148,15 @@ body {
     margin: 18px 0;
 }
 
+.sidebar-menu ul li.menu-title {
+    padding: 15px 30px 10px 30px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .menu-title {
     padding: 12px 20px;
     color: rgba(255, 255, 255, 0.5);
@@ -188,10 +197,26 @@ body {
     font-family: 'bootstrap-icons';
     margin-left: auto;
     transition: var(--transition);
+    transform: rotate(0deg);
 }
 
 .has-submenu.active>a::after {
     transform: rotate(180deg);
+}
+
+.submenu-item {
+    padding: 12px 50px !important;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.75) !important;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+}
+
+.submenu-item:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-left: 4px solid var(--white) !important;
 }
 
 .sidebar-footer {

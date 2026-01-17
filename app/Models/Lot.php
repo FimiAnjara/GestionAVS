@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lot extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'lot';
     protected $primaryKey = 'id_lot';
     protected $keyType = 'string';

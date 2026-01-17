@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ArticleFille extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'articleFille';
     protected $primaryKey = 'id_articleFille';
     protected $keyType = 'string';
