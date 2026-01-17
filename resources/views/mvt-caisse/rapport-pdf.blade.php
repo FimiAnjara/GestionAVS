@@ -155,8 +155,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>RAPPORT FINANCIER</h1>
-        <p>État des Caisses et Mouvements</p>
+        <h1>GROSSISTE</h1>
+        <p>Rapport des Mouvements Caisse</p>
     </div>
 
     <div class="date-report">
@@ -234,8 +234,8 @@
     @endif
 
     <div class="footer">
-        <p>Ce rapport a été généré automatiquement par le système de gestion financière.</p>
-        <p>Pour plus de détails ou des informations supplémentaires, veuillez consulter les mouvements détaillés des caisses.</p>
+        <p>Document généré le {{ now()->format('d/m/Y H:i') }}</p>
+        <p>GROSSISTE - Système de Gestion Commerciale</p>
     </div>
 </body>
 </html>

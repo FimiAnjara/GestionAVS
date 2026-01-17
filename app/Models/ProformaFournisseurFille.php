@@ -14,7 +14,7 @@ class ProformaFournisseurFille extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_proformaFornisseurFille', 'prix_achat', 'id_proformaFournisseur', 'id_article'];
+    protected $fillable = ['id_proformaFornisseurFille', 'prix_achat', 'quantite', 'id_proformaFournisseur', 'id_article'];
 
     public function proformaFournisseur()
     {

@@ -15,8 +15,8 @@
     <nav id="sidebar">
         <div class="sidebar-header">
             <h3 class="mb-0">
-                <i class="bi bi-layout-text-sidebar"></i>
-                <span class="ms-2">Mon App</span>
+                <i class="bi bi-shop"></i>
+                <span class="ms-2">GROSSISTE</span>
             </h3>
         </div>
 
@@ -186,6 +186,30 @@
                             class="submenu-item {{ request()->is('mvt-caisse/etat*') ? 'active' : '' }}">
                             <i class="bi bi-graph-up"></i>
                             <span>Etat</span>
+                        </a>
+                    </div>
+                </li>
+
+                <div class="menu-divider"></div>
+
+                <li class="menu-title">Achats</li>
+                <!-- PROFORMA FOURNISSEUR MENU -->
+                <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-check"></i>
+                        <span class="menu-text">Proforma</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('proforma-fournisseur.create') }}"
+                            class="submenu-item {{ request()->is('proforma-fournisseur/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('proforma-fournisseur.list') }}"
+                            class="submenu-item {{ request()->is('proforma-fournisseur/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
                         </a>
                     </div>
                 </li>

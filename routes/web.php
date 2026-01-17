@@ -7,6 +7,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\UniteController;
 use App\Http\Controllers\CaisseController;
 use App\Http\Controllers\MvtCaisseController;
+use App\Http\Controllers\ProformaFournisseurController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -96,6 +97,17 @@ Route::prefix('mvt-caisse')->group(function () {
     Route::delete('/{id}', [MvtCaisseController::class, 'destroy'])->name('mvt-caisse.destroy');
     Route::get('/etat/rapport', [MvtCaisseController::class, 'etat'])->name('mvt-caisse.etat');
     Route::get('/etat/export-pdf', [MvtCaisseController::class, 'exportPdf'])->name('mvt-caisse.export-pdf');
+});
+
+// Routes Proforma Fournisseur (Achats)
+Route::prefix('proforma-fournisseur')->group(function () {
+    Route::get('/list', [ProformaFournisseurController::class, 'list'])->name('proforma-fournisseur.list');
+    Route::get('/create', [ProformaFournisseurController::class, 'create'])->name('proforma-fournisseur.create');
+    Route::post('/', [ProformaFournisseurController::class, 'store'])->name('proforma-fournisseur.store');
+    Route::get('/{id}', [ProformaFournisseurController::class, 'show'])->name('proforma-fournisseur.show');
+    Route::get('/{id}/export-pdf', [ProformaFournisseurController::class, 'exportPdf'])->name('proforma-fournisseur.exportPdf');
+    Route::post('/{id}/etat', [ProformaFournisseurController::class, 'changerEtat'])->name('proforma-fournisseur.etat');
+    Route::delete('/{id}', [ProformaFournisseurController::class, 'destroy'])->name('proforma-fournisseur.destroy');
 });
 
 Route::get('/about', function () {

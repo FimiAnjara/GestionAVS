@@ -14,7 +14,11 @@ class ProformaFournisseur extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_proformaFournisseur', 'date_', 'etat', 'id_fournisseur'];
+    protected $fillable = ['id_proformaFournisseur', 'date_', 'etat', 'description', 'id_fournisseur'];
+
+    protected $casts = [
+        'date_' => 'datetime',
+    ];
 
     public function fournisseur()
     {
@@ -24,6 +28,28 @@ class ProformaFournisseur extends Model
     public function proformaFournisseurFille()
     {
         return $this->hasMany(ProformaFournisseurFille::class, 'id_proformaFournisseur', 'id_proformaFournisseur');
+    }
+
+    public function getEtatLabelAttribute()
+    {
+        $etats = [
+            1 => 'Créée',
+            5 => 'Validée par Finance',
+            11 => 'Validée par DG',
+            0 => 'Annulée',
+        ];
+        return $etats[$this->etat] ?? 'Inconnu';
+    }
+
+    public function getEtatBadgeAttribute()
+    {
+        $badges = [
+            1 => 'warning',
+            5 => 'info',
+            11 => 'success',
+            0 => 'danger',
+        ];
+        return $badges[$this->etat] ?? 'secondary';
     }
 
     public function bonCommande()
