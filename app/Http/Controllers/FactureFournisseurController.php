@@ -72,17 +72,21 @@ class FactureFournisseurController extends Controller
         $request->validate([
             'date_' => 'required|date',
             'id_bonCommande' => 'required|exists:bonCommande,id_bonCommande',
+            'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
             'description' => 'nullable|string',
+            'articles' => 'required|array',
+            'articles.*.id_article' => 'required|exists:article,id_article',
+            'articles.*.quantite' => 'required|numeric|min:0.01',
+            'articles.*.prix' => 'required|numeric|min:0',
         ]);
 
         $id = 'FACT_' . uniqid();
-        
-        // Ajouter les articles du bon de commande pour calculer le total
         $bonCommande = BonCommande::find($request->id_bonCommande);
-        $montant_total = 0;
         
-        foreach ($bonCommande->bonCommandeFille as $article) {
-            $montant_total += $article->quantite * $article->prix_achat;
+        // Calculate total from submitted articles
+        $montant_total = 0;
+        foreach ($request->articles as $article) {
+            $montant_total += $article['quantite'] * $article['prix'];
         }
         
         $facture = FactureFournisseur::create([
@@ -95,18 +99,18 @@ class FactureFournisseurController extends Controller
             'montant_paye' => 0,
         ]);
 
-        // Ajouter les articles du bon de commande
-        foreach ($bonCommande->bonCommandeFille as $article) {
+        // Add submitted articles
+        foreach ($request->articles as $index => $article) {
             FactureFournisseurFille::create([
                 'id_factureFournisseurFille' => 'FACTF_' . uniqid(),
                 'id_factureFournisseur' => $id,
-                'id_article' => $article->id_article,
-                'quantite' => $article->quantite,
-                'prix_achat' => $article->prix_achat,
+                'id_article' => $article['id_article'],
+                'quantite' => $article['quantite'],
+                'prix_achat' => $article['prix'],
             ]);
         }
 
-        // Mettre à jour le bon de commande
+        // Update bon de commande
         $bonCommande->update(['id_factureFournisseur' => $id]);
 
         return redirect()->route('facture-fournisseur.show', $id)->with('success', 'Facture créée avec succès');
