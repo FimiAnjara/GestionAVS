@@ -224,6 +224,35 @@
 
                 <div class="menu-divider"></div>
 
+                <li class="menu-title">Magasin</li>
+                <!-- MAGASIN MENU -->
+                <li class="has-submenu {{ request()->is('magasin*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-shop-window"></i>
+                        <span class="menu-text">Magasin</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('magasin.create') }}"
+                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('magasin.list') }}"
+                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                        <a href="{{ route('magasin.carte') }}"
+                            class="submenu-item {{ request()->is('magasin/carte') ? 'active' : '' }}">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Voir Carte</span>
+                        </a>
+                    </div>
+                </li>
+
+                <div class="menu-divider"></div>
+
                 <li class="menu-title">Finance</li>
                 <!-- CAISSE MENU -->
                 <li class="has-submenu {{ request()->is('caisse*') ? 'active' : '' }}">
