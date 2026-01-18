@@ -57,7 +57,7 @@ class FactureFournisseurController extends Controller
                 return back()->withErrors(['facture' => 'Une facture existe déjà pour ce bon de commande']);
             }
 
-        return view('facture-fournisseur.create', compact('bonCommande'));
+            return view('facture-fournisseur.create', compact('bonCommande'));
         }
         
         // Si aucun ID n'est fourni, afficher la liste des bons de commande disponibles
