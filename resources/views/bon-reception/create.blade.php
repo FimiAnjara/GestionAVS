@@ -24,29 +24,63 @@
                 @csrf
                 
                 <div class="row mb-3">
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <label for="date_" class="form-label">Date <span class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('date_') is-invalid @enderror" 
                             id="date_" name="date_" value="{{ old('date_', now()->format('Y-m-d')) }}" required>
                         @error('date_') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <label for="id_bonCommande" class="form-label">Bon de Commande <span class="text-danger">*</span></label>
                         <select class="form-select select2-commande @error('id_bonCommande') is-invalid @enderror" 
                             id="id_bonCommande" name="id_bonCommande" required>
                             <option value="">-- Sélectionner --</option>
                             @foreach ($bonCommandes as $bc)
                                 <option value="{{ $bc->id_bonCommande }}"
+                                    data-fournisseur="{{ $bc->proformaFournisseur?->fournisseur?->id_fournisseur }}"
+                                    data-fournisseur-nom="{{ $bc->proformaFournisseur?->fournisseur?->nom }}"
+                                    data-articles="{{ json_encode($bc->bonCommandeFille->map(function($item) { return ['id_article' => $item->id_article, 'quantite' => $item->quantite, 'nom' => $item->article?->nom ?? $item->id_article]; })->toArray()) }}"
                                     {{ old('id_bonCommande') == $bc->id_bonCommande ? 'selected' : '' }}>
                                     {{ $bc->id_bonCommande }} - {{ $bc->proformaFournisseur->fournisseur->nom }}
                                 </option>
                             @endforeach
                         </select>
-                        <small class="text-muted">Seuls les bons validés par DG (état ≥ 11) sont affichés</small>
+                        <small class="text-muted">Seuls les bons validés</small>
                         @error('id_bonCommande') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
+                    
+                    <div class="col-lg-3">
+                        <label for="id_fournisseur" class="form-label">Fournisseur <span class="text-danger">*</span></label>
+                        <select class="form-select select2-fournisseur @error('id_fournisseur') is-invalid @enderror" 
+                            id="id_fournisseur" name="id_fournisseur" required>
+                            <option value="">-- Sélectionner --</option>
+                            @foreach ($fournisseurs ?? [] as $fournisseur)
+                                <option value="{{ $fournisseur->id_fournisseur }}" {{ old('id_fournisseur') == $fournisseur->id_fournisseur ? 'selected' : '' }}>
+                                    {{ $fournisseur->nom }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_fournisseur') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <label for="id_magasin" class="form-label">Magasin <span class="text-danger">*</span></label>
+                        <select class="form-select select2-magasin @error('id_magasin') is-invalid @enderror" 
+                            id="id_magasin" name="id_magasin" required>
+                            <option value="">-- Sélectionner --</option>
+                            @foreach ($magasins ?? [] as $mag)
+                                <option value="{{ $mag->id_magasin }}" {{ old('id_magasin') == $mag->id_magasin ? 'selected' : '' }}>
+                                    {{ $mag->nom ?? $mag->designation }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_magasin') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
                 </div>
+                
+                <!-- État caché -->
+                <input type="hidden" name="etat" id="etat" value="1">
                 
                 <!-- Articles -->
                 <div class="mb-4">
@@ -107,9 +141,80 @@
     
     <script>
         $(document).ready(function() {
-            $('.select2-commande, .select2-article').select2({
+            $('.select2-commande, .select2-article, .select2-magasin, .select2-fournisseur').select2({
                 language: 'fr',
                 width: '100%',
+            });
+            
+            // Quand on sélectionne un bon de commande
+            $('#id_bonCommande').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const idFournisseur = selectedOption.data('fournisseur');
+                const articles = selectedOption.data('articles');
+                
+                console.log('Articles reçus:', articles);
+                
+                // Remplir le fournisseur avec Select2
+                if (idFournisseur) {
+                    $('#id_fournisseur').val(idFournisseur).trigger('change');
+                } else {
+                    $('#id_fournisseur').val('').trigger('change');
+                }
+                
+                // Remplir les articles
+                if (articles && articles.length > 0) {
+                    const container = document.getElementById('articles-container');
+                    container.innerHTML = ''; // Vider le conteneur
+                    
+                    articles.forEach((article, index) => {
+                        const articleRow = document.createElement('div');
+                        articleRow.className = 'article-row mb-3 p-3 border rounded';
+                        articleRow.setAttribute('data-row', index);
+                        articleRow.innerHTML = `
+                            <div class="row g-2">
+                                <div class="col-lg-5">
+                                    <label class="form-label">Article</label>
+                                    <select class="form-select select2-article" name="articles[${index}][id_article]" required>
+                                        <option value="${article.id_article}" selected>
+                                            ${article.id_article} - ${article.nom}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label class="form-label">Quantité</label>
+                                    <input type="number" class="form-control" name="articles[${index}][quantite]" 
+                                        value="${article.quantite}" min="1" step="0.01" required>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label class="form-label">Date Expiration</label>
+                                    <input type="date" class="form-control" name="articles[${index}][date_expiration]">
+                                </div>
+                                <div class="col-lg-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger btn-sm btn-remove-article w-100" style="display:${articles.length > 1 ? 'block' : 'none'};">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(articleRow);
+                        
+                        // Initialiser Select2 pour ce nouveau select
+                        $(articleRow).find('.select2-article').select2({
+                            language: 'fr',
+                            width: '100%',
+                        });
+                        
+                        // Ajouter écouteur pour suppression
+                        articleRow.querySelector('.btn-remove-article').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            articleRow.remove();
+                            updateRemoveButtons();
+                        });
+                    });
+                    
+                    rowCount = articles.length;
+                    updateRemoveButtons();
+                }
             });
         });
         
@@ -117,33 +222,50 @@
         
         document.getElementById('btn-add-article').addEventListener('click', function() {
             const container = document.getElementById('articles-container');
-            const newRow = document.querySelector('.article-row').cloneNode(true);
-            
+            const newRow = document.createElement('div');
+            newRow.className = 'article-row mb-3 p-3 border rounded';
             newRow.setAttribute('data-row', rowCount);
-            newRow.querySelectorAll('input, select').forEach(input => {
-                const name = input.name.replace(/\[\d+\]/, '[' + rowCount + ']');
-                input.name = name;
-                input.value = '';
-            });
-            
-            const newSelect = newRow.querySelector('.select2-article');
-            if (newSelect) {
-                newSelect.className = 'form-select select2-article';
-            }
-            
-            newRow.querySelectorAll('.btn-remove-article').forEach(btn => {
-                btn.style.display = 'block';
-                btn.addEventListener('click', function() {
-                    newRow.remove();
-                    updateRemoveButtons();
-                });
-            });
+            newRow.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-lg-5">
+                        <label class="form-label">Article</label>
+                        <select class="form-select select2-article" name="articles[${rowCount}][id_article]" required>
+                            <option value="">-- Sélectionner --</option>
+                            @foreach ($articles as $article)
+                                <option value="{{ $article->id_article }}">
+                                    {{ $article->id_article }} - {{ $article->nom }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="form-label">Quantité</label>
+                        <input type="number" class="form-control" name="articles[${rowCount}][quantite]" 
+                            placeholder="0" min="1" step="0.01" required>
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="form-label">Date Expiration</label>
+                        <input type="date" class="form-control" name="articles[${rowCount}][date_expiration]">
+                    </div>
+                    <div class="col-lg-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-article w-100" style="display:none;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
             
             container.appendChild(newRow);
             
             $(newRow).find('.select2-article').select2({
                 language: 'fr',
                 width: '100%',
+            });
+            
+            newRow.querySelector('.btn-remove-article').addEventListener('click', function(e) {
+                e.preventDefault();
+                newRow.remove();
+                updateRemoveButtons();
             });
             
             rowCount++;
@@ -160,7 +282,8 @@
         
         updateRemoveButtons();
         document.querySelectorAll('.btn-remove-article').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
                 this.closest('.article-row').remove();
                 updateRemoveButtons();
             });

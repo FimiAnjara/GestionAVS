@@ -150,15 +150,28 @@ Route::prefix('bon-reception')->group(function () {
     Route::get('/{id}', [BonReceptionController::class, 'show'])->name('bon-reception.show');
     Route::get('/{id}/export-pdf', [BonReceptionController::class, 'exportPdf'])->name('bon-reception.exportPdf');
     Route::post('/{id}/recevoir', [BonReceptionController::class, 'recevoir'])->name('bon-reception.recevoir');
+    Route::post('/{id}/valider', [BonReceptionController::class, 'valider'])->name('bon-reception.valider');
+    Route::post('/{id}/annuler', [BonReceptionController::class, 'annuler'])->name('bon-reception.annuler');
     Route::delete('/{id}', [BonReceptionController::class, 'destroy'])->name('bon-reception.destroy');
 });
 
 // Routes Mouvement de Stock
 Route::prefix('mvt-stock')->group(function () {
     Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
+    Route::get('/create', [MvtStockController::class, 'create'])->name('mvt-stock.create');
+    Route::post('/', [MvtStockController::class, 'store'])->name('mvt-stock.store');
     Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
     Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
 });
+
+// Détails des mouvements (articles enfants)
+Route::get('/stock/details', [MvtStockController::class, 'details'])->name('stock.details');
+
+// Alias pour l'état/etat des stocks (pointe vers la liste des mouvements)
+Route::get('/stock/list', [MvtStockController::class, 'list'])->name('stock.list');
+
+// État du stock par magasin
+Route::get('/stock/etat', [MvtStockController::class, 'etat'])->name('stock.etat');
 
 // Routes Magasin
 Route::prefix('magasin')->group(function () {

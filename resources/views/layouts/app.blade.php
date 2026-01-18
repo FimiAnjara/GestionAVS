@@ -116,22 +116,6 @@
                     </div>
                 </li>
 
-                <!-- MOUVEMENT DE STOCK MENU -->
-                <li class="has-submenu {{ request()->is('mvt-stock*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-arrow-left-right"></i>
-                        <span class="menu-text">Mouvements Stock</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('mvt-stock*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('mvt-stock.list') }}"
-                            class="submenu-item {{ request()->is('mvt-stock/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                    </div>
-                </li>
-
                 <div class="menu-divider"></div>
 
                 <li class="menu-title">Tiers</li>
@@ -197,6 +181,37 @@
                             class="submenu-item {{ request()->is('articles/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- MOUVEMENT DE STOCK MENU -->
+                <li class="has-submenu {{ request()->is('mvt-stock*') || request()->is('stock*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span class="menu-text">Gestion Stock</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('mvt-stock*') || request()->is('stock*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('mvt-stock.create') }}"
+                            class="submenu-item {{ request()->is('mvt-stock/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('mvt-stock.list') }}"
+                            class="submenu-item {{ request()->is('mvt-stock/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                        <a href="{{ route('stock.details') }}"
+                            class="submenu-item {{ request()->is('stock/details') ? 'active' : '' }}">
+                            <i class="bi bi-list-check"></i>
+                            <span>Détails</span>
+                        </a>
+                        <a href="{{ route('stock.etat') }}"
+                            class="submenu-item {{ request()->is('stock/etat') || request()->is('stock*') ? 'active' : '' }}">
+                            <i class="bi bi-boxes"></i>
+                            <span>Etat</span>
                         </a>
                     </div>
                 </li>

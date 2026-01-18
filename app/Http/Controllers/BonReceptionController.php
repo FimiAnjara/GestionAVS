@@ -9,6 +9,8 @@ use App\Models\MvtStock;
 use App\Models\Article;
 use App\Models\Emplacement;
 use App\Models\Stock;
+use App\Models\Fournisseur;
+use App\Models\Magasin;
 use Illuminate\Http\Request;
 use PDF;
 
@@ -46,11 +48,13 @@ class BonReceptionController extends Controller
      */
     public function create(Request $request)
     {
-        $bonCommandes = BonCommande::where('etat', '>=', 11)->with('proformaFournisseur.fournisseur')->get();
+        $bonCommandes = BonCommande::where('etat', '>=', 11)->with('proformaFournisseur.fournisseur', 'bonCommandeFille.article')->get();
         $articles = Article::all();
+        $fournisseurs = Fournisseur::where('deleted_at', null)->get();
+        $magasins = Magasin::where('deleted_at', null)->get();
         $emplacements = Emplacement::all();
         
-        return view('bon-reception.create', compact('bonCommandes', 'articles', 'emplacements'));
+        return view('bon-reception.create', compact('bonCommandes', 'articles', 'fournisseurs', 'magasins', 'emplacements'));
     }
     
     /**
@@ -61,6 +65,8 @@ class BonReceptionController extends Controller
         $request->validate([
             'date_' => 'required|date',
             'id_bonCommande' => 'required|exists:bonCommande,id_bonCommande',
+            'id_magasin' => 'required|exists:magasin,id_magasin',
+            'etat' => 'required|in:1,11,0',
             'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
             'articles.*.quantite' => 'required|numeric|min:1',
@@ -68,11 +74,18 @@ class BonReceptionController extends Controller
         ]);
         
         $id = 'BR_' . uniqid();
+        
+        // Récupérer le fournisseur du bon de commande
+        $bonCommande = BonCommande::with('proformaFournisseur.fournisseur')->findOrFail($request->id_bonCommande);
+        $idFournisseur = $bonCommande->proformaFournisseur?->fournisseur?->id_fournisseur;
+        
         $bonReception = BonReception::create([
             'id_bonReception' => $id,
             'date_' => $request->date_,
-            'etat' => 1,
+            'etat' => $request->etat ?? 1,
             'id_bonCommande' => $request->id_bonCommande,
+            'id_fournisseur' => $idFournisseur,
+            'id_magasin' => $request->id_magasin,
         ]);
         
         // Ajouter les articles
@@ -152,6 +165,38 @@ class BonReceptionController extends Controller
         $bonReception->update(['etat' => 11]);
         
         return back()->with('success', 'Mouvements de stock créés et bon réceptionné');
+    }
+    
+    /**
+     * Valider un bon de réception (état 1 -> 11)
+     */
+    public function valider($id)
+    {
+        $bonReception = BonReception::findOrFail($id);
+        
+        if ($bonReception->etat != 1) {
+            return back()->withErrors(['etat' => 'Seuls les bons créés peuvent être validés']);
+        }
+        
+        $bonReception->update(['etat' => 11]);
+        
+        return back()->with('success', 'Bon de réception validé');
+    }
+    
+    /**
+     * Annuler un bon de réception (état 1|11 -> 0)
+     */
+    public function annuler($id)
+    {
+        $bonReception = BonReception::findOrFail($id);
+        
+        if ($bonReception->etat == 0) {
+            return back()->withErrors(['etat' => 'Ce bon est déjà annulé']);
+        }
+        
+        $bonReception->update(['etat' => 0]);
+        
+        return back()->with('success', 'Bon de réception annulé');
     }
     
     /**

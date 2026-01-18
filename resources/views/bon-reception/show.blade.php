@@ -9,6 +9,33 @@
     <a href="{{ route('bon-reception.exportPdf', $bonReception->id_bonReception) }}" class="btn btn-success" target="_blank">
         <i class="bi bi-file-pdf me-2"></i>Exporter PDF
     </a>
+    
+    @if ($bonReception->etat == 1)
+        <form action="{{ route('bon-reception.valider', $bonReception->id_bonReception) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>Valider
+            </button>
+        </form>
+        <form action="{{ route('bon-reception.annuler', $bonReception->id_bonReception) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-x-circle me-2"></i>Annuler
+            </button>
+        </form>
+    @elseif ($bonReception->etat == 11)
+        <a href="{{ route('mvt-stock.create', ['from_bon_reception' => $bonReception->id_bonReception]) }}" class="btn btn-info">
+            <i class="bi bi-arrow-repeat me-2"></i>Générer Mouvement de Stock
+        </a>
+        <form action="{{ route('bon-reception.annuler', $bonReception->id_bonReception) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-x-circle me-2"></i>Annuler
+            </button>
+        </form>
+    @elseif ($bonReception->etat == 0)
+        <span class="badge bg-danger fs-6">Annulé</span>
+    @endif
 @endsection
 
 @section('content')
@@ -63,21 +90,6 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    @if ($bonReception->etat == 1)
-                        <form action="{{ route('bon-reception.recevoir', $bonReception->id_bonReception) }}"
-                            method="POST" class="mb-3">
-                            @csrf
-                            <button type="submit" class="btn btn-success w-100 mb-2" onclick="return confirm('Confirmer la réception et générer les mouvements de stock ?')">
-                                <i class="bi bi-check-circle me-2"></i>Réceptionner
-                            </button>
-                        </form>
-                    @else
-                        <div class="alert alert-info mb-2">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <small>Ce bon est déjà réceptionné</small>
-                        </div>
-                    @endif
-
                     <form action="{{ route('bon-reception.destroy', $bonReception->id_bonReception) }}" method="POST">
                         @csrf
                         @method('DELETE')
@@ -95,11 +107,11 @@
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3">
             <h6 class="mb-0">
-                <i class="bi bi-box-seam me-2"></i>Articles Reçus ({{ $bonReception->articles->count() }})
+                <i class="bi bi-box-seam me-2"></i>Articles Reçus ({{ $bonReception->bonReceptionFille->count() }})
             </h6>
         </div>
         <div class="card-body p-0">
-            @if ($bonReception->articles->count() > 0)
+            @if ($bonReception->bonReceptionFille->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
@@ -111,7 +123,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($bonReception->articles as $article)
+                            @foreach ($bonReception->bonReceptionFille as $article)
                                 <tr>
                                     <td>
                                         <div>
@@ -151,45 +163,4 @@
             @endif
         </div>
     </div>
-
-    <!-- Mouvements de Stock Générés -->
-    @if ($bonReception->mouvementsStock()->count() > 0)
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header bg-light border-0 py-3">
-                <h6 class="mb-0">
-                    <i class="bi bi-arrow-left-right me-2"></i>Mouvements de Stock Générés
-                </h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID Mouvement</th>
-                                <th>Article</th>
-                                <th class="text-center">Entrée</th>
-                                <th>Emplacement</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($bonReception->mouvementsStock as $mvt)
-                                <tr>
-                                    <td>
-                                        <strong class="text-primary">{{ $mvt->id_mvt_stock }}</strong>
-                                    </td>
-                                    <td>{{ $mvt->article->nom }}</td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success">{{ number_format($mvt->entree, 2, ',', ' ') }}</span>
-                                    </td>
-                                    <td>{{ $mvt->emplacement->libelle }}</td>
-                                    <td><small>{{ $mvt->date_->format('d/m/Y H:i') }}</small></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    @endif
 @endsection

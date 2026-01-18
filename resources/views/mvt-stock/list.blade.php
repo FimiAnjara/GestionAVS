@@ -2,167 +2,188 @@
 
 @section('title', 'Mouvements de Stock')
 
+@section('header-buttons')
+    <div class="d-flex gap-2">
+        <a href="{{ route('mvt-stock.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nouveau Mouvement
+        </a>
+    </div>
+@endsection
+
 @section('content')
-    <!-- Filtres -->
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3">
-            <h6 class="mb-0">
-                <i class="bi bi-funnel me-2"></i>Filtres et Recherche
-            </h6>
-        </div>
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('mvt-stock.list') }}" class="row g-2 align-items-end">
-                <div class="col-lg-2">
-                    <label for="id" class="form-label">ID Mouvement</label>
-                    <input type="text" class="form-control form-control-sm" id="id" name="id"
-                        placeholder="MVT_..." value="{{ request('id') }}">
+            <h5 class="mb-3">
+                <i class="bi bi-arrow-left-right me-2" style="color: #0056b3;"></i>
+                Mouvements de Stock
+            </h5>
+            <!-- Filtres -->
+            <form class="row g-2" method="GET" action="{{ route('mvt-stock.list') }}">
+                <div class="col-md-2">
+                    <input type="text" name="id_mvt_stock" class="form-control form-control-sm" placeholder="ID Mvt" value="{{ request('id_mvt_stock') }}">
                 </div>
-
-                <div class="col-lg-2">
-                    <label for="date_from" class="form-label">De</label>
-                    <input type="date" class="form-control form-control-sm" id="date_from" name="date_from"
-                        value="{{ request('date_from') }}">
+                <div class="col-md-2">
+                    <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
                 </div>
-
-                <div class="col-lg-2">
-                    <label for="date_to" class="form-label">À</label>
-                    <input type="date" class="form-control form-control-sm" id="date_to" name="date_to"
-                        value="{{ request('date_to') }}">
+                <div class="col-md-2">
+                    <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
                 </div>
-
-                <div class="col-lg-3">
-                    <label for="id_article" class="form-label">Article</label>
-                    <select class="form-select form-select-sm select2-select" id="id_article" name="id_article">
-                        <option value="">-- Tous --</option>
-                        @foreach ($articles as $article)
-                            <option value="{{ $article->id_article }}"
-                                {{ request('id_article') == $article->id_article ? 'selected' : '' }}>
-                                {{ $article->id_article }} - {{ $article->nom }}
+                <div class="col-md-2">
+                    <select name="id_magasin" class="form-select form-select-sm">
+                        <option value="">-- Tous les magasins --</option>
+                        @foreach($magasins as $mag)
+                            <option value="{{ $mag->id_magasin }}" @selected(request('id_magasin') == $mag->id_magasin)>
+                                {{ $mag->nom ?? $mag->designation }}
                             </option>
                         @endforeach
                     </select>
                 </div>
-
-                <div class="col-lg-2">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                            <i class="bi bi-search me-2"></i>Rechercher
-                        </button>
-                        <a href="{{ route('mvt-stock.list') }}" class="btn btn-secondary btn-sm" title="Réinitialiser les filtres">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </a>
-                    </div>
+                <div class="col-md-2">
+                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Description" value="{{ request('description') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm btn-primary w-100">
+                        <i class="bi bi-search me-1"></i>Filtrer
+                    </button>
                 </div>
             </form>
         </div>
-    </div>
-
-    <!-- Liste des Mouvements -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-light border-0 py-3">
-            <h6 class="mb-0">
-                <i class="bi bi-list me-2"></i>Mouvements de Stock ({{ $mouvements->total() }} total)
-            </h6>
-        </div>
         <div class="card-body p-0">
-            @if ($mouvements->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Date</th>
-                                <th>Article</th>
-                                <th class="text-center">Entrée</th>
-                                <th class="text-center">Sortie</th>
-                                <th>Emplacement</th>
-                                <th>Expiration</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($mouvements as $mvt)
-                                <tr>
-                                    <td>
-                                        <strong class="text-primary">{{ $mvt->id_mvt_stock }}</strong>
-                                    </td>
-                                    <td>
-                                        <small>{{ $mvt->date_->format('d/m/Y H:i') }}</small>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <strong class="d-block">{{ $mvt->article->nom }}</strong>
-                                            <small class="text-muted">{{ $mvt->id_article }}</small>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($mvt->entree > 0)
-                                            <span class="badge bg-success">{{ number_format($mvt->entree, 2, ',', ' ') }}</span>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($mvt->sortie > 0)
-                                            <span class="badge bg-danger">{{ number_format($mvt->sortie, 2, ',', ' ') }}</span>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <small>{{ $mvt->emplacement->libelle }}</small>
-                                    </td>
-                                    <td>
-                                        @if ($mvt->date_expiration)
-                                            <span class="badge bg-warning text-dark">
-                                                {{ \Carbon\Carbon::parse($mvt->date_expiration)->format('d/m/Y') }}
-                                            </span>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('mvt-stock.show', $mvt->id_mvt_stock) }}"
-                                            class="btn btn-info btn-sm" title="Voir">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('mvt-stock.exportPdf', $mvt->id_mvt_stock) }}"
-                                            class="btn btn-success btn-sm" title="Exporter PDF" target="_blank">
-                                            <i class="bi bi-file-pdf"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+            @if($mouvements->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="mvtTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%"></th>
+                            <th>ID Mouvement</th>
+                            <th>Date</th>
+                            <th>Magasin</th>
+                            <th>Description</th>
+                            <th class="text-end">Montant Total</th>
+                            <th class="text-center">Articles</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($mouvements as $mvt)
+                        <tr class="mvt-row" data-mvt-id="{{ $mvt->id_mvt_stock }}">
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-primary toggle-details" 
+                                        title="Voir/Masquer les articles">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </td>
+                            <td><strong>{{ $mvt->id_mvt_stock }}</strong></td>
+                            <td>{{ $mvt->date_?->format('d/m/Y H:i') ?? 'N/A' }}</td>
+                            <td>{{ $mvt->magasin?->nom ?? $mvt->magasin?->designation ?? 'N/A' }}</td>
+                            <td>{{ Str::limit($mvt->description, 30) ?? '-' }}</td>
+                            <td class="text-end">
+                                <span class="badge bg-info">{{ number_format($mvt->montant_total, 0) }} Ar</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ $mvt->mvtStockFille?->count() ?? 0 }}</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ route('mvt-stock.show', $mvt->id_mvt_stock) }}" class="btn btn-sm btn-info" title="Voir les détails">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Ligne détails (cachée par défaut) -->
+                        <tr class="details-row" data-mvt-id="{{ $mvt->id_mvt_stock }}" style="display: none;">
+                            <td colspan="8">
+                                <div class="p-3 bg-light">
+                                    <h6 class="mb-3"><i class="bi bi-list-check me-2"></i>Articles du mouvement</h6>
+                                    @if($mvt->mvtStockFille->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Article</th>
+                                                    <th class="text-center">Entrée</th>
+                                                    <th class="text-center">Sortie</th>
+                                                    <th class="text-center">Prix Unit.</th>
+                                                    <th class="text-end">Montant (Ar)</th>
+                                                    <th>Date Exp.</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($mvt->mvtStockFille as $fille)
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ $fille->article?->id_article }}</strong><br>
+                                                        <small class="text-muted">{{ $fille->article?->designation }}</small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-success">{{ $fille->entree }}</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-danger">{{ $fille->sortie }}</span>
+                                                    </td>
+                                                    <td class="text-center">{{ number_format($fille->prix_unitaire, 0) }} Ar</td>
+                                                    <td class="text-end">
+                                                        <strong>{{ number_format($fille->entree * $fille->prix_unitaire, 0) }} Ar</strong>
+                                                    </td>
+                                                    <td>
+                                                        @if($fille->date_expiration)
+                                                            {{ $fille->date_expiration->format('d/m/Y') }}
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @else
+                                    <div class="alert alert-info mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>Aucun article pour ce mouvement
+                                    </div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Pagination -->
-                <div class="p-3 border-top d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
-                        Affichage de {{ $mouvements->firstItem() }} à {{ $mouvements->lastItem() }} sur {{ $mouvements->total() }} mouvements
-                    </small>
-                    <nav aria-label="pagination">
-                        {{ $mouvements->links() }}
-                    </nav>
-                </div>
+            <!-- Pagination -->
+            <div class="card-footer bg-light">
+                {{ $mouvements->links() }}
+            </div>
             @else
-                <div class="text-center py-5">
-                    <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
-                    <p class="text-muted">Aucun mouvement de stock trouvé</p>
-                </div>
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-inbox me-2"></i>Aucun mouvement de stock enregistré
+            </div>
             @endif
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $('.select2-select').select2({
-                    language: 'fr',
-                    width: '100%'
-                });
-            });
-        </script>
-    @endpush
+    <script>
+    $(document).ready(function() {
+        // Toggle détails
+        $('.toggle-details').on('click', function(e) {
+            e.preventDefault();
+            const mvtId = $(this).closest('.mvt-row').data('mvt-id');
+            const detailsRow = $('tr.details-row[data-mvt-id="' + mvtId + '"]');
+            const icon = $(this).find('i');
+            
+            // Vérifier l'état AVANT toggle
+            const isHidden = detailsRow.is(':hidden');
+            
+            detailsRow.slideToggle(300);
+            
+            // Changer l'icône après toggle
+            setTimeout(function() {
+                if (isHidden) {
+                    icon.removeClass('bi-plus').addClass('bi-dash');
+                } else {
+                    icon.removeClass('bi-dash').addClass('bi-plus');
+                }
+            }, 150);
+        });
+    });
+    </script>
 @endsection

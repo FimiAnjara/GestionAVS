@@ -14,7 +14,7 @@ class BonReception extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonReception', 'date_', 'id_bonCommande', 'etat'];
+    protected $fillable = ['id_bonReception', 'date_', 'id_bonCommande', 'id_fournisseur', 'id_magasin', 'etat'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -43,6 +43,16 @@ class BonReception extends Model
     public function bonCommande()
     {
         return $this->belongsTo(BonCommande::class, 'id_bonCommande', 'id_bonCommande');
+    }
+    
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class, 'id_fournisseur', 'id_fournisseur');
+    }
+    
+    public function magasin()
+    {
+        return $this->belongsTo(Magasin::class, 'id_magasin', 'id_magasin');
     }
 
     public function bonReceptionFille()

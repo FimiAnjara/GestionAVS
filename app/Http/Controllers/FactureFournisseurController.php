@@ -72,9 +72,8 @@ class FactureFournisseurController extends Controller
         $request->validate([
             'date_' => 'required|date',
             'id_bonCommande' => 'required|exists:bonCommande,id_bonCommande',
-            'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
             'description' => 'nullable|string',
-            'articles' => 'required|array',
+            'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
             'articles.*.quantite' => 'required|numeric|min:0.01',
             'articles.*.prix' => 'required|numeric|min:0',

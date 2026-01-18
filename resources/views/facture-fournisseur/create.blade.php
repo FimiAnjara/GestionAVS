@@ -11,152 +11,138 @@
 @endsection
 
 @section('content')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #dee2e6;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-top: 5px;
+            color: #212529;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+    </style>
+
     @if($bonCommande)
     <!-- Formulaire de Création avec Bon de Commande -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-file-earmark me-2"></i>Nouvelle Facture Fournisseur
-                    </h5>
-                </div>
-                <div class="card-body p-4">
-                    <form id="factureForm" method="POST" action="{{ route('facture-fournisseur.store') }}">
-                        @csrf
-                        
-                        <!-- Bon de Commande -->
-                        <div class="mb-4">
-                            <label class="form-label">
-                                <i class="bi bi-receipt me-2"></i><strong>Bon de Commande</strong>
-                            </label>
-                            <input type="text" class="form-control" value="{{ $bonCommande->id_bonCommande }}" disabled>
-                            <input type="hidden" name="id_bonCommande" value="{{ $bonCommande->id_bonCommande }}">
-                        </div>
-
-                        <!-- Fournisseur -->
-                        <div class="mb-4">
-                            <label for="id_fournisseur" class="form-label">
-                                <i class="bi bi-building me-2"></i>Fournisseur <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select select2-fournisseur @error('id_fournisseur') is-invalid @enderror" 
-                                    id="id_fournisseur" name="id_fournisseur" required>
-                                <option value="">-- Sélectionner un fournisseur --</option>
-                                @php
-                                    $fournisseurs = \App\Models\Fournisseur::all();
-                                    $defaultFournisseur = $bonCommande->proformaFournisseur?->id_fournisseur;
-                                @endphp
-                                @foreach ($fournisseurs as $fournisseur)
-                                    <option value="{{ $fournisseur->id_fournisseur }}" 
-                                            {{ (old('id_fournisseur') ?? $defaultFournisseur) == $fournisseur->id_fournisseur ? 'selected' : '' }}>
-                                        {{ $fournisseur->id_fournisseur }} - {{ $fournisseur->nom }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('id_fournisseur')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Date Facture -->
-                        <div class="mb-4">
-                            <label for="date_" class="form-label">
-                                <i class="bi bi-calendar-event me-2"></i>Date de Facture <span class="text-danger">*</span>
-                            </label>
-                            <input type="date" class="form-control @error('date_') is-invalid @enderror" 
-                                   id="date_" name="date_" 
-                                   value="{{ old('date_', now()->format('Y-m-d')) }}" required>
-                            @error('date_')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Description -->
-                        <div class="mb-4">
-                            <label for="description" class="form-label">
-                                <i class="bi bi-card-text me-2"></i>Description
-                            </label>
-                            <textarea class="form-control @error('description') is-invalid @enderror" 
-                                      id="description" name="description" rows="3" 
-                                      placeholder="Notes ou observations">{{ old('description') }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Boutons -->
-                        <div class="mt-4 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle me-2"></i>Créer la Facture
-                            </button>
-                            <a href="{{ route('facture-fournisseur.list') }}" class="btn btn-secondary">
-                                <i class="bi bi-x-circle me-2"></i>Annuler
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0 py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-file-earmark me-2" style="color: #0056b3;"></i>
+                Nouvelle Facture Fournisseur
+            </h5>
         </div>
+        <div class="card-body p-4">
+            <form action="{{ route('facture-fournisseur.store') }}" method="POST" id="factureForm">
+                @csrf
 
-        <!-- Articles Éditables -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-list-ul me-2"></i>Articles
-                        </h5>
-                        <button type="button" class="btn btn-light btn-sm" id="btn-add-article">
-                            <i class="bi bi-plus-circle"></i>
-                        </button>
+                <!-- Info Bon de Commande -->
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Bon de Commande:</strong> {{ $bonCommande->id_bonCommande }}
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <label for="date_" class="form-label">
+                            <i class="bi bi-calendar me-2" style="color: #0d0d0e;"></i>
+                            Date de Facture
+                        </label>
+                        <input type="date" class="form-control @error('date_') is-invalid @enderror" id="date_"
+                            name="date_" value="{{ old('date_', date('Y-m-d')) }}" required>
+                        @error('date_')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div id="articles-container">
+
+                <div class="mb-4">
+                    <label for="description" class="form-label">
+                        <i class="bi bi-file-text me-2" style="color: #0056b3;"></i>
+                        Description (optionnel)
+                    </label>
+                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
+                        rows="3" placeholder="Détails ou notes sur cette facture">{{ old('description') }}</textarea>
+                    @error('description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Articles -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="bi bi-basket me-2" style="color: #0056b3;"></i>
+                        Articles
+                    </label>
+                    <div id="articlesContainer">
                         @php $index = 0; @endphp
                         @foreach($bonCommande->bonCommandeFille as $ligne)
-                        <div class="article-row p-3 border-bottom" data-row="{{ $index }}">
-                            <div class="row g-2 mb-2">
-                                <div class="col-12">
-                                    <select class="form-select form-select-sm select2-article" name="articles[{{ $index }}][id_article]" required>
-                                        <option value="">-- Sélectionner un article --</option>
-                                        @php $articles = \App\Models\Article::all(); @endphp
-                                        @foreach ($articles as $article)
-                                            <option value="{{ $article->id_article }}" 
-                                                    {{ $ligne->id_article == $article->id_article ? 'selected' : '' }}>
-                                                {{ $article->id_article }} - {{ $article->nom }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                        <div class="row g-2 article-row mb-3">
+                            <div class="col-lg-5">
+                                <select class="form-select searchable-select @error('articles.'.$index.'.id_article') is-invalid @enderror"
+                                    name="articles[{{ $index }}][id_article]" required>
+                                    <option value="">-- Sélectionner un article --</option>
+                                    @php $articles = \App\Models\Article::all(); @endphp
+                                    @foreach ($articles as $article)
+                                        <option value="{{ $article->id_article }}"
+                                            {{ $ligne->id_article == $article->id_article ? 'selected' : '' }}>
+                                            {{ $article->id_article }} - {{ $article->nom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <input type="number"
+                                    class="form-control @error('articles.'.$index.'.quantite') is-invalid @enderror"
+                                    name="articles[{{ $index }}][quantite]" placeholder="Quantité" min="1" step="0.01"
+                                    value="{{ $ligne->quantite }}" required>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="input-group">
+                                    <input type="number"
+                                        class="form-control @error('articles.'.$index.'.prix') is-invalid @enderror"
+                                        name="articles[{{ $index }}][prix]" placeholder="Prix" min="0" step="0.01"
+                                        value="{{ $ligne->prix_achat }}" required>
+                                    <span class="input-group-text">Ar</span>
                                 </div>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="form-text text-muted small d-block mb-1">Quantité</label>
-                                    <input type="number" class="form-control form-control-sm article-qty" name="articles[{{ $index }}][quantite]" 
-                                        value="{{ $ligne->quantite }}" min="1" step="0.01" required>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-text text-muted small d-block mb-1">Prix (Ar)</label>
-                                    <input type="number" class="form-control form-control-sm article-price" name="articles[{{ $index }}][prix]" 
-                                        value="{{ $ligne->prix_achat }}" min="0" step="0.01" required>
-                                </div>
+                            <div class="col-lg-1">
+                                <button type="button" class="btn btn-danger btn-remove-article" {{ count($bonCommande->bonCommandeFille) == 1 ? 'style="display: none;"' : '' }}>
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-danger btn-sm btn-remove-article mt-2 w-100" style="{{ $bonCommande->bonCommandeFille->count() == 1 ? 'display:none' : '' }}">
-                                <i class="bi bi-trash"></i> Supprimer
-                            </button>
                         </div>
                         @php $index++; @endphp
                         @endforeach
                     </div>
+                    @error('articles')
+                        <div class="alert alert-danger mt-2">{{ $message }}</div>
+                    @enderror
+                    <button type="button" class="btn btn-secondary btn-sm mt-2" id="btnAddArticle">
+                        <i class="bi bi-plus-circle me-2"></i>Ajouter un article
+                    </button>
                 </div>
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between">
-                        <strong>Total:</strong>
-                        <strong id="total-articles">0 Ar</strong>
-                    </div>
+
+                <!-- Boutons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Créer la Facture
+                    </button>
+                    <a href="{{ route('facture-fournisseur.list') }}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-lg me-2"></i>
+                        Annuler
+                    </a>
                 </div>
-            </div>
+
+                <input type="hidden" name="id_bonCommande" value="{{ $bonCommande->id_bonCommande }}">
+            </form>
         </div>
     </div>
 
@@ -212,119 +198,118 @@
     </div>
     @endif
 
-@endsection
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5.min.css" rel="stylesheet" />
 
-@push('scripts')
-<script>
-    let articles = @json(\App\Models\Article::all());
-    let articleIndex = {{ count($bonCommande->bonCommandeFille ?? []) }};
-
-    function updateTotal() {
-        let total = 0;
-        document.querySelectorAll('.article-row').forEach(row => {
-            let qty = parseFloat(row.querySelector('.article-qty').value) || 0;
-            let price = parseFloat(row.querySelector('.article-price').value) || 0;
-            total += qty * price;
-        });
-        
-        let totalElement = document.getElementById('total-articles');
-        totalElement.textContent = new Intl.NumberFormat('fr-FR').format(Math.floor(total)) + ' Ar';
+<style>
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        border: 1px solid #dee2e6;
+        padding-top: 2px;
     }
+    
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #212529;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+</style>
 
-    function createArticleRow(index, articleId = '', qty = '', price = '') {
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialiser Select2 pour les sélects existants
+    initSelect2();
+    
+    let articleCount = {{ count($bonCommande->bonCommandeFille ?? []) }};
+
+    // Ajouter un article
+    $('#btnAddArticle').on('click', function() {
+        const container = document.getElementById('articlesContainer');
+        const articles = @json(\App\Models\Article::all());
+        
         const html = `
-            <div class="article-row p-3 border-bottom" data-row="${index}">
-                <div class="row g-2 mb-2">
-                    <div class="col-12">
-                        <select class="form-select form-select-sm select2-article" name="articles[${index}][id_article]" required>
-                            <option value="">-- Sélectionner un article --</option>
-                            ${articles.map(art => `
-                                <option value="${art.id_article}" ${articleId === art.id_article ? 'selected' : ''}>
-                                    ${art.id_article} - ${art.nom}
-                                </option>
-                            `).join('')}
-                        </select>
+            <div class="row g-2 article-row mb-3">
+                <div class="col-lg-5">
+                    <select class="form-select searchable-select" name="articles[${articleCount}][id_article]" required>
+                        <option value="">-- Sélectionner un article --</option>
+                        ${articles.map(art => `
+                            <option value="${art.id_article}">
+                                ${art.id_article} - ${art.nom}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <input type="number" class="form-control" name="articles[${articleCount}][quantite]" 
+                           placeholder="Quantité" min="1" step="0.01" required>
+                </div>
+                <div class="col-lg-3">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="articles[${articleCount}][prix]" 
+                               placeholder="Prix" min="0" step="0.01" required>
+                        <span class="input-group-text">Ar</span>
                     </div>
                 </div>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <label class="form-text text-muted small d-block mb-1">Quantité</label>
-                        <input type="number" class="form-control form-control-sm article-qty" name="articles[${index}][quantite]" 
-                            value="${qty}" min="1" step="0.01" required>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-text text-muted small d-block mb-1">Prix (Ar)</label>
-                        <input type="number" class="form-control form-control-sm article-price" name="articles[${index}][prix]" 
-                            value="${price}" min="0" step="0.01" required>
-                    </div>
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-danger btn-remove-article" style="width: 100%;">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
-                <button type="button" class="btn btn-danger btn-sm btn-remove-article mt-2 w-100">
-                    <i class="bi bi-trash"></i> Supprimer
-                </button>
             </div>
         `;
-        return html;
+        container.insertAdjacentHTML('beforeend', html);
+        articleCount++;
+        
+        // Initialiser Select2 pour le nouveau select
+        $(container).find('.searchable-select:last').select2({
+            language: 'fr',
+            placeholder: '-- Sélectionner --',
+            allowClear: true,
+            width: '100%'
+        });
+        
+        updateRemoveButtons();
+    });
+
+    // Supprimer un article
+    $(document).on('click', '.btn-remove-article', function(e) {
+        e.preventDefault();
+        $(this).closest('.article-row').remove();
+        updateRemoveButtons();
+    });
+
+    function updateRemoveButtons() {
+        const rows = document.querySelectorAll('.article-row');
+        document.querySelectorAll('.btn-remove-article').forEach((btn, index) => {
+            btn.style.display = rows.length > 1 ? 'block' : 'none';
+        });
     }
 
-    // Event delegation for article removal and changes
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-remove-article')) {
-            e.preventDefault();
-            const row = e.target.closest('.article-row');
-            
-            // Keep at least one article
-            if (document.querySelectorAll('.article-row').length > 1) {
-                row.remove();
-                updateTotal();
-            } else {
-                alert('Vous devez conserver au moins un article');
-            }
-        }
-    });
-
-    // Listen for changes in quantity and price
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('article-qty') || e.target.classList.contains('article-price')) {
-            updateTotal();
-        }
-    });
-
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('article-qty') || e.target.classList.contains('article-price')) {
-            updateTotal();
-        }
-    });
-
-    // Add article button
-    document.getElementById('btn-add-article').addEventListener('click', function(e) {
-        e.preventDefault();
-        const container = document.getElementById('articles-container');
-        container.insertAdjacentHTML('beforeend', createArticleRow(articleIndex, '', '', ''));
-        
-        // Initialize Select2 for new row
-        $(`.article-row[data-row="${articleIndex}"] .select2-article`).select2({
-            theme: 'bootstrap-5'
+    function initSelect2() {
+        $('.searchable-select').select2({
+            language: 'fr',
+            placeholder: '-- Sélectionner --',
+            allowClear: true,
+            width: '100%'
         });
-        
-        articleIndex++;
-        updateTotal();
-    });
+    }
 
-    // Initialize Select2 and update total on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Select2 for fournisseur
-        $('#id_fournisseur').select2({
-            theme: 'bootstrap-5',
-            language: 'fr'
-        });
-
-        // Initialize Select2 for articles
-        $('.select2-article').select2({
-            theme: 'bootstrap-5'
-        });
-
-        // Update total
-        updateTotal();
-    });
+    updateRemoveButtons();
+});
 </script>
-@endpush
+@endsection

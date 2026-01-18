@@ -1,209 +1,142 @@
 @extends('layouts.app')
 
-@section('title', 'Détails du Mouvement - ' . $mouvement->id_mvt_stock)
-
-@section('header-buttons')
-    <a href="{{ route('mvt-stock.list') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Retour
-    </a>
-    <a href="{{ route('mvt-stock.exportPdf', $mouvement->id_mvt_stock) }}" class="btn btn-success" target="_blank">
-        <i class="bi bi-file-pdf me-2"></i>Exporter PDF
-    </a>
-@endsection
+@section('title', 'Détails du Mouvement de Stock')
 
 @section('content')
-    <div class="row mb-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0 py-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Informations du Mouvement
-                    </h6>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-arrow-left-right"></i> Mouvement {{ $mouvement->id_mvt_stock }}</h4>
+                    <a href="{{ route('mvt-stock.list') }}" class="btn btn-sm btn-light">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row">
+                        <!-- Informations du mouvement -->
                         <div class="col-md-6">
-                            <label class="form-label text-muted small">ID</label>
-                            <p class="form-control-plaintext fw-bold text-primary">{{ $mouvement->id_mvt_stock }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Date</label>
-                            <p class="form-control-plaintext">{{ $mouvement->date_->format('d/m/Y à H:i') }}</p>
-                        </div>
-                    </div>
+                            <dl class="row">
+                                <dt class="col-sm-4"><strong>ID Mouvement</strong></dt>
+                                <dd class="col-sm-8">{{ $mouvement->id_mvt_stock }}</dd>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Type</label>
-                            <p class="form-control-plaintext">
-                                @if ($mouvement->entree > 0)
-                                    <span class="badge bg-success">ENTRÉE</span>
-                                @else
-                                    <span class="badge bg-danger">SORTIE</span>
-                                @endif
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Quantité</label>
-                            <p class="form-control-plaintext fw-bold">
-                                {{ number_format($mouvement->entree > 0 ? $mouvement->entree : $mouvement->sortie, 2, ',', ' ') }}
-                            </p>
-                        </div>
-                    </div>
+                                <dt class="col-sm-4"><strong>Date</strong></dt>
+                                <dd class="col-sm-8">{{ $mouvement->date_?->format('d/m/Y H:i') ?? 'N/A' }}</dd>
 
-                    @if ($mouvement->date_expiration)
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label text-muted small">Date d'Expiration</label>
-                                <p class="form-control-plaintext">
-                                    <span class="badge bg-warning text-dark">
-                                        {{ \Carbon\Carbon::parse($mouvement->date_expiration)->format('d/m/Y') }}
+                                <dt class="col-sm-4"><strong>Magasin</strong></dt>
+                                <dd class="col-sm-8">
+                                    {{ $mouvement->magasin?->libelle ?? $mouvement->magasin?->designation ?? 'N/A' }}
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <!-- Montant -->
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4"><strong>Description</strong></dt>
+                                <dd class="col-sm-8">{{ $mouvement->description ?? '-' }}</dd>
+
+                                <dt class="col-sm-4"><strong>Montant Total</strong></dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-success" style="font-size: 1.1em;">
+                                        {{ number_format($mouvement->montant_total, 0) }} Ar
                                     </span>
-                                </p>
-                            </div>
+                                </dd>
+
+                                <dt class="col-sm-4"><strong>Créé le</strong></dt>
+                                <dd class="col-sm-8">{{ $mouvement->created_at?->format('d/m/Y H:i') ?? 'N/A' }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles du mouvement -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Articles du Mouvement</h5>
+                </div>
+                <div class="card-body">
+                    @if($mouvement->mvtStockFille && $mouvement->mvtStockFille->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Article</th>
+                                        <th class="text-center">Entrée</th>
+                                        <th class="text-center">Sortie</th>
+                                        <th class="text-end">Prix Unitaire</th>
+                                        <th class="text-end">Montant</th>
+                                        <th>Date Expiration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($mouvement->mvtStockFille as $fille)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $fille->article?->id_article ?? 'N/A' }}</strong><br>
+                                            <small class="text-muted">{{ $fille->article?->designation ?? '-' }}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($fille->entree > 0)
+                                                <span class="badge bg-success">+{{ number_format($fille->entree, 0) }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($fille->sortie > 0)
+                                                <span class="badge bg-danger">-{{ number_format($fille->sortie, 0) }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end">{{ number_format($fille->prix_unitaire, 0) }} Ar</td>
+                                        <td class="text-end">
+                                            <strong>{{ number_format($fille->getMontantAttribute(), 0) }} Ar</strong>
+                                        </td>
+                                        <td>
+                                            @if($fille->date_expiration)
+                                                {{ $fille->date_expiration->format('d/m/Y') }}
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-light">
+                                        <th colspan="4" class="text-end">Total Mouvement:</th>
+                                        <th class="text-end">
+                                            <strong>{{ number_format($mouvement->montant_total, 0) }} Ar</strong>
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Aucun article dans ce mouvement.
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0 py-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-box-seam me-2"></i>Article
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Nom</label>
-                            <p class="form-control-plaintext fw-bold">{{ $mouvement->article->nom }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">ID Article</label>
-                            <p class="form-control-plaintext">{{ $mouvement->id_article }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Unité</label>
-                            <p class="form-control-plaintext">{{ $mouvement->article->unite->libelle }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Catégorie</label>
-                            <p class="form-control-plaintext">{{ $mouvement->article->categorie->libelle }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Localisation et Stock -->
-    <div class="row mb-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0 py-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-geo-alt me-2"></i>Localisation
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Emplacement</label>
-                            <p class="form-control-plaintext fw-bold">{{ $mouvement->emplacement->libelle }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Département</label>
-                            <p class="form-control-plaintext">{{ $mouvement->emplacement->departement->libelle }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0 py-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-diagram-2 me-2"></i>Stock
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Quantité en Stock</label>
-                            <p class="form-control-plaintext fw-bold fs-5">
-                                {{ number_format($mouvement->stock->quantite, 2, ',', ' ') }}
-                                {{ $mouvement->article->unite->libelle }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <a href="{{ route('stock.show', $mouvement->id_stock) }}" class="btn btn-info btn-sm">
-                                <i class="bi bi-eye me-2"></i>Voir le Stock
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Source du Mouvement -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-light border-0 py-3">
-            <h6 class="mb-0">
-                <i class="bi bi-arrow-left-right me-2"></i>Source du Mouvement
-            </h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                @if ($mouvement->id_bonReception)
-                    <div class="col-lg-6">
-                        <label class="form-label text-muted small">Bon de Réception</label>
-                        <p class="form-control-plaintext">
-                            <a href="{{ route('bon-reception.show', $mouvement->id_bonReception) }}"
-                                class="text-decoration-none">
-                                <strong>{{ $mouvement->bonReception->id_bonReception }}</strong>
-                            </a>
-                        </p>
-                    </div>
-                    <div class="col-lg-6">
-                        <label class="form-label text-muted small">Date Réception</label>
-                        <p class="form-control-plaintext">{{ $mouvement->bonReception->date_->format('d/m/Y') }}</p>
-                    </div>
-                @elseif ($mouvement->id_bonCommande)
-                    <div class="col-lg-6">
-                        <label class="form-label text-muted small">Bon de Commande</label>
-                        <p class="form-control-plaintext">
-                            <a href="{{ route('bon-commande.show', $mouvement->id_bonCommande) }}"
-                                class="text-decoration-none">
-                                <strong>{{ $mouvement->bonCommande->id_bonCommande }}</strong>
-                            </a>
-                        </p>
-                    </div>
-                    <div class="col-lg-6">
-                        <label class="form-label text-muted small">Date Commande</label>
-                        <p class="form-control-plaintext">{{ $mouvement->bonCommande->date_->format('d/m/Y') }}</p>
-                    </div>
-                @else
-                    <div class="col-12">
-                        <p class="text-muted">Mouvement manuel (pas de source liée)</p>
-                    </div>
+            <!-- Boutons d'action -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a href="{{ route('mvt-stock.list') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                @if($mouvement->mvtStockFille && $mouvement->mvtStockFille->count() > 0)
+                    <a href="{{ route('mvt-stock.exportPdf', $mouvement->id_mvt_stock) }}" class="btn btn-warning" target="_blank">
+                        <i class="bi bi-file-pdf"></i> Exporter PDF
+                    </a>
                 @endif
             </div>
         </div>
     </div>
+</div>
 @endsection
