@@ -45,7 +45,7 @@ class FactureFournisseurController extends Controller
     public function createFromBonCommande($id_bonCommande = null)
     {
         if ($id_bonCommande) {
-            $bonCommande = BonCommande::findOrFail($id_bonCommande);
+            $bonCommande = BonCommande::with('proformaFournisseur.fournisseur', 'bonCommandeFille.article')->findOrFail($id_bonCommande);
             
             // Vérifier que le bon est en état 11
             if ($bonCommande->etat != 11) {
@@ -76,16 +76,26 @@ class FactureFournisseurController extends Controller
         ]);
 
         $id = 'FACT_' . uniqid();
+        
+        // Ajouter les articles du bon de commande pour calculer le total
+        $bonCommande = BonCommande::find($request->id_bonCommande);
+        $montant_total = 0;
+        
+        foreach ($bonCommande->bonCommandeFille as $article) {
+            $montant_total += $article->quantite * $article->prix_achat;
+        }
+        
         $facture = FactureFournisseur::create([
             'id_factureFournisseur' => $id,
             'date_' => $request->date_,
             'etat' => 1,
             'description' => $request->description,
             'id_bonCommande' => $request->id_bonCommande,
+            'montant_total' => $montant_total,
+            'montant_paye' => 0,
         ]);
 
         // Ajouter les articles du bon de commande
-        $bonCommande = BonCommande::find($request->id_bonCommande);
         foreach ($bonCommande->bonCommandeFille as $article) {
             FactureFournisseurFille::create([
                 'id_factureFournisseurFille' => 'FACTF_' . uniqid(),

@@ -15,11 +15,23 @@ class FactureFournisseur extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_factureFournisseur', 'date_', 'etat', 'description', 'id_bonCommande'];
+    protected $fillable = ['id_factureFournisseur', 'date_', 'etat', 'description', 'id_bonCommande', 'montant_total', 'montant_paye'];
 
     protected $casts = [
         'date_' => 'datetime',
     ];
+
+    // Accesseur pour le reste à payer
+    public function getResteAPayerAttribute()
+    {
+        return $this->montant_total - $this->montant_paye;
+    }
+
+    // Accesseur pour vérifier si la facture est complètement payée
+    public function getEstPayeeAttribute()
+    {
+        return $this->reste_a_payer <= 0;
+    }
 
     // Accesseurs pour l'état
     public function getEtatLabelAttribute()

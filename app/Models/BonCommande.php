@@ -30,6 +30,18 @@ class BonCommande extends Model
         return $this->belongsTo(ProformaFournisseur::class, 'id_proformaFournisseur', 'id_proformaFournisseur');
     }
 
+    public function fournisseur()
+    {
+        return $this->hasOneThrough(
+            Fournisseur::class,
+            ProformaFournisseur::class,
+            'id_proformaFournisseur',
+            'id_fournisseur',
+            'id_proformaFournisseur',
+            'id_fournisseur'
+        );
+    }
+
     public function bonCommandeFille()
     {
         return $this->hasMany(BonCommandeFille::class, 'id_bonCommande', 'id_bonCommande');

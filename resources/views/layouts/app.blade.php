@@ -36,7 +36,7 @@
                 <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-file-earmark-check"></i>
-                        <span class="menu-text">Proforma</span>
+                        <span class="menu-text">Demande d'achat</span>
                     </a>
                     <div class="sidebar-submenu"
                         style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">

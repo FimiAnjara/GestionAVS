@@ -122,6 +122,7 @@ Route::prefix('proforma-fournisseur')->group(function () {
 Route::prefix('bon-commande')->group(function () {
     Route::get('/list', [BonCommandeController::class, 'list'])->name('bon-commande.list');
     Route::get('/create', [BonCommandeController::class, 'create'])->name('bon-commande.create');
+    Route::get('/api/proforma/{id}', [BonCommandeController::class, 'getProformaData'])->name('bon-commande.api.proforma');
     Route::post('/', [BonCommandeController::class, 'store'])->name('bon-commande.store');
     Route::get('/{id}', [BonCommandeController::class, 'show'])->name('bon-commande.show');
     Route::get('/{id}/export-pdf', [BonCommandeController::class, 'exportPdf'])->name('bon-commande.exportPdf');

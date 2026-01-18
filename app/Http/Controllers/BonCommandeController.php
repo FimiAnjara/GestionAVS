@@ -158,6 +158,32 @@ class BonCommandeController extends Controller
     }
     
     /**
+     * Récupérer les données d'une proforma pour pré-remplissage (AJAX)
+     */
+    public function getProformaData($id)
+    {
+        $proforma = ProformaFournisseur::with('proformaFournisseurFille.article', 'fournisseur')->find($id);
+        
+        if (!$proforma) {
+            return response()->json(['error' => 'Proforma non trouvée'], 404);
+        }
+        
+        return response()->json([
+            'fournisseur_id' => $proforma->id_fournisseur,
+            'fournisseur_nom' => $proforma->fournisseur->nom,
+            'description' => $proforma->description,
+            'articles' => $proforma->proformaFournisseurFille->map(function($item) {
+                return [
+                    'id_article' => $item->id_article,
+                    'nom' => $item->article->nom,
+                    'quantite' => $item->quantite,
+                    'prix' => $item->prix_achat,
+                ];
+            }),
+        ]);
+    }
+    
+    /**
      * Exporter en PDF
      */
     public function exportPdf($id)

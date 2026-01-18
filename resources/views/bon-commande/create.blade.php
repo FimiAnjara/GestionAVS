@@ -170,6 +170,9 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <script>
+        // Passer les articles disponibles au JavaScript
+        const articlesData = @json($articles->map(fn($a) => ['id' => $a->id_article, 'nom' => $a->nom])->values());
+        
         $(document).ready(function() {
             // Initialiser Select2 pour fournisseur et proforma
             $('.select2-fournisseur, .select2-proforma').select2({
@@ -181,6 +184,95 @@
             $('.select2-article').select2({
                 language: 'fr',
                 width: '100%',
+            });
+            
+            // Écouter le changement du select proforma
+            $('#id_proformaFournisseur').on('change', function() {
+                const proformaId = $(this).val();
+                
+                if (proformaId) {
+                    // Récupérer les données de la proforma
+                    $.ajax({
+                        url: '{{ route("bon-commande.api.proforma", ":id") }}'.replace(':id', proformaId),
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            // Pré-remplir le fournisseur
+                            $('#id_fournisseur').val(data.fournisseur_id).trigger('change');
+                            
+                            // Pré-remplir la description avec ID proforma + description de la proforma
+                            const newDescription = 'Demande d\'achat ' + proformaId + '\n' + (data.description ? data.description : '');
+                            $('#description').val(newDescription);
+                            
+                            // Pré-remplir les articles
+                            const container = document.getElementById('articles-container');
+                            container.innerHTML = ''; // Vider les articles existants
+                            rowCount = 0; // Réinitialiser le compteur
+                            
+                            if (data.articles && data.articles.length > 0) {
+                                data.articles.forEach((article, index) => {
+                                    // Créer les options d'articles
+                                    let articleOptions = '<option value="">-- Sélectionner --</option>';
+                                    articlesData.forEach(art => {
+                                        const selected = art.id === article.id_article ? 'selected' : '';
+                                        articleOptions += `<option value="${art.id}" ${selected}>${art.id} - ${art.nom}</option>`;
+                                    });
+                                    
+                                    const articleHtml = `
+                                        <div class="article-row mb-3 p-3 border rounded" data-row="${index}">
+                                            <div class="row g-2">
+                                                <div class="col-lg-6">
+                                                    <label class="form-label">Article</label>
+                                                    <select class="form-select select2-article" name="articles[${index}][id_article]" required>
+                                                        ${articleOptions}
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <label class="form-label">Quantité</label>
+                                                    <input type="number" class="form-control" name="articles[${index}][quantite]" 
+                                                        value="${article.quantite}"
+                                                        placeholder="0" min="1" step="0.01" required>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label class="form-label">Prix (Ar)</label>
+                                                    <input type="number" class="form-control" name="articles[${index}][prix]" 
+                                                        value="${article.prix}"
+                                                        placeholder="0" min="0" step="0.01" required>
+                                                </div>
+                                                <div class="col-lg-1 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm btn-remove-article w-100">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    container.insertAdjacentHTML('beforeend', articleHtml);
+                                    rowCount++;
+                                });
+                                
+                                // Réinitialiser Select2 pour les nouveaux articles
+                                $('select.select2-article').select2({
+                                    language: 'fr',
+                                    width: '100%',
+                                });
+                                
+                                // Ajouter les listeners de suppression
+                                document.querySelectorAll('.btn-remove-article').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        this.closest('.article-row').remove();
+                                        updateRemoveButtons();
+                                    });
+                                });
+                                
+                                updateRemoveButtons();
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('Erreur lors du chargement de la proforma');
+                        }
+                    });
+                }
             });
         });
         

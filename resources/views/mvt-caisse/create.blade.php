@@ -5,6 +5,11 @@
 @section('content')
     <form action="{{ route('mvt-caisse.store') }}" method="POST">
         @csrf
+        
+        <!-- Champ caché pour tracer la facture si paiement -->
+        @if($id_facture)
+        <input type="hidden" name="id_factureFournisseur" value="{{ $id_facture }}">
+        @endif
 
         <div class="row mb-4">
             <div class="col-lg-6">
@@ -47,7 +52,8 @@
                         <i class="bi bi-tag me-2 text-primary"></i>Origine
                     </label>
                     <input type="text" class="form-control @error('origine') is-invalid @enderror" 
-                        id="origine" name="origine" placeholder="Ex: Vente, Achat, etc." value="{{ old('origine') }}" required>
+                        id="origine" name="origine" placeholder="Ex: Vente, Achat, etc." 
+                        value="{{ old('origine', $id_facture ?? '') }}" required>
                     @error('origine')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -60,7 +66,7 @@
                 <i class="bi bi-file-text me-2 text-primary"></i>Description
             </label>
             <textarea class="form-control @error('description') is-invalid @enderror" 
-                id="description" name="description" rows="4" placeholder="Détails du mouvement (optionnel)">{{ old('description') }}</textarea>
+                id="description" name="description" rows="4" placeholder="Détails du mouvement (optionnel)">{{ old('description', $id_facture ? 'Paiement de la facture fournisseur ' . $id_facture : '') }}</textarea>
             @error('description')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
             @enderror
@@ -73,7 +79,8 @@
                 </label>
                 <div class="input-group input-group-lg">
                     <input type="number" class="form-control @error('debit') is-invalid @enderror" 
-                        id="debit" name="debit" placeholder="0.00" step="0.01" min="0" value="{{ old('debit', 0) }}">
+                        id="debit" name="debit" placeholder="0.00" step="0.01" min="0" 
+                        value="{{ old('debit', $montant_reste ?? 0) }}">
                     <span class="input-group-text">Ar</span>
                 </div>
                 @error('debit')

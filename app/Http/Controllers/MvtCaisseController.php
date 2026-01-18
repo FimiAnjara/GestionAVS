@@ -17,10 +17,15 @@ class MvtCaisseController extends Controller
     }
 
     // Affiche le formulaire de création
-    public function create()
+    public function create(Request $request)
     {
         $caisses = Caisse::all();
-        return view('mvt-caisse.create', compact('caisses'));
+        
+        // Récupérer les paramètres passés depuis la facture
+        $id_facture = $request->query('id_facture');
+        $montant_reste = $request->query('montant');
+        
+        return view('mvt-caisse.create', compact('caisses', 'id_facture', 'montant_reste'));
     }
 
     // Stocke un nouveau mouvement
@@ -33,6 +38,7 @@ class MvtCaisseController extends Controller
             'description' => 'nullable|string|max:500',
             'date_' => 'required|date',
             'id_caisse' => 'required|exists:caisse,id_caisse',
+            'id_factureFournisseur' => 'nullable|exists:factureFournisseur,id_factureFournisseur',
         ], [
             'origine.required' => 'L\'origine est requise',
             'date_.required' => 'La date est requise',
@@ -57,6 +63,23 @@ class MvtCaisseController extends Controller
         $caisse = Caisse::find($request->id_caisse);
         $solde = $caisse->montant + ($request->credit ?? 0) - ($request->debit ?? 0);
         $caisse->update(['montant' => $solde]);
+
+        // Si c'est un paiement de facture, mettre à jour le montant payé
+        $id_factureFournisseur = null;
+        if ($request->filled('id_factureFournisseur')) {
+            $facture = \App\Models\FactureFournisseur::find($request->id_factureFournisseur);
+            if ($facture) {
+                $montant_paiement = $request->debit ?? 0; // Débit = sortie = paiement fournisseur
+                $nouveau_montant_paye = min($facture->montant_paye + $montant_paiement, $facture->montant_total);
+                $facture->update(['montant_paye' => $nouveau_montant_paye]);
+                $id_factureFournisseur = $request->id_factureFournisseur;
+            }
+        }
+
+        // Rediriger vers la facture si paiement, sinon vers la liste des mouvements
+        if ($id_factureFournisseur) {
+            return redirect()->route('facture-fournisseur.show', $id_factureFournisseur)->with('success', 'Paiement enregistré avec succès! (ID: ' . $id_mvt_caisse . ')');
+        }
 
         return redirect()->route('mvt-caisse.list')->with('success', 'Mouvement créé avec succès! (ID: ' . $id_mvt_caisse . ')');
     }
@@ -122,10 +145,10 @@ class MvtCaisseController extends Controller
 
         $caisses = Caisse::all();
         
-        // Calculer le total de la facture
-        $total = $facture->factureFournisseurFille()->sum(\DB::raw('quantite * prix_achat'));
+        $total = $facture->montant_total;
+        $reste_a_payer = $facture->reste_a_payer;
         
-        return view('mvt-caisse.create-from-facture', compact('facture', 'caisses', 'total'));
+        return view('mvt-caisse.create-from-facture', compact('facture', 'caisses', 'total', 'reste_a_payer'));
     }
 
     // Affiche l'état des caisses
