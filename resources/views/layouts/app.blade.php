@@ -74,6 +74,27 @@
                     </div>
                 </li>
 
+                <!-- FACTURE FOURNISSEUR MENU -->
+                <li class="has-submenu {{ request()->is('facture-fournisseur*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-receipt"></i>
+                        <span class="menu-text">Facture Fournisseur</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('facture-fournisseur*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('facture-fournisseur.create') }}"
+                            class="submenu-item {{ request()->is('facture-fournisseur/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('facture-fournisseur.list') }}"
+                            class="submenu-item {{ request()->is('facture-fournisseur/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
                 <!-- BON DE RECEPTION MENU -->
                 <li class="has-submenu {{ request()->is('bon-reception*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">

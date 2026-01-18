@@ -9,6 +9,7 @@ use App\Http\Controllers\CaisseController;
 use App\Http\Controllers\MvtCaisseController;
 use App\Http\Controllers\ProformaFournisseurController;
 use App\Http\Controllers\BonCommandeController;
+use App\Http\Controllers\FactureFournisseurController;
 use App\Http\Controllers\BonReceptionController;
 use App\Http\Controllers\MvtStockController;
 use App\Http\Controllers\MagasinController;
@@ -94,6 +95,7 @@ Route::prefix('caisse')->group(function () {
 Route::prefix('mvt-caisse')->group(function () {
     Route::get('/list', [MvtCaisseController::class, 'list'])->name('mvt-caisse.list');
     Route::get('/create', [MvtCaisseController::class, 'create'])->name('mvt-caisse.create');
+    Route::get('/create-from-facture/{id}', [MvtCaisseController::class, 'createFromFacture'])->name('mvt-caisse.createFromFacture');
     Route::post('/', [MvtCaisseController::class, 'store'])->name('mvt-caisse.store');
     Route::get('/{id}', [MvtCaisseController::class, 'show'])->name('mvt-caisse.show');
     Route::get('/{id}/edit', [MvtCaisseController::class, 'edit'])->name('mvt-caisse.edit');
@@ -125,6 +127,18 @@ Route::prefix('bon-commande')->group(function () {
     Route::get('/{id}/export-pdf', [BonCommandeController::class, 'exportPdf'])->name('bon-commande.exportPdf');
     Route::post('/{id}/etat', [BonCommandeController::class, 'changerEtat'])->name('bon-commande.etat');
     Route::delete('/{id}', [BonCommandeController::class, 'destroy'])->name('bon-commande.destroy');
+});
+
+// Routes Facture Fournisseur
+Route::prefix('facture-fournisseur')->group(function () {
+    Route::get('/list', [FactureFournisseurController::class, 'list'])->name('facture-fournisseur.list');
+    Route::get('/create', [FactureFournisseurController::class, 'createFromBonCommande'])->name('facture-fournisseur.createFromBonCommande');
+    Route::get('/create/{id_bonCommande}', [FactureFournisseurController::class, 'createFromBonCommande'])->name('facture-fournisseur.createFromBonCommande');
+    Route::post('/', [FactureFournisseurController::class, 'store'])->name('facture-fournisseur.store');
+    Route::get('/{id}', [FactureFournisseurController::class, 'show'])->name('facture-fournisseur.show');
+    Route::post('/{id}/etat', [FactureFournisseurController::class, 'changerEtat'])->name('facture-fournisseur.changerEtat');
+    Route::get('/{id}/export-pdf', [FactureFournisseurController::class, 'exportPdf'])->name('facture-fournisseur.exportPdf');
+    Route::delete('/{id}', [FactureFournisseurController::class, 'destroy'])->name('facture-fournisseur.destroy');
 });
 
 // Routes Bon de Réception

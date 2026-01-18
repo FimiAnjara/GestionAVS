@@ -128,6 +128,19 @@
                             <i class="bi bi-file-pdf me-2"></i>Exporter PDF
                         </a>
 
+                        <!-- Créer Facture (si état = 11 et pas de facture déjà créée) -->
+                        @if ($bonCommande->etat == 11 && !$bonCommande->id_factureFournisseur)
+                            <a href="{{ route('facture-fournisseur.createFromBonCommande', $bonCommande->id_bonCommande) }}" 
+                                class="btn btn-primary">
+                                <i class="bi bi-receipt me-2"></i>Créer Facture
+                            </a>
+                        @elseif($bonCommande->id_factureFournisseur)
+                            <a href="{{ route('facture-fournisseur.show', $bonCommande->id_factureFournisseur) }}" 
+                                class="btn btn-info">
+                                <i class="bi bi-receipt me-2"></i>Voir Facture
+                            </a>
+                        @endif
+
                         <!-- Valider par DG (si état = 5) -->
                         @if ($bonCommande->etat == 5)
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" 

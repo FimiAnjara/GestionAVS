@@ -14,7 +14,7 @@ class BonCommande extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonCommande', 'date_', 'etat', 'id_utilisateur', 'id_proformaFournisseur'];
+    protected $fillable = ['id_bonCommande', 'date_', 'etat', 'id_utilisateur', 'id_proformaFournisseur', 'id_factureFournisseur'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -43,5 +43,10 @@ class BonCommande extends Model
     public function bonLivraison()
     {
         return $this->hasMany(BonLivraison::class, 'id_bonCommande', 'id_bonCommande');
+    }
+
+    public function factureFournisseur()
+    {
+        return $this->belongsTo(FactureFournisseur::class, 'id_factureFournisseur', 'id_factureFournisseur');
     }
 }

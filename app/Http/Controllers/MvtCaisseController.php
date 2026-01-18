@@ -110,6 +110,24 @@ class MvtCaisseController extends Controller
         return redirect()->route('mvt-caisse.list')->with('success', 'Mouvement supprimé avec succès!');
     }
 
+    // Crée un MvtCaisse à partir d'une FactureFournisseur
+    public function createFromFacture($id_facture)
+    {
+        $facture = \App\Models\FactureFournisseur::findOrFail($id_facture);
+        
+        // Vérifier que la facture est en état 11
+        if ($facture->etat != 11) {
+            return back()->withErrors(['etat' => 'La facture doit être validée par DG (état 11)']);
+        }
+
+        $caisses = Caisse::all();
+        
+        // Calculer le total de la facture
+        $total = $facture->factureFournisseurFille()->sum(\DB::raw('quantite * prix_achat'));
+        
+        return view('mvt-caisse.create-from-facture', compact('facture', 'caisses', 'total'));
+    }
+
     // Affiche l'état des caisses
     public function etat()
     {
