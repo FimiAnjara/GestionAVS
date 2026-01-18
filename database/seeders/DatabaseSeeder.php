@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             FournisseurSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
+            MagasinSeeder::class,
         ]);
     }
 }

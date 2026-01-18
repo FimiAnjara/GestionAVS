@@ -1,0 +1,247 @@
+@extends('layouts.app')
+
+@section('title', 'Carte des Magasins')
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+    <style>
+        #map {
+            height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-legend {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .marker-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-content {
+            font-size: 12px;
+        }
+
+        .popup-content strong {
+            display: block;
+            font-size: 13px;
+            color: #1a73e8;
+            margin-bottom: 5px;
+        }
+
+        .popup-item {
+            margin: 3px 0;
+            line-height: 1.5;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1a73e8 0%, #0052cc 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-card h6 {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+    </style>
+@endpush
+
+@section('content')
+    <!-- Résumé des Magasins -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h6><i class="bi bi-shop me-2"></i>Total des Magasins</h6>
+                <div class="number">{{ $totalMagasins }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="summary-card" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                <h6><i class="bi bi-geo-alt me-2"></i>Magasins Affichés</h6>
+                <div class="number">{{ $magasinsAntananarivo }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres de Recherche -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light border-0 py-3">
+            <h6 class="mb-0">
+                <i class="bi bi-funnel me-2"></i>Rechercher un Magasin
+            </h6>
+        </div>
+        <div class="card-body p-3">
+            <form method="GET" action="{{ route('magasin.carte') }}" class="row g-2 align-items-end">
+                <div class="col-lg-8">
+                    <label for="nom" class="form-label">Nom du Magasin</label>
+                    <input type="text" class="form-control" id="nom" name="nom"
+                        placeholder="Chercher par nom..." value="{{ request('nom') }}">
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                        <a href="{{ route('magasin.carte') }}" class="btn btn-secondary btn-sm" title="Réinitialiser">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Carte -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0 py-3">
+            <h6 class="mb-0">
+                <i class="bi bi-geo-alt me-2"></i>Carte des Magasins à Antananarivo
+            </h6>
+        </div>
+        <div class="card-body p-3">
+            <div id="map"></div>
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Coordonnées d'Antananarivo
+            const antananarivo = [-18.8792, 47.5079];
+
+            // Initialiser la carte centrée sur Antananarivo
+            const map = L.map('map', {
+                zoom: 13,
+                center: antananarivo
+            }).setView(antananarivo, 13);
+
+            // Ajouter les tuiles OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                style: 'mapnik'
+            }).addTo(map);
+
+            // Ajouter les contrôles de zoom
+            L.control.zoom({
+                position: 'topright'
+            }).addTo(map);
+
+            // Charger les magasins depuis l'API
+            const searchParams = new URLSearchParams(window.location.search);
+            const nomFilter = searchParams.get('nom') ? `?nom=${encodeURIComponent(searchParams.get('nom'))}` : '';
+
+            fetch('{{ route('magasin.magasins') }}' + nomFilter)
+                .then(response => response.json())
+                .then(locations => {
+                    // Ajouter les marqueurs
+                    locations.forEach((location, index) => {
+                        if (location.latitude && location.longitude) {
+                            // Couleur uniforme pour tous les marqueurs
+                            const color = '#1a73e8';
+
+                            const markerHtml = `
+                            <div class="marker-icon" style="background-color: ${color};">
+                                <i class="bi bi-shop" style="font-size: 18px;"></i>
+                            </div>
+                        `;
+
+                            const customMarker = L.divIcon({
+                                html: markerHtml,
+                                className: 'custom-marker',
+                                iconSize: [40, 40],
+                                iconAnchor: [20, 40],
+                                popupAnchor: [0, -40]
+                            });
+
+                            // Créer le contenu du popup
+                            const popupContent = `
+                            <div class="popup-content">
+                                <strong>
+                                    <a href="{{ url('magasin') }}/${location.id}" style="color: #1a73e8; text-decoration: none;">
+                                        ${location.nom}
+                                    </a>
+                                </strong>
+                                <div class="popup-item">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <small style="color: #999;">
+                                        ${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}
+                                    </small>
+                                </div>
+                                <div class="popup-item">
+                                    <a href="https://maps.google.com/?q=${location.latitude},${location.longitude}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-link-45deg"></i> Google Maps
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+
+                            // Ajouter le marqueur à la carte
+                            L.marker([location.latitude, location.longitude], {
+                                    icon: customMarker
+                                })
+                                .bindPopup(popupContent, {
+                                    maxWidth: 300
+                                })
+                                .addTo(map);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des magasins:', error);
+                });
+
+            // Ajouter une légende
+            const legend = L.control({
+                position: 'bottomright'
+            });
+            legend.onAdd = function() {
+                const div = L.DomUtil.create('div', 'map-legend');
+                div.innerHTML = `
+                <strong>Légende</strong>
+                <div class="map-legend-item">
+                    <small><i class="bi bi-shop"></i> Magasin</small>
+                </div>
+                <div class="map-legend-item">
+                    <small>Cliquez sur un marqueur pour voir les détails</small>
+                </div>
+            `;
+                return div;
+            };
+            legend.addTo(map);
+        });
+    </script>
+@endpush

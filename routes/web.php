@@ -11,6 +11,7 @@ use App\Http\Controllers\ProformaFournisseurController;
 use App\Http\Controllers\BonCommandeController;
 use App\Http\Controllers\BonReceptionController;
 use App\Http\Controllers\MvtStockController;
+use App\Http\Controllers\MagasinController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -142,6 +143,22 @@ Route::prefix('mvt-stock')->group(function () {
     Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
     Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
     Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
+});
+
+// Routes Magasin
+Route::prefix('magasin')->group(function () {
+    // Routes spécifiques AVANT les paramètres
+    Route::get('/carte', [MagasinController::class, 'carte'])->name('magasin.carte');
+    Route::get('/api/magasins', [MagasinController::class, 'getMagasins'])->name('magasin.magasins');
+    Route::get('/list', [MagasinController::class, 'list'])->name('magasin.list');
+    Route::get('/create', [MagasinController::class, 'create'])->name('magasin.create');
+    Route::post('/', [MagasinController::class, 'store'])->name('magasin.store');
+    
+    // Routes avec paramètres EN DERNIER
+    Route::get('/{id}', [MagasinController::class, 'show'])->name('magasin.show');
+    Route::get('/{id}/edit', [MagasinController::class, 'edit'])->name('magasin.edit');
+    Route::put('/{id}', [MagasinController::class, 'update'])->name('magasin.update');
+    Route::delete('/{id}', [MagasinController::class, 'destroy'])->name('magasin.destroy');
 });
 
 Route::get('/about', function () {
