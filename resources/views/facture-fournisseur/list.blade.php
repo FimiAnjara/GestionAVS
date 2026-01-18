@@ -1,4 +1,4 @@
-@extends('app')
+@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid mt-4">
@@ -7,7 +7,7 @@
             <h1 class="h3"><i class="bi bi-receipt"></i> Factures Fournisseur</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{{ route('facture-fournisseur.createFromBonCommande') }}" class="btn btn-primary">
+            <a href="{{ route('facture-fournisseur.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus"></i> Nouvelle Facture
             </a>
         </div>

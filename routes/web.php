@@ -132,7 +132,7 @@ Route::prefix('bon-commande')->group(function () {
 // Routes Facture Fournisseur
 Route::prefix('facture-fournisseur')->group(function () {
     Route::get('/list', [FactureFournisseurController::class, 'list'])->name('facture-fournisseur.list');
-    Route::get('/create', [FactureFournisseurController::class, 'createFromBonCommande'])->name('facture-fournisseur.createFromBonCommande');
+    Route::get('/create', [FactureFournisseurController::class, 'createFromBonCommande'])->name('facture-fournisseur.create');
     Route::get('/create/{id_bonCommande}', [FactureFournisseurController::class, 'createFromBonCommande'])->name('facture-fournisseur.createFromBonCommande');
     Route::post('/', [FactureFournisseurController::class, 'store'])->name('facture-fournisseur.store');
     Route::get('/{id}', [FactureFournisseurController::class, 'show'])->name('facture-fournisseur.show');

@@ -40,22 +40,28 @@ class FactureFournisseurController extends Controller
 
     /**
      * Créer une facture à partir d'un bon de commande
+     * Si $id_bonCommande est null, affiche la liste des bons de commande disponibles
      */
-    public function createFromBonCommande($id_bonCommande)
+    public function createFromBonCommande($id_bonCommande = null)
     {
-        $bonCommande = BonCommande::findOrFail($id_bonCommande);
-        
-        // Vérifier que le bon est en état 11
-        if ($bonCommande->etat != 11) {
-            return back()->withErrors(['etat' => 'Le bon de commande doit être en état "Validée par DG"']);
-        }
+        if ($id_bonCommande) {
+            $bonCommande = BonCommande::findOrFail($id_bonCommande);
+            
+            // Vérifier que le bon est en état 11
+            if ($bonCommande->etat != 11) {
+                return back()->withErrors(['etat' => 'Le bon de commande doit être en état "Validée par DG"']);
+            }
 
-        // Vérifier qu'une facture n'existe pas déjà
-        if ($bonCommande->id_factureFournisseur) {
-            return back()->withErrors(['facture' => 'Une facture existe déjà pour ce bon de commande']);
-        }
+            // Vérifier qu'une facture n'existe pas déjà
+            if ($bonCommande->id_factureFournisseur) {
+                return back()->withErrors(['facture' => 'Une facture existe déjà pour ce bon de commande']);
+            }
 
         return view('facture-fournisseur.create', compact('bonCommande'));
+        }
+        
+        // Si aucun ID n'est fourni, afficher la liste des bons de commande disponibles
+        return view('facture-fournisseur.create', ['bonCommande' => null]);
     }
 
     /**
