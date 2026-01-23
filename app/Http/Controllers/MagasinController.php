@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Magasin;
 use App\Models\Emplacement;
 use App\Models\Stock;
+use App\Models\Site;
+use App\Models\Entite;
+use App\Models\Groupe;
 use Illuminate\Http\Request;
 
 class MagasinController extends Controller
@@ -22,7 +25,7 @@ class MagasinController extends Controller
 
         $magasins = $query->paginate(10);
 
-        return view('magasin.list', compact('magasins'));
+        return view('organigramme.magasin.list', compact('magasins'));
     }
 
     /**
@@ -30,7 +33,8 @@ class MagasinController extends Controller
      */
     public function create()
     {
-        return view('magasin.create');
+        $sites = Site::with('entite.groupe')->get();
+        return view('organigramme.magasin.create', compact('sites'));
     }
 
     /**
@@ -42,6 +46,7 @@ class MagasinController extends Controller
             'nom' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'id_site' => 'nullable|exists:site,id_site',
         ]);
 
         $id = 'MAG_' . uniqid();
@@ -50,6 +55,7 @@ class MagasinController extends Controller
             'nom' => $request->nom,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
+            'id_site' => $request->id_site,
         ]);
 
         return redirect()->route('magasin.list')->with('success', 'Magasin créé avec succès');
@@ -62,7 +68,7 @@ class MagasinController extends Controller
     {
         $magasin = Magasin::findOrFail($id);
         
-        return view('magasin.show', compact('magasin'));
+        return view('organigramme.magasin.show', compact('magasin'));
     }
 
     /**
@@ -71,8 +77,9 @@ class MagasinController extends Controller
     public function edit($id)
     {
         $magasin = Magasin::findOrFail($id);
+        $sites = Site::with('entite.groupe')->get();
         
-        return view('magasin.edit', compact('magasin'));
+        return view('organigramme.magasin.edit', compact('magasin', 'sites'));
     }
 
     /**
@@ -86,12 +93,14 @@ class MagasinController extends Controller
             'nom' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'id_site' => 'nullable|exists:site,id_site',
         ]);
 
         $magasin->update([
             'nom' => $request->nom,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
+            'id_site' => $request->id_site,
         ]);
 
         return redirect()->route('magasin.show', $magasin->id_magasin)->with('success', 'Magasin modifié avec succès');
@@ -113,8 +122,28 @@ class MagasinController extends Controller
      */
     public function carte(Request $request)
     {
-        $query = Magasin::query();
+        $query = Magasin::with(['site.entite.groupe']);
 
+        // Filtre par groupe
+        if ($request->filled('id_groupe')) {
+            $query->whereHas('site.entite', function($q) use ($request) {
+                $q->where('id_groupe', $request->id_groupe);
+            });
+        }
+
+        // Filtre par entité
+        if ($request->filled('id_entite')) {
+            $query->whereHas('site', function($q) use ($request) {
+                $q->where('id_entite', $request->id_entite);
+            });
+        }
+
+        // Filtre par site
+        if ($request->filled('id_site')) {
+            $query->where('id_site', $request->id_site);
+        }
+
+        // Filtre par nom
         if ($request->filled('nom')) {
             $query->where('nom', 'like', '%' . $request->nom . '%');
         }
@@ -122,18 +151,36 @@ class MagasinController extends Controller
         $magasins = $query->get();
 
         $locations = $magasins->map(function ($magasin) {
+            $entite = $magasin->site?->entite;
             return [
                 'id' => $magasin->id_magasin,
                 'nom' => $magasin->nom,
                 'latitude' => floatval($magasin->latitude),
                 'longitude' => floatval($magasin->longitude),
+                'site' => $magasin->site?->localisation,
+                'entite' => $entite?->nom,
+                'groupe' => $entite?->groupe?->nom,
+                'code_couleur' => $entite?->code_couleur ?? '#1a73e8',
             ];
         });
 
         $totalMagasins = Magasin::count();
-        $magasinsAntananarivo = $locations->count();
+        $magasinsAffiches = $locations->count();
 
-        return view('magasin.carte', compact('locations', 'magasins', 'totalMagasins', 'magasinsAntananarivo'));
+        // Données pour les filtres
+        $groupes = Groupe::orderBy('nom')->get();
+        $entites = Entite::orderBy('nom')->get();
+        $sites = Site::orderBy('localisation')->get();
+
+        return view('organigramme.magasin.carte', compact(
+            'locations', 
+            'magasins', 
+            'totalMagasins', 
+            'magasinsAffiches',
+            'groupes',
+            'entites',
+            'sites'
+        ));
     }
 
     /**
@@ -141,8 +188,28 @@ class MagasinController extends Controller
      */
     public function getMagasins(Request $request)
     {
-        $query = Magasin::query();
+        $query = Magasin::with(['site.entite.groupe']);
 
+        // Filtre par groupe
+        if ($request->filled('id_groupe')) {
+            $query->whereHas('site.entite', function($q) use ($request) {
+                $q->where('id_groupe', $request->id_groupe);
+            });
+        }
+
+        // Filtre par entité
+        if ($request->filled('id_entite')) {
+            $query->whereHas('site', function($q) use ($request) {
+                $q->where('id_entite', $request->id_entite);
+            });
+        }
+
+        // Filtre par site
+        if ($request->filled('id_site')) {
+            $query->where('id_site', $request->id_site);
+        }
+
+        // Filtre par nom
         if ($request->filled('nom')) {
             $query->where('nom', 'like', '%' . $request->nom . '%');
         }
@@ -150,15 +217,56 @@ class MagasinController extends Controller
         $magasins = $query->get();
 
         $locations = $magasins->map(function ($magasin) {
+            $entite = $magasin->site?->entite;
             return [
                 'id' => $magasin->id_magasin,
                 'nom' => $magasin->nom,
                 'latitude' => floatval($magasin->latitude),
                 'longitude' => floatval($magasin->longitude),
+                'site' => $magasin->site?->localisation,
+                'entite' => $entite?->nom,
+                'groupe' => $entite?->groupe?->nom,
+                'code_couleur' => $entite?->code_couleur ?? '#1a73e8',
             ];
         });
 
         return response()->json($locations);
+    }
+
+    /**
+     * API : Récupérer les entités par groupe
+     */
+    public function getEntitesByGroupe(Request $request)
+    {
+        $entites = Entite::when($request->filled('id_groupe'), function($q) use ($request) {
+            $q->where('id_groupe', $request->id_groupe);
+        })->orderBy('nom')->get(['id_entite', 'nom', 'code_couleur']);
+
+        return response()->json($entites);
+    }
+
+    /**
+     * API : Récupérer les sites par entité
+     */
+    public function getSitesByEntite(Request $request)
+    {
+        $sites = Site::when($request->filled('id_entite'), function($q) use ($request) {
+            $q->where('id_entite', $request->id_entite);
+        })->orderBy('localisation')->get(['id_site', 'localisation as nom']);
+
+        return response()->json($sites);
+    }
+
+    /**
+     * API : Récupérer les magasins par site
+     */
+    public function getMagasinsBySite(Request $request)
+    {
+        $magasins = Magasin::when($request->filled('id_site'), function($q) use ($request) {
+            $q->where('id_site', $request->id_site);
+        })->orderBy('nom')->get(['id_magasin', 'nom']);
+
+        return response()->json($magasins);
     }
 }
 

@@ -118,6 +118,99 @@
 
                 <div class="menu-divider"></div>
 
+                <li class="menu-title">Organigramme</li>
+                <!-- GROUPE MENU -->
+                <li class="has-submenu {{ request()->is('groupe*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-diagram-3"></i>
+                        <span class="menu-text">Groupes</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('groupe*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('groupe.create') }}"
+                            class="submenu-item {{ request()->is('groupe/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('groupe.list') }}"
+                            class="submenu-item {{ request()->is('groupe/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- ENTITE MENU -->
+                <li class="has-submenu {{ request()->is('entite*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-grid-3x3"></i>
+                        <span class="menu-text">Entités</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('entite*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('entite.create') }}"
+                            class="submenu-item {{ request()->is('entite/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('entite.list') }}"
+                            class="submenu-item {{ request()->is('entite/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- SITE MENU -->
+                <li class="has-submenu {{ request()->is('site*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-geo-alt"></i>
+                        <span class="menu-text">Sites</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('site*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('site.create') }}"
+                            class="submenu-item {{ request()->is('site/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('site.list') }}"
+                            class="submenu-item {{ request()->is('site/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- MAGASIN MENU (Organigramme) -->
+                <li class="has-submenu {{ request()->is('magasin*') && !request()->is('magasin/carte') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-shop-window"></i>
+                        <span class="menu-text">Magasins</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('magasin*') && !request()->is('magasin/carte') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('magasin.create') }}"
+                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('magasin.list') }}"
+                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- CARTE MENU -->
+                <li>
+                    <a href="{{ route('magasin.carte') }}" class="{{ request()->is('magasin/carte') ? 'active' : '' }}">
+                        <i class="bi bi-map"></i>
+                        <span class="menu-text">Carte</span>
+                    </a>
+                </li>
+                <div class="menu-divider"></div>
                 <li class="menu-title">Tiers</li>
                 <!-- CLIENT MENU -->
                 <li class="has-submenu {{ request()->is('clients*') ? 'active' : '' }}">
@@ -254,35 +347,6 @@
                             class="submenu-item {{ request()->is('unites/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
-                        </a>
-                    </div>
-                </li>
-
-                <div class="menu-divider"></div>
-
-                <li class="menu-title">Magasin</li>
-                <!-- MAGASIN MENU -->
-                <li class="has-submenu {{ request()->is('magasin*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-shop-window"></i>
-                        <span class="menu-text">Magasin</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
-                        <a href="{{ route('magasin.create') }}"
-                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>Saisie</span>
-                        </a>
-                        <a href="{{ route('magasin.list') }}"
-                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        <a href="{{ route('magasin.carte') }}"
-                            class="submenu-item {{ request()->is('magasin/carte') ? 'active' : '' }}">
-                            <i class="bi bi-geo-alt"></i>
-                            <span>Voir Carte</span>
                         </a>
                     </div>
                 </li>
