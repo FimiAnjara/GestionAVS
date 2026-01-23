@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Assurez-vous que l'extension PostGIS est activée sur votre base PostgreSQL :
+        // DB::statement('CREATE EXTENSION IF NOT EXISTS postgis');
         Schema::create('magasin', function (Blueprint $table) {
             $table->string('id_magasin')->primary();
             $table->string('nom');
-            $table->decimal('latitude', 10, 6)->nullable();
-            $table->decimal('longitude', 10, 6)->nullable();
+            // Utilisation de PostGIS pour les coordonnées géographiques
+            $table->geometry('location', '4326')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

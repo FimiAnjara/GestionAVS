@@ -1,0 +1,38 @@
+Departement Achats
+
+| Rôle                   | Peut faire          | Ne peut pas faire      |
+| ---------------------- | ------------------- | ---------------------- |
+| Demandeur d’achat      | Créer DA            | Approuver              |
+| Approbat. N1 / N2 / N3 | Valider selon seuil | Commander              |
+| Acheteur               | BC, fournisseurs    | Valider ses propres BC |
+| Responsable Achats     | Débloquer litiges   | Modifier stock         |
+| Finance Achats         | Vérifier budget     | Réceptionner           |
+
+
+Departement stock logistique
+| Rôle                 | Fonction                 |
+| -------------------- | ------------------------ |
+| Magasinier Réception | Réception fournisseurs   |
+| Magasinier Sortie    | Livraison / sortie       |
+| Chef Magasin         | Validation transferts    |
+| Responsable Stock    | Inventaires, ajustements |
+| Logisticien          | Planification flux       |
+
+
+Departement vente
+| Rôle                   | Fonction               |
+| ---------------------- | ---------------------- |
+| Commercial             | Devis, commandes       |
+| Caissier / Facturation | Factures, encaissement |
+| Responsable Commercial | Validation remises     |
+| Service Client         | Retours / réclamations |
+
+Departement Finance
+| Rôle                  | Fonction                  |
+| --------------------- | ------------------------- |
+| Comptable Fournisseur | Factures fournisseurs     |
+| Comptable Client      | Factures clients          |
+| Trésorier             | Paiements / encaissements |
+| Contrôleur de gestion | Marges, coûts             |
+| DAF                   | Validation exceptionnelle |
+
