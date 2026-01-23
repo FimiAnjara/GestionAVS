@@ -13,12 +13,48 @@ use App\Http\Controllers\FactureFournisseurController;
 use App\Http\Controllers\BonReceptionController;
 use App\Http\Controllers\MvtStockController;
 use App\Http\Controllers\MagasinController;
+use App\Http\Controllers\GroupeController;
+use App\Http\Controllers\EntiteController;
+use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    return view('dashboard');
+    return view('dashboard.dashboard');
 })->name('home');
+
+// Routes Organigramme - Groupe
+Route::prefix('groupe')->group(function () {
+    Route::get('/list', [GroupeController::class, 'list'])->name('groupe.list');
+    Route::get('/create', [GroupeController::class, 'create'])->name('groupe.create');
+    Route::post('/', [GroupeController::class, 'store'])->name('groupe.store');
+    Route::get('/{id}', [GroupeController::class, 'show'])->name('groupe.show');
+    Route::get('/{id}/edit', [GroupeController::class, 'edit'])->name('groupe.edit');
+    Route::put('/{id}', [GroupeController::class, 'update'])->name('groupe.update');
+    Route::delete('/{id}', [GroupeController::class, 'destroy'])->name('groupe.destroy');
+});
+
+// Routes Organigramme - Entite
+Route::prefix('entite')->group(function () {
+    Route::get('/list', [EntiteController::class, 'list'])->name('entite.list');
+    Route::get('/create', [EntiteController::class, 'create'])->name('entite.create');
+    Route::post('/', [EntiteController::class, 'store'])->name('entite.store');
+    Route::get('/{id}', [EntiteController::class, 'show'])->name('entite.show');
+    Route::get('/{id}/edit', [EntiteController::class, 'edit'])->name('entite.edit');
+    Route::put('/{id}', [EntiteController::class, 'update'])->name('entite.update');
+    Route::delete('/{id}', [EntiteController::class, 'destroy'])->name('entite.destroy');
+});
+
+// Routes Organigramme - Site
+Route::prefix('site')->group(function () {
+    Route::get('/list', [SiteController::class, 'list'])->name('site.list');
+    Route::get('/create', [SiteController::class, 'create'])->name('site.create');
+    Route::post('/', [SiteController::class, 'store'])->name('site.store');
+    Route::get('/{id}', [SiteController::class, 'show'])->name('site.show');
+    Route::get('/{id}/edit', [SiteController::class, 'edit'])->name('site.edit');
+    Route::put('/{id}', [SiteController::class, 'update'])->name('site.update');
+    Route::delete('/{id}', [SiteController::class, 'destroy'])->name('site.destroy');
+});
 
 // Routes Clients
 Route::prefix('clients')->group(function () {
@@ -178,6 +214,9 @@ Route::prefix('magasin')->group(function () {
     // Routes spécifiques AVANT les paramètres
     Route::get('/carte', [MagasinController::class, 'carte'])->name('magasin.carte');
     Route::get('/api/magasins', [MagasinController::class, 'getMagasins'])->name('magasin.magasins');
+    Route::get('/api/entites-by-groupe', [MagasinController::class, 'getEntitesByGroupe'])->name('magasin.entitesByGroupe');
+    Route::get('/api/sites-by-entite', [MagasinController::class, 'getSitesByEntite'])->name('magasin.sitesByEntite');
+    Route::get('/api/magasins-by-site', [MagasinController::class, 'getMagasinsBySite'])->name('magasin.magasinsBySite');
     Route::get('/list', [MagasinController::class, 'list'])->name('magasin.list');
     Route::get('/create', [MagasinController::class, 'create'])->name('magasin.create');
     Route::post('/', [MagasinController::class, 'store'])->name('magasin.store');
@@ -189,10 +228,3 @@ Route::prefix('magasin')->group(function () {
     Route::delete('/{id}', [MagasinController::class, 'destroy'])->name('magasin.destroy');
 });
 
-Route::get('/about', function () {
-    return view('about');
-});
-
-Route::get('/contact', function () {
-    return view('contact');
-});
