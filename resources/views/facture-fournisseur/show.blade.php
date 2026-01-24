@@ -216,36 +216,14 @@
                     </a>
                     @if($facture->etat != 11)
                     <button type="button" class="btn btn-outline-danger btn-sm w-100" 
-                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deleteConfirmModal"
+                            data-bs-url="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
+                            data-bs-item="la facture {{ $facture->id_factureFournisseur }}"
+                            title="Supprimer">
                         <i class="bi bi-trash me-2"></i>Supprimer
                     </button>
                     @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Suppression -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmer la suppression</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Êtes-vous sûr de vouloir supprimer la facture <strong>{{ $facture->id_factureFournisseur }}</strong> ?
-                    <br><small class="text-muted">Cette action est irréversible.</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form action="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash me-2"></i>Supprimer
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>

@@ -35,33 +35,20 @@
                             @enderror
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="stock" class="form-label">
-                                    <i class="bi bi-box-seam"></i> Stock <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control @error('stock') is-invalid @enderror" 
-                                       id="stock" name="stock" placeholder="0" min="0" required>
-                                @error('stock')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="id_categorie" class="form-label">
-                                    <i class="bi bi-tag"></i> Catégorie <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-control @error('id_categorie') is-invalid @enderror" 
-                                        id="id_categorie" name="id_categorie" required>
-                                    <option value="">-- Sélectionner --</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id_categorie }}">{{ $cat->libelle }}</option>
-                                    @endforeach
-                                </select>
-                                @error('id_categorie')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_categorie" class="form-label">
+                                <i class="bi bi-tag"></i> Catégorie <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control @error('id_categorie') is-invalid @enderror" 
+                                    id="id_categorie" name="id_categorie" required>
+                                <option value="">-- Sélectionner --</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id_categorie }}">{{ $cat->libelle }}</option>
+                                @endforeach
+                            </select>
+                            @error('id_categorie')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="row">
@@ -77,6 +64,40 @@
                                     @endforeach
                                 </select>
                                 @error('id_unite')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="id_entite" class="form-label">
+                                    <i class="bi bi-building"></i> Entité <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control @error('id_entite') is-invalid @enderror" 
+                                        id="id_entite" name="id_entite" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    @foreach($entites as $entite)
+                                        <option value="{{ $entite->id_entite }}">{{ $entite->nom }}</option>
+                                    @endforeach
+                                </select>
+                                @error('id_entite')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_type_evaluation_stock" class="form-label">
+                                    <i class="bi bi-calculator"></i> Type d'Évaluation <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control @error('id_type_evaluation_stock') is-invalid @enderror" 
+                                        id="id_type_evaluation_stock" name="id_type_evaluation_stock" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    @foreach($typeEvaluations as $type)
+                                        <option value="{{ $type->id_type_evaluation_stock }}">{{ $type->libelle }} ({{ $type->id_type_evaluation_stock }})</option>
+                                    @endforeach
+                                </select>
+                                @error('id_type_evaluation_stock')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

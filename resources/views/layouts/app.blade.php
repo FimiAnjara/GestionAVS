@@ -357,6 +357,27 @@
                     </div>
                 </li>
 
+                <!-- TYPE EVALUATION STOCK MENU -->
+                <li class="has-submenu {{ request()->is('type-evaluation-stock*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-calculator"></i>
+                        <span class="menu-text">Évaluation Stock</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('type-evaluation-stock*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('type-evaluation-stock.create') }}"
+                            class="submenu-item {{ request()->is('type-evaluation-stock/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('type-evaluation-stock.list') }}"
+                            class="submenu-item {{ request()->is('type-evaluation-stock/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
                 <div class="menu-divider"></div>
 
                 <li class="menu-title">Finance</li>
@@ -558,6 +579,8 @@
         </footer>
     </div>
 
+    @include('partials.delete-modal')
+
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -671,6 +694,22 @@
         // Exécuter au chargement
         document.addEventListener('DOMContentLoaded', function() {
             updateTime();
+
+            // Unified Delete Confirmation Modal Handler
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const url = button.getAttribute('data-bs-url');
+                    const itemName = button.getAttribute('data-bs-item');
+
+                    const form = deleteModal.querySelector('#deleteConfirmForm');
+                    const nameContainer = deleteModal.querySelector('#deleteItemName');
+
+                    if (form) form.action = url;
+                    if (nameContainer) nameContainer.textContent = itemName || 'cet élément';
+                });
+            }
         });
     </script>
 

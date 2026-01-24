@@ -7,7 +7,6 @@
     <!-- En-tête -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="bi bi-box"></i> Détails de l'Article</h2>
             <p class="text-muted">Informations complètes</p>
         </div>
         <div>
@@ -48,11 +47,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="text-muted small">Stock</label>
-                            <p class="fw-bold"><span class="badge bg-warning text-dark">{{ $article->stock }}</span></p>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="text-muted small">Catégorie</label>
                             <p class="fw-bold">
                                 <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getCategoryColor($article->categorie->libelle ?? '') }}; color: white;">
@@ -68,6 +63,29 @@
                             <p class="fw-bold">
                                 <span class="badge" style="background-color: {{ \App\Helpers\BadgeHelper::getUnitColor($article->unite->libelle ?? '') }}; color: white;">
                                     {{ $article->unite->libelle ?? '-' }}
+                                </span>
+                            </p>
+                        </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Entité</label>
+                            <p class="fw-bold">
+                                @if($article->entite)
+                                    <a href="{{ route('entite.show', $article->id_entite) }}" class="text-decoration-none">
+                                        <span class="badge bg-secondary">
+                                            {{ $article->entite->nom }}
+                                        </span>
+                                    </a>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Évaluation Stock</label>
+                            <p class="fw-bold">
+                                <span class="badge bg-info text-dark">
+                                    {{ $article->typeEvaluation->libelle ?? '-' }}
                                 </span>
                             </p>
                         </div>
@@ -98,7 +116,11 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <button class="btn btn-danger w-100" onclick="confirmDelete()">
+                    <button class="btn btn-danger w-100" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteConfirmModal"
+                        data-bs-url="{{ route('articles.destroy', $article->id_article) }}"
+                        data-bs-item="{{ $article->nom }}">
                         <i class="bi bi-trash"></i> Supprimer cet article
                     </button>
                     <p class="small text-muted mt-3">
@@ -110,30 +132,4 @@
     </div>
 </div>
 
-<script>
-    function confirmDelete() {
-        if (confirm('Êtes-vous absolument sûr de vouloir supprimer cet article ?')) {
-            fetch('{{ route("articles.destroy", $article->id_article) }}', {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    window.location.href = '{{ route("articles.list") }}';
-                } else {
-                    alert('Erreur: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue');
-            });
-        }
-    }
-</script>
 @endsection

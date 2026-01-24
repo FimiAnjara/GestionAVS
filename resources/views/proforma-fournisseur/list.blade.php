@@ -125,8 +125,11 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             @endif
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $proforma->id_proformaFournisseur }}"
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('proforma-fournisseur.destroy', $proforma->id_proformaFournisseur) }}"
+                                                data-bs-item="la proforma {{ $proforma->id_proformaFournisseur }}"
                                                 title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -170,34 +173,6 @@
                                                     <button type="submit" class="btn btn-primary">Valider</button>
                                                 </div>
                                             </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $proforma->id_proformaFournisseur }}"
-                                    tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer cette proforma?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Annuler</button>
-                                                <form
-                                                    action="{{ route('proforma-fournisseur.destroy', $proforma->id_proformaFournisseur) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

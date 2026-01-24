@@ -14,7 +14,7 @@ class Article extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_article', 'nom', 'stock', 'id_unite', 'id_categorie', 'photo'];
+    protected $fillable = ['id_article', 'nom', 'id_unite', 'id_categorie', 'id_entite', 'id_type_evaluation_stock', 'photo'];
 
     public function unite()
     {
@@ -24,6 +24,16 @@ class Article extends Model
     public function categorie()
     {
         return $this->belongsTo(Categorie::class, 'id_categorie', 'id_categorie');
+    }
+
+    public function entite()
+    {
+        return $this->belongsTo(Entite::class, 'id_entite', 'id_entite');
+    }
+
+    public function typeEvaluation()
+    {
+        return $this->belongsTo(TypeEvaluationStock::class, 'id_type_evaluation_stock', 'id_type_evaluation_stock');
     }
 
     public function articleFille()

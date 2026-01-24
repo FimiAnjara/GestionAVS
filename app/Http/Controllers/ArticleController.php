@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\Categorie;
 use App\Models\Unite;
+use App\Models\Entite;
+use App\Models\TypeEvaluationStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +14,7 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $query = Article::with(['categorie', 'unite'])
+        $query = Article::with(['categorie', 'unite', 'entite'])
             ->whereNull('deleted_at');
         
         // Filtres
@@ -23,21 +25,34 @@ class ArticleController extends Controller
         if (request('unite_id')) {
             $query->where('id_unite', request('unite_id'));
         }
+
+        if (request('entite_id')) {
+            $query->where('id_entite', request('entite_id'));
+        }
+
+        if (request('type_evaluation_id')) {
+            $query->where('id_type_evaluation_stock', request('type_evaluation_id'));
+        }
         
-        $articles = $query->orderBy('created_at', 'desc')
+        $articles = $query->with('typeEvaluation')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
         
         $categories = Categorie::whereNull('deleted_at')->get();
         $unites = Unite::whereNull('deleted_at')->get();
+        $entites = Entite::whereNull('deleted_at')->get();
+        $typeEvaluations = TypeEvaluationStock::whereNull('deleted_at')->get();
         
-        return view('articles.list', compact('articles', 'categories', 'unites'));
+        return view('articles.list', compact('articles', 'categories', 'unites', 'entites', 'typeEvaluations'));
     }
 
     public function create()
     {
         $categories = Categorie::whereNull('deleted_at')->get();
         $unites = Unite::whereNull('deleted_at')->get();
-        return view('articles.create', compact('categories', 'unites'));
+        $entites = Entite::whereNull('deleted_at')->get();
+        $typeEvaluations = TypeEvaluationStock::whereNull('deleted_at')->get();
+        return view('articles.create', compact('categories', 'unites', 'entites', 'typeEvaluations'));
     }
 
     public function edit($id)
@@ -45,16 +60,19 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $categories = Categorie::whereNull('deleted_at')->get();
         $unites = Unite::whereNull('deleted_at')->get();
-        return view('articles.edit', compact('article', 'categories', 'unites'));
+        $entites = Entite::whereNull('deleted_at')->get();
+        $typeEvaluations = TypeEvaluationStock::whereNull('deleted_at')->get();
+        return view('articles.edit', compact('article', 'categories', 'unites', 'entites', 'typeEvaluations'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:250',
-            'stock' => 'required|numeric|min:0',
             'id_categorie' => 'required|exists:categorie,id_categorie',
             'id_unite' => 'required|exists:unite,id_unite',
+            'id_entite' => 'required|exists:entite,id_entite',
+            'id_type_evaluation_stock' => 'required|exists:type_evaluation_stock,id_type_evaluation_stock',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -69,9 +87,10 @@ class ArticleController extends Controller
             Article::create([
                 'id_article' => $idArticle,
                 'nom' => $validated['nom'],
-                'stock' => $validated['stock'],
                 'id_categorie' => $validated['id_categorie'],
                 'id_unite' => $validated['id_unite'],
+                'id_entite' => $validated['id_entite'],
+                'id_type_evaluation_stock' => $validated['id_type_evaluation_stock'],
                 'photo' => $photoPath,
             ]);
 
@@ -89,7 +108,7 @@ class ArticleController extends Controller
 
     public function show($id)
     {
-        $article = Article::with(['categorie', 'unite'])->findOrFail($id);
+        $article = Article::with(['categorie', 'unite', 'entite', 'typeEvaluation'])->findOrFail($id);
         return view('articles.show', compact('article'));
     }
 
@@ -99,9 +118,10 @@ class ArticleController extends Controller
         
         $validated = $request->validate([
             'nom' => 'required|string|max:250',
-            'stock' => 'required|numeric|min:0',
             'id_categorie' => 'required|exists:categorie,id_categorie',
             'id_unite' => 'required|exists:unite,id_unite',
+            'id_entite' => 'required|exists:entite,id_entite',
+            'id_type_evaluation_stock' => 'required|exists:type_evaluation_stock,id_type_evaluation_stock',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 

@@ -117,8 +117,11 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             @endif
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $facture->id_factureFournisseur }}"
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
+                                                data-bs-item="la facture {{ $facture->id_factureFournisseur }}"
                                                 title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -159,37 +162,6 @@
                                                     <button type="submit" class="btn btn-primary">Valider</button>
                                                 </div>
                                             </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $facture->id_factureFournisseur }}"
-                                    tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer la facture
-                                                <strong>{{ $facture->id_factureFournisseur }}</strong> ?
-                                                Cette action est irréversible.
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Annuler</button>
-                                                <form action="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">
-                                                        <i class="bi bi-trash"></i> Supprimer
-                                                    </button>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

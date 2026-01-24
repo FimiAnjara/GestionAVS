@@ -116,6 +116,17 @@ Route::prefix('unites')->group(function () {
     Route::get('/search/query', [UniteController::class, 'search'])->name('unites.search');
 });
 
+// Routes Types d'Évaluation de Stock
+Route::prefix('type-evaluation-stock')->group(function () {
+    Route::get('/list', [\App\Http\Controllers\TypeEvaluationStockController::class, 'index'])->name('type-evaluation-stock.list');
+    Route::get('/create', [\App\Http\Controllers\TypeEvaluationStockController::class, 'create'])->name('type-evaluation-stock.create');
+    Route::post('/', [\App\Http\Controllers\TypeEvaluationStockController::class, 'store'])->name('type-evaluation-stock.store');
+    Route::get('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'show'])->name('type-evaluation-stock.show');
+    Route::get('/{id}/edit', [\App\Http\Controllers\TypeEvaluationStockController::class, 'edit'])->name('type-evaluation-stock.edit');
+    Route::put('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'update'])->name('type-evaluation-stock.update');
+    Route::delete('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'destroy'])->name('type-evaluation-stock.destroy');
+});
+
 // Routes Caisse (Finance)
 Route::prefix('caisse')->group(function () {
     Route::get('/list', [CaisseController::class, 'list'])->name('caisse.list');
