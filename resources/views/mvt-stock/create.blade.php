@@ -62,21 +62,26 @@
 
                 <div class="col-lg-4">
                     <label for="id_magasin" class="form-label">
-                        <i class="bi bi-building me-2"></i>
-                        Magasin
+                        <i class="bi bi-shop me-2"></i>
+                        Magasin <span id="magasin-detail-badge" class="badge bg-light text-dark ms-2" style="display:none; font-weight: normal;"></span>
                     </label>
                     <select class="form-select searchable-select @error('id_magasin') is-invalid @enderror" 
                             id="id_magasin" name="id_magasin">
                         <option value="">-- Sélectionner un magasin --</option>
                         @foreach($magasins as $magasin)
-                            <option value="{{ $magasin->id_magasin }}" @selected(old('id_magasin') == $magasin->id_magasin || ($prefilledMagasin && $prefilledMagasin == $magasin->id_magasin))>
-                                {{ $magasin->id_magasin }} - {{ $magasin->nom ?? $magasin->designation }}
+                            <option value="{{ $magasin->id_magasin }}" 
+                                    data-entite="{{ $magasin->site?->entite?->nom ?? 'N/A' }}"
+                                    data-site="{{ $magasin->site?->localisation ?? 'N/A' }}"
+                                    @selected(old('id_magasin') == $magasin->id_magasin || ($prefilledMagasin && $prefilledMagasin == $magasin->id_magasin))>
+                                {{ $magasin->id_magasin }} - {{ $magasin->nom ?? $magasin->designation }} 
+                                [{{ $magasin->site?->entite?->nom ?? 'N/A' }} | {{ $magasin->site?->localisation ?? 'N/A' }}]
                             </option>
                         @endforeach
                     </select>
                     @error('id_magasin')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                    <div id="magasin-info" class="mt-2 small text-muted"></div>
                 </div>
             </div>
 
@@ -322,6 +327,28 @@ $(document).ready(function() {
     // Attacher les écouteurs pour la première ligne
     attachCalculationListeners();
     updateRemoveButtons();
+
+    // Gestion de l'affichage des détails du magasin
+    $('#id_magasin').on('change', function() {
+        const selected = $(this).find(':selected');
+        const entite = selected.data('entite');
+        const site = selected.data('site');
+        const badge = $('#magasin-detail-badge');
+        const infoDiv = $('#magasin-info');
+
+        if ($(this).val()) {
+            badge.text(`${entite}`).show();
+            infoDiv.html(`<i class="bi bi-geo-alt me-1"></i> Site: <strong>${site}</strong> | <i class="bi bi-building me-1"></i> Entité: <strong>${entite}</strong>`).fadeIn();
+        } else {
+            badge.hide();
+            infoDiv.hide().empty();
+        }
+    });
+
+    // Déclencher au chargement si déjà rempli
+    if ($('#id_magasin').val()) {
+        $('#id_magasin').trigger('change');
+    }
 });
 </script>
 @endsection

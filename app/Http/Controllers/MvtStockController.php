@@ -60,7 +60,7 @@ class MvtStockController extends Controller
     public function create(Request $request)
     {
         $articles = Article::all();
-        $magasins = Magasin::all();
+        $magasins = Magasin::with('site.entite')->get();
         
         // Pré-remplissage depuis un bon de réception
         $bonReception = null;

@@ -77,9 +77,9 @@
                 </div>
 
                 <!-- Réinitialiser -->
-                <div class="col-md-1">
-                    <a href="{{ route('articles.list') }}" class="btn btn-light w-100 border text-muted" title="Réinitialiser">
-                        <i class="bi bi-arrow-counterclockwise" style="color: #6c757d;"></i>
+                <div class="col-md-1 text-center">
+                    <a href="{{ route('articles.list') }}" class="btn btn-secondary shadow-sm px-3" title="Réinitialiser">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </div>
             </form>
