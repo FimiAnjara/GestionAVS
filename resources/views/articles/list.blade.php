@@ -15,62 +15,75 @@
     </div>
 
     <!-- Filtres et Recherche -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-3">
-            <div class="input-group shadow-sm">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search text-muted"></i>
-                </span>
-                <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Rechercher un article...">
-            </div>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form action="{{ route('articles.list') }}" method="GET" class="row g-2 align-items-center">
+                <!-- Recherche -->
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="Rechercher...">
+                    </div>
+                </div>
+
+                <!-- Catégorie -->
+                <div class="col-md-2">
+                    <select name="categorie_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Catégorie</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id_categorie }}" {{ request('categorie_id') == $cat->id_categorie ? 'selected' : '' }}>
+                                {{ $cat->libelle }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Unité -->
+                <div class="col-md-2">
+                    <select name="unite_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Unité</option>
+                        @foreach($unites as $un)
+                            <option value="{{ $un->id_unite }}" {{ request('unite_id') == $un->id_unite ? 'selected' : '' }}>
+                                {{ $un->libelle }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Entité -->
+                <div class="col-md-2">
+                    <select name="entite_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Entité</option>
+                        @foreach($entites as $ent)
+                            <option value="{{ $ent->id_entite }}" {{ request('entite_id') == $ent->id_entite ? 'selected' : '' }}>
+                                {{ $ent->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Évaluation -->
+                <div class="col-md-2">
+                    <select name="type_evaluation_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Évaluation</option>
+                        @foreach($typeEvaluations as $te)
+                            <option value="{{ $te->id_type_evaluation_stock }}" {{ request('type_evaluation_id') == $te->id_type_evaluation_stock ? 'selected' : '' }}>
+                                {{ $te->libelle }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Réinitialiser -->
+                <div class="col-md-1">
+                    <a href="{{ route('articles.list') }}" class="btn btn-light w-100 border text-muted" title="Réinitialiser">
+                        <i class="bi bi-arrow-counterclockwise" style="color: #6c757d;"></i>
+                    </a>
+                </div>
+            </form>
         </div>
-        <form action="{{ route('articles.list') }}" method="GET" class="col-md-9 row g-3">
-            <div class="col-md-3">
-                <select name="categorie_id" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="">Toutes les catégories</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->id_categorie }}" {{ request('categorie_id') == $cat->id_categorie ? 'selected' : '' }}>
-                            {{ $cat->libelle }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="unite_id" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="">Toutes les unités</option>
-                    @foreach($unites as $un)
-                        <option value="{{ $un->id_unite }}" {{ request('unite_id') == $un->id_unite ? 'selected' : '' }}>
-                            {{ $un->libelle }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="entite_id" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="">Toutes les entités</option>
-                    @foreach($entites as $ent)
-                        <option value="{{ $ent->id_entite }}" {{ request('entite_id') == $ent->id_entite ? 'selected' : '' }}>
-                            {{ $ent->nom }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="type_evaluation_id" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="">Toutes les évaluations</option>
-                    @foreach($typeEvaluations as $te)
-                        <option value="{{ $te->id_type_evaluation_stock }}" {{ request('type_evaluation_id') == $te->id_type_evaluation_stock ? 'selected' : '' }}>
-                            {{ $te->libelle }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('articles.list') }}" class="btn btn-outline-secondary w-100 shadow-sm">
-                    <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
-                </a>
-            </div>
-        </form>
     </div>
 
     <!-- Tableau -->

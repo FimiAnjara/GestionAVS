@@ -22,9 +22,10 @@ class DatabaseSeeder extends Seeder
             UniteSeeder::class,
             ClientSeeder::class,
             FournisseurSeeder::class,
+            OrganigrammeSeeder::class,
+            TypeEvaluationStockSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
-            OrganigrammeSeeder::class,
         ]);
     }
 }
