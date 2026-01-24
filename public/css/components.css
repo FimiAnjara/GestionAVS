@@ -1,0 +1,595 @@
+/* ========================================
+   COMPONENTS STYLING - GestionAVS
+   Modern, unified styling for all components
+   (Dashboard, Detail Views, Cards, Stats, etc.)
+   ======================================== */
+
+/* ========== PAGE HEADERS ========== */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1,
+.page-header h2 {
+    color: hsl(220, 85%, 35%);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 i,
+.page-header h2 i {
+    color: hsl(220, 85%, 45%);
+    font-size: 1.2em;
+}
+
+.page-header .lead,
+.page-header p.text-muted {
+    font-size: 1.05rem;
+    color: hsl(220, 12%, 55%);
+    margin: 0;
+}
+
+/* ========== STAT CARDS (Dashboard) ========== */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(220, 16%, 90%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 86, 179, 0.12);
+    border-color: hsl(220, 85%, 45%);
+}
+
+.stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .stat-icon.primary {
+    background: linear-gradient(135deg, hsl(220, 85%, 45%) 0%, hsl(220, 85%, 55%) 100%);
+    color: white;
+}
+
+.stat-card .stat-icon.success {
+    background: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(142, 76%, 46%) 100%);
+    color: white;
+}
+
+.stat-card .stat-icon.info {
+    background: linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(199, 89%, 58%) 100%);
+    color: white;
+}
+
+.stat-card .stat-icon.warning {
+    background: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(38, 92%, 60%) 100%);
+    color: hsl(38, 92%, 10%);
+}
+
+.stat-card .stat-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: hsl(220, 12%, 55%);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: hsl(220, 18%, 12%);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+}
+
+.stat-card .stat-change {
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-card .stat-change.positive {
+    color: hsl(142, 76%, 36%);
+}
+
+.stat-card .stat-change.negative {
+    color: hsl(0, 84%, 60%);
+}
+
+/* ========== INFO CARDS (Detail Views) ========== */
+.info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(220, 16%, 90%);
+    margin-bottom: 1.5rem;
+}
+
+.info-card .info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid hsl(220, 16%, 90%);
+}
+
+.info-card .info-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: hsl(220, 85%, 35%);
+    font-size: 1.1rem;
+}
+
+.info-card .info-header i {
+    color: hsl(220, 85%, 45%);
+    font-size: 1.3rem;
+}
+
+.info-card .info-row {
+    display: flex;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid hsl(220, 16%, 95%);
+}
+
+.info-card .info-row:last-child {
+    border-bottom: none;
+}
+
+.info-card .info-label {
+    flex: 0 0 35%;
+    font-weight: 700;
+    color: hsl(220, 18%, 30%);
+    font-size: 0.9rem;
+}
+
+.info-card .info-value {
+    flex: 1;
+    color: hsl(220, 18%, 12%);
+    font-weight: 500;
+}
+
+/* ========== ACTION CARDS ========== */
+.action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(220, 16%, 90%);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 86, 179, 0.12);
+}
+
+.action-card .action-icon {
+    font-size: 2.5rem;
+    color: hsl(220, 85%, 45%);
+    margin-bottom: 1rem;
+}
+
+.action-card .action-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: hsl(220, 18%, 12%);
+    margin-bottom: 0.5rem;
+}
+
+.action-card .action-description {
+    font-size: 0.9rem;
+    color: hsl(220, 12%, 55%);
+    margin-bottom: 1rem;
+}
+
+/* ========== ENHANCED CARDS ========== */
+.card.enhanced {
+    border: 1px solid hsl(220, 16%, 90%);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.card.enhanced:hover {
+    box-shadow: 0 8px 20px rgba(0, 86, 179, 0.12);
+    transform: translateY(-2px);
+}
+
+.card.enhanced .card-header {
+    background: linear-gradient(135deg, hsl(220, 20%, 98%) 0%, hsl(220, 18%, 95%) 100%);
+    border-bottom: 2px solid hsl(220, 85%, 45%);
+    padding: 1.25rem 1.5rem;
+}
+
+.card.enhanced .card-header h5,
+.card.enhanced .card-header h6 {
+    margin: 0;
+    font-weight: 700;
+    color: hsl(220, 85%, 35%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card.enhanced .card-body {
+    padding: 1.75rem 1.5rem;
+}
+
+/* ========== DISPLAY CARDS (Large Value Display) ========== */
+.display-card {
+    background: linear-gradient(135deg, hsl(220, 85%, 45%) 0%, hsl(220, 85%, 35%) 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 86, 179, 0.3);
+    text-align: center;
+}
+
+.display-card .display-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.75rem;
+}
+
+.display-card .display-value {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.display-card .display-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+/* ========== TIMELINE (Activity/History) ========== */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: hsl(220, 16%, 90%);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.4rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: hsl(220, 85%, 45%);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px hsl(220, 85%, 45%);
+}
+
+.timeline-item .timeline-date {
+    font-size: 0.85rem;
+    color: hsl(220, 12%, 55%);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-item .timeline-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid hsl(220, 16%, 90%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ========== ENHANCED BADGES ========== */
+.badge.enhanced {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.badge.badge-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* ========== QUICK STATS ROW ========== */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.quick-stat {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid hsl(220, 16%, 90%);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.quick-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 86, 179, 0.1);
+}
+
+.quick-stat .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: hsl(220, 85%, 45%);
+    margin-bottom: 0.5rem;
+}
+
+.quick-stat .stat-label {
+    font-size: 0.9rem;
+    color: hsl(220, 12%, 55%);
+    font-weight: 600;
+}
+
+/* ========== ALERT BOXES ========== */
+.alert.modern {
+    border-radius: 10px;
+    border: none;
+    border-left: 4px solid;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert.modern i {
+    font-size: 1.5rem;
+}
+
+.alert.modern.alert-info {
+    background: hsl(199, 89%, 96%);
+    border-left-color: hsl(199, 89%, 48%);
+    color: hsl(199, 89%, 25%);
+}
+
+.alert.modern.alert-success {
+    background: hsl(142, 76%, 96%);
+    border-left-color: hsl(142, 76%, 36%);
+    color: hsl(142, 76%, 20%);
+}
+
+.alert.modern.alert-warning {
+    background: hsl(38, 92%, 96%);
+    border-left-color: hsl(38, 92%, 50%);
+    color: hsl(38, 92%, 25%);
+}
+
+.alert.modern.alert-danger {
+    background: hsl(0, 84%, 96%);
+    border-left-color: hsl(0, 84%, 60%);
+    color: hsl(0, 84%, 30%);
+}
+
+/* ========== PROGRESS BARS ========== */
+.progress.modern {
+    height: 12px;
+    border-radius: 6px;
+    background: hsl(220, 16%, 95%);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.progress.modern .progress-bar {
+    border-radius: 6px;
+    background: linear-gradient(90deg, hsl(220, 85%, 45%) 0%, hsl(220, 85%, 55%) 100%);
+    box-shadow: 0 2px 4px rgba(0, 86, 179, 0.3);
+}
+
+/* ========== LIST GROUPS ========== */
+.list-group-item.modern {
+    border: 1px solid hsl(220, 16%, 90%);
+    border-radius: 8px !important;
+    margin-bottom: 0.5rem;
+    padding: 1rem 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.list-group-item.modern:hover {
+    background: hsl(220, 100%, 99%);
+    border-color: hsl(220, 85%, 45%);
+    transform: translateX(4px);
+}
+
+.list-group-item.modern.active {
+    background: hsl(220, 85%, 45%);
+    border-color: hsl(220, 85%, 45%);
+    color: white;
+}
+
+/* ========== BREADCRUMBS ========== */
+.breadcrumb.modern {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb.modern .breadcrumb-item {
+    font-weight: 600;
+}
+
+.breadcrumb.modern .breadcrumb-item a {
+    color: hsl(220, 85%, 45%);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.breadcrumb.modern .breadcrumb-item a:hover {
+    color: hsl(220, 85%, 35%);
+    text-decoration: underline;
+}
+
+.breadcrumb.modern .breadcrumb-item.active {
+    color: hsl(220, 12%, 55%);
+}
+
+/* ========== EMPTY STATES ========== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state .empty-icon {
+    font-size: 4rem;
+    color: hsl(220, 12%, 80%);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(220, 18%, 30%);
+    margin-bottom: 0.75rem;
+}
+
+.empty-state .empty-description {
+    font-size: 1rem;
+    color: hsl(220, 12%, 55%);
+    margin-bottom: 1.5rem;
+}
+
+/* ========== TABS ========== */
+.nav-tabs.modern {
+    border-bottom: 2px solid hsl(220, 16%, 90%);
+}
+
+.nav-tabs.modern .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: hsl(220, 12%, 55%);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs.modern .nav-link:hover {
+    color: hsl(220, 85%, 45%);
+    border-bottom-color: hsl(220, 85%, 75%);
+}
+
+.nav-tabs.modern .nav-link.active {
+    color: hsl(220, 85%, 45%);
+    border-bottom-color: hsl(220, 85%, 45%);
+    background: transparent;
+}
+
+/* ========== MODALS ========== */
+.modal-content.modern {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header.modern {
+    background: linear-gradient(135deg, hsl(220, 20%, 98%) 0%, hsl(220, 18%, 95%) 100%);
+    border-bottom: 2px solid hsl(220, 85%, 45%);
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+}
+
+.modal-header.modern .modal-title {
+    font-weight: 700;
+    color: hsl(220, 85%, 35%);
+}
+
+.modal-body.modern {
+    padding: 2rem;
+}
+
+.modal-footer.modern {
+    border-top: 1px solid hsl(220, 16%, 90%);
+    padding: 1.25rem 1.5rem;
+}
+
+/* ========== TOOLTIPS ========== */
+.tooltip.modern .tooltip-inner {
+    background: hsl(220, 18%, 12%);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== RESPONSIVE UTILITIES ========== */
+@media (max-width: 768px) {
+    .stat-card .stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .display-card .display-value {
+        font-size: 2.25rem;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-card .info-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .info-card .info-label {
+        flex: none;
+    }
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+    .stat-card,
+    .info-card,
+    .card.enhanced {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .btn,
+    .action-card {
+        display: none;
+    }
+}

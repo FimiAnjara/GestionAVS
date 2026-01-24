@@ -14,6 +14,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/tables.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/forms.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/components.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 
@@ -520,15 +523,7 @@
                         @yield('header-buttons')
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                @yield('content')
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @yield('content')
 
                 <!-- Affichage des erreurs de validation -->
                 @if ($errors->any())
