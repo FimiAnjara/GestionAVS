@@ -22,11 +22,8 @@
 
 <body>
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3 class="mb-0">
-                <i class="bi bi-shop"></i>
-                <span class="ms-2">GROSSISTE</span>
-            </h3>
+        <div class="sidebar-header text-center">
+            <img src="{{ asset('assets/logo/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px; max-width: 300px;">
         </div>
 
         <div class="sidebar-menu">
