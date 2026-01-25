@@ -122,6 +122,94 @@
                     </div>
                 </li>
 
+                <!-- VENTES SECTION -->
+                <div class="menu-divider"></div>
+                <li class="menu-title">Ventes</li>
+
+                <!-- PROFORMA CLIENT MENU -->
+                <li class="has-submenu {{ request()->is('proforma-client*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span class="menu-text">Devis / Proforma</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('proforma-client*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('proforma-client.create') }}"
+                            class="submenu-item {{ request()->is('proforma-client/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('proforma-client.list') }}"
+                            class="submenu-item {{ request()->is('proforma-client/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- BON DE COMMANDE CLIENT MENU -->
+                <li class="has-submenu {{ request()->is('bon-commande-client*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-file-earmark-check"></i>
+                        <span class="menu-text">Bon de Commande</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('bon-commande-client*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('bon-commande-client.create') }}"
+                            class="submenu-item {{ request()->is('bon-commande-client/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('bon-commande-client.list') }}"
+                            class="submenu-item {{ request()->is('bon-commande-client/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- FACTURE CLIENT MENU -->
+                <li class="has-submenu {{ request()->is('facture-client*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <span class="menu-text">Facture Client</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('facture-client*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('facture-client.create') }}"
+                            class="submenu-item {{ request()->is('facture-client/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('facture-client.list') }}"
+                            class="submenu-item {{ request()->is('facture-client/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- BON DE LIVRAISON CLIENT MENU -->
+                <li class="has-submenu {{ request()->is('bon-livraison-client*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-truck"></i>
+                        <span class="menu-text">Bon de Livraison</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('bon-livraison-client*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('bon-livraison-client.create') }}"
+                            class="submenu-item {{ request()->is('bon-livraison-client/create') ? 'active' : '' }}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Saisie</span>
+                        </a>
+                        <a href="{{ route('bon-livraison-client.list') }}"
+                            class="submenu-item {{ request()->is('bon-livraison-client/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
                 <div class="menu-divider"></div>
 
                 <li class="menu-title">Organigramme</li>

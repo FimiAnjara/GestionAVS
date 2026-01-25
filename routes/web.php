@@ -245,3 +245,54 @@ Route::prefix('magasin')->group(function () {
     Route::delete('/{id}', [MagasinController::class, 'destroy'])->name('magasin.destroy');
 });
 
+// Routes Ventes
+use App\Http\Controllers\Ventes\ProformaClientController;
+use App\Http\Controllers\Ventes\BonCommandeClientController;
+use App\Http\Controllers\Ventes\FactureClientController;
+use App\Http\Controllers\Ventes\BonLivraisonClientController;
+
+// Routes Proforma Client (Ventes)
+Route::prefix('proforma-client')->group(function () {
+    Route::get('/list', [ProformaClientController::class, 'index'])->name('proforma-client.list');
+    Route::get('/create', [ProformaClientController::class, 'create'])->name('proforma-client.create');
+    Route::post('/', [ProformaClientController::class, 'store'])->name('proforma-client.store');
+    Route::get('/{id}', [ProformaClientController::class, 'show'])->name('proforma-client.show');
+    Route::get('/{id}/export-pdf', [ProformaClientController::class, 'exportPdf'])->name('proforma-client.exportPdf');
+    Route::post('/{id}/etat', [ProformaClientController::class, 'changeEtat'])->name('proforma-client.etat');
+    Route::delete('/{id}', [ProformaClientController::class, 'destroy'])->name('proforma-client.destroy');
+});
+
+// Routes Bon de Commande Client
+Route::prefix('bon-commande-client')->group(function () {
+    Route::get('/list', [BonCommandeClientController::class, 'index'])->name('bon-commande-client.list');
+    Route::get('/create', [BonCommandeClientController::class, 'create'])->name('bon-commande-client.create');
+    Route::get('/api/proforma/{id}', [BonCommandeClientController::class, 'getProformaData'])->name('bon-commande-client.api.proforma');
+    Route::post('/', [BonCommandeClientController::class, 'store'])->name('bon-commande-client.store');
+    Route::get('/{id}', [BonCommandeClientController::class, 'show'])->name('bon-commande-client.show');
+    Route::get('/{id}/export-pdf', [BonCommandeClientController::class, 'exportPdf'])->name('bon-commande-client.exportPdf');
+    Route::post('/{id}/etat', [BonCommandeClientController::class, 'changeEtat'])->name('bon-commande-client.etat');
+    Route::delete('/{id}', [BonCommandeClientController::class, 'destroy'])->name('bon-commande-client.destroy');
+});
+
+// Routes Facture Client
+Route::prefix('facture-client')->group(function () {
+    Route::get('/list', [FactureClientController::class, 'index'])->name('facture-client.list');
+    Route::get('/create', [FactureClientController::class, 'create'])->name('facture-client.create');
+    Route::post('/', [FactureClientController::class, 'store'])->name('facture-client.store');
+    Route::get('/{id}', [FactureClientController::class, 'show'])->name('facture-client.show');
+    Route::post('/{id}/etat', [FactureClientController::class, 'changeEtat'])->name('facture-client.etat');
+    Route::get('/{id}/export-pdf', [FactureClientController::class, 'exportPdf'])->name('facture-client.exportPdf');
+    Route::delete('/{id}', [FactureClientController::class, 'destroy'])->name('facture-client.destroy');
+});
+
+// Routes Bon de Livraison Client
+Route::prefix('bon-livraison-client')->group(function () {
+    Route::get('/list', [BonLivraisonClientController::class, 'index'])->name('bon-livraison-client.list');
+    Route::get('/create', [BonLivraisonClientController::class, 'create'])->name('bon-livraison-client.create');
+    Route::get('/api/bon-commande/{id}', [BonLivraisonClientController::class, 'getBonCommandeData'])->name('bon-livraison-client.api.bon-commande');
+    Route::post('/', [BonLivraisonClientController::class, 'store'])->name('bon-livraison-client.store');
+    Route::get('/{id}', [BonLivraisonClientController::class, 'show'])->name('bon-livraison-client.show');
+    Route::get('/{id}/valider', [BonLivraisonClientController::class, 'valider'])->name('bon-livraison-client.valider');
+    Route::get('/{id}/export-pdf', [BonLivraisonClientController::class, 'exportPdf'])->name('bon-livraison-client.exportPdf');
+    Route::delete('/{id}', [BonLivraisonClientController::class, 'destroy'])->name('bon-livraison-client.destroy');
+});
