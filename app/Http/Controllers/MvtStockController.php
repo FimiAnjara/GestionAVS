@@ -264,9 +264,69 @@ class MvtStockController extends Controller
     public function destroyFille($id)
     {
         $fille = MvtStockFille::findOrFail($id);
+        $idMvtStock = $fille->id_mvt_stock;
         $fille->delete();
         
+        // Recalculer le montant total du mouvement parent
+        $mvt = MvtStock::find($idMvtStock);
+        if ($mvt) {
+            $mvt->montant_total = $mvt->mvtStockFille->sum(function($f) {
+                return (($f->entree ?? 0) + ($f->sortie ?? 0)) * ($f->prix_unitaire ?? 0);
+            });
+            $mvt->save();
+        }
+        
         return back()->with('success', 'Ligne de mouvement supprimée avec succès');
+    }
+
+    /**
+     * Formulaire d'édition d'une ligne de mouvement spécifique
+     */
+    public function editFille($id)
+    {
+        $fille = MvtStockFille::with('mvtStock', 'article')->findOrFail($id);
+        return view('mvt-stock.edit-fille', compact('fille'));
+    }
+
+    /**
+     * Mettre à jour une ligne de mouvement spécifique
+     */
+    public function updateFille(Request $request, $id)
+    {
+        $fille = MvtStockFille::findOrFail($id);
+        
+        $validated = $request->validate([
+            'entree' => 'nullable|numeric|min:0',
+            'sortie' => 'nullable|numeric|min:0',
+            'prix_unitaire' => 'nullable|numeric|min:0',
+            'reste' => 'nullable|numeric|min:0',
+            'date_expiration' => 'nullable|date',
+        ]);
+
+        // Si on modifie l'entree d'un lot d'entrée, on ajuste le reste proportionnellement
+        // pour ne pas fausser le stock disponible si des sorties ont déjà eu lieu
+        if (isset($validated['entree']) && $fille->entree > 0) {
+            $difference = $validated['entree'] - $fille->entree;
+            $newReste = $fille->reste + $difference;
+            
+            if ($newReste < 0) {
+                return back()->withErrors(['error' => 'La nouvelle quantité d\'entrée est inférieure aux sorties déjà effectuées sur ce lot.']);
+            }
+            $validated['reste'] = $newReste;
+        }
+
+        $fille->update($validated);
+
+        // Recalculer le montant total du mouvement parent
+        $mvt = MvtStock::find($fille->id_mvt_stock);
+        if ($mvt) {
+            $mvt->montant_total = $mvt->mvtStockFille->sum(function($f) {
+                return (($f->entree ?? 0) + ($f->sortie ?? 0)) * ($f->prix_unitaire ?? 0);
+            });
+            $mvt->save();
+        }
+
+        return redirect()->route('stock.details')->with('success', 'Ligne de mouvement mise à jour avec succès');
     }
 
     /**
