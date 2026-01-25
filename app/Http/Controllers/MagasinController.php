@@ -111,7 +111,7 @@ class MagasinController extends Controller
             });
         }
         
-        $mouvements = $query->orderByDesc(
+        $mouvements = $query->orderBy(
                 \App\Models\MvtStock::select('date_')
                     ->whereColumn('mvt_stock.id_mvt_stock', 'mvt_stock_fille.id_mvt_stock')
             )
