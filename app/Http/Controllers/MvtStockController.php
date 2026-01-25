@@ -16,7 +16,7 @@ class MvtStockController extends Controller
      */
     public function list(Request $request)
     {
-        $query = MvtStock::with('mvtStockFille.article', 'magasin');
+        $query = MvtStock::with('mvtStockFille.article.unite', 'magasin');
         
         if ($request->filled('date_from')) {
             $query->where('date_', '>=', $request->date_from);
@@ -49,7 +49,7 @@ class MvtStockController extends Controller
      */
     public function show($id)
     {
-        $mouvement = MvtStock::with('mvtStockFille.article')->findOrFail($id);
+        $mouvement = MvtStock::with('mvtStockFille.article.unite')->findOrFail($id);
         
         return view('mvt-stock.show', compact('mouvement'));
     }
@@ -59,8 +59,9 @@ class MvtStockController extends Controller
      */
     public function create(Request $request)
     {
-        $articles = Article::all();
-        $magasins = Magasin::all();
+        $articles = Article::with(['unite', 'categorie'])->get();
+        $magasins = Magasin::with('site.entite')->get();
+        $typeMvts = \App\Models\TypeMvtStock::all();
         
         // Pré-remplissage depuis un bon de réception
         $bonReception = null;
@@ -89,11 +90,24 @@ class MvtStockController extends Controller
                     'quantite' => $item->quantite,
                     'prix_unitaire' => $prixUnitaire,
                     'nom' => $item->article?->nom ?? $item->id_article,
+                    'photo' => $item->article?->photo,
+                    'unite' => $item->article?->unite?->libelle,
+                    'est_perissable' => $item->article?->categorie?->est_perissable ?? false,
+                    'date_expiration' => $item->date_expiration ? $item->date_expiration->format('Y-m-d') : null,
                 ];
             })->toArray();
         }
         
-        return view('mvt-stock.create', compact('articles', 'magasins', 'bonReception', 'prefilledArticles', 'prefilledMagasin'));
+        $prefilledTypeMvt = $request->id_type_mvt;
+        
+        return view('mvt-stock.create', compact('articles', 'magasins', 'bonReception', 'prefilledArticles', 'prefilledMagasin', 'typeMvts', 'prefilledTypeMvt'));
+    }
+
+    protected $mvtStockService;
+
+    public function __construct(\App\Services\MvtStockService $mvtStockService)
+    {
+        $this->mvtStockService = $mvtStockService;
     }
 
     /**
@@ -104,7 +118,8 @@ class MvtStockController extends Controller
         $validated = $request->validate([
             'id_mvt_stock' => 'required|unique:mvt_stock',
             'date_' => 'required|date',
-            'id_magasin' => 'nullable|exists:magasin,id_magasin',
+            'id_magasin' => 'required|exists:magasin,id_magasin',
+            'id_type_mvt' => 'required|exists:type_mvt_stock,id_type_mvt',
             'description' => 'nullable|string',
             'montant_total' => 'required|numeric|min:0',
             'articles' => 'required|array|min:1',
@@ -115,29 +130,12 @@ class MvtStockController extends Controller
             'articles.*.date_expiration' => 'nullable|date',
         ]);
 
-        // Créer le mouvement parent
-        $mvtStock = MvtStock::create([
-            'id_mvt_stock' => $validated['id_mvt_stock'],
-            'date_' => $validated['date_'],
-            'id_magasin' => $validated['id_magasin'],
-            'description' => $validated['description'],
-            'montant_total' => $validated['montant_total'],
-        ]);
-
-        // Créer les articles enfants
-        foreach ($validated['articles'] as $index => $article) {
-            MvtStockFille::create([
-                'id_mvt_stock_fille' => $validated['id_mvt_stock'] . '_' . ($index + 1),
-                'id_mvt_stock' => $validated['id_mvt_stock'],
-                'id_article' => $article['id_article'],
-                'entree' => $article['entree'] ?? 0,
-                'sortie' => $article['sortie'] ?? 0,
-                'prix_unitaire' => $article['prix_unitaire'] ?? 0,
-                'date_expiration' => $article['date_expiration'] ?? null,
-            ]);
+        try {
+            $this->mvtStockService->createMovement($validated);
+            return redirect()->route('mvt-stock.list')->with('success', 'Mouvement de stock créé avec succès');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Erreur lors de la création du mouvement : ' . $e->getMessage()]);
         }
-
-        return redirect()->route('mvt-stock.list')->with('success', 'Mouvement de stock créé avec succès');
     }
 
     /**
@@ -210,7 +208,7 @@ class MvtStockController extends Controller
      */
     public function details(Request $request)
     {
-        $query = MvtStockFille::with('mvtStock.magasin', 'article');
+        $query = MvtStockFille::with('mvtStock.magasin', 'article.unite');
         
         // Filtres
         if ($request->filled('id_article')) {
@@ -244,5 +242,52 @@ class MvtStockController extends Controller
         $magasins = Magasin::where('deleted_at', null)->get();
         
         return view('mvt-stock.details', compact('mouvementsFille', 'magasins'));
+    }
+
+    /**
+     * Supprimer un mouvement de stock (Soft Delete)
+     */
+    public function destroy($id)
+    {
+        $mvt = MvtStock::findOrFail($id);
+        $mvt->delete(); // Soft delete parent
+        
+        // Supprimer aussi les filles (soft delete cascade si configuré ou manuel)
+        $mvt->mvtStockFille()->delete();
+        
+        return redirect()->route('mvt-stock.list')->with('success', 'Mouvement supprimé avec succès');
+    }
+
+    /**
+     * Supprimer une ligne de mouvement spécifique (Soft Delete)
+     */
+    public function destroyFille($id)
+    {
+        $fille = MvtStockFille::findOrFail($id);
+        $fille->delete();
+        
+        return back()->with('success', 'Ligne de mouvement supprimée avec succès');
+    }
+
+    /**
+     * API: Obtenir le prix unitaire actuel d'un article dans un magasin
+     */
+    public function getPrixActuel(Request $request)
+    {
+        $idArticle = $request->input('id_article');
+        $idMagasin = $request->input('id_magasin');
+
+        if (!$idArticle || !$idMagasin) {
+            return response()->json(['prix' => 0]);
+        }
+
+        $article = Article::find($idArticle);
+        if (!$article) {
+            return response()->json(['prix' => 0]);
+        }
+
+        $prix = $article->getPrixActuel($idMagasin);
+
+        return response()->json(['prix' => $prix]);
     }
 }

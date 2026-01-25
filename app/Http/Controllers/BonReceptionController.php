@@ -21,8 +21,12 @@ class BonReceptionController extends Controller
      */
     public function list(Request $request)
     {
-        $query = BonReception::query();
+        $query = BonReception::with(['bonCommande.proformaFournisseur.fournisseur', 'magasin.site.entite']);
         
+        if ($request->filled('id_magasin')) {
+            $query->where('id_magasin', $request->id_magasin);
+        }
+
         if ($request->filled('date_from')) {
             $query->where('date_', '>=', $request->date_from);
         }
@@ -39,8 +43,9 @@ class BonReceptionController extends Controller
         }
         
         $bonReceptions = $query->latest('date_')->paginate(10);
+        $magasins = Magasin::with('site.entite')->get();
         
-        return view('bon-reception.list', compact('bonReceptions'));
+        return view('bon-reception.list', compact('bonReceptions', 'magasins'));
     }
     
     /**
@@ -49,12 +54,49 @@ class BonReceptionController extends Controller
     public function create(Request $request)
     {
         $bonCommandes = BonCommande::where('etat', '>=', 11)->with('proformaFournisseur.fournisseur', 'bonCommandeFille.article')->get();
-        $articles = Article::all();
+        $articles = Article::with('unite')->get();
         $fournisseurs = Fournisseur::where('deleted_at', null)->get();
-        $magasins = Magasin::where('deleted_at', null)->get();
+        $magasins = Magasin::with('site.entite')->where('deleted_at', null)->get();
         $emplacements = Emplacement::all();
+
+        $articlesJS = $articles->map(fn($a) => [
+            'id' => $a->id_article, 
+            'nom' => $a->nom,
+            'unite' => $a->unite?->libelle,
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : '',
+            'est_perissable' => $a->categorie?->est_perissable ?? false
+        ])->values();
         
-        return view('bon-reception.create', compact('bonCommandes', 'articles', 'fournisseurs', 'magasins', 'emplacements'));
+        return view('bon-reception.create', compact('bonCommandes', 'articles', 'fournisseurs', 'magasins', 'emplacements', 'articlesJS'));
+    }
+
+    /**
+     * Récupérer les données d'un bon de commande pour pré-remplissage (AJAX)
+     */
+    public function getBonCommandeData($id)
+    {
+        $bc = BonCommande::with(['proformaFournisseur.fournisseur', 'bonCommandeFille.article.unite', 'magasin.site.entite'])->find($id);
+        
+        if (!$bc) {
+            return response()->json(['error' => 'Bon de Commande non trouvé'], 404);
+        }
+        
+        return response()->json([
+            'fournisseur_id' => $bc->proformaFournisseur?->id_fournisseur,
+            'fournisseur_nom' => $bc->proformaFournisseur?->fournisseur?->nom,
+            'id_magasin' => $bc->id_magasin,
+            'description' => $bc->description,
+            'articles' => $bc->bonCommandeFille->map(function($item) {
+                return [
+                    'id_article' => $item->id_article,
+                    'nom' => $item->article->nom,
+                    'unite' => $item->article->unite?->libelle,
+                    'photo' => $item->article->photo ? asset('storage/' . $item->article->photo) : '',
+                    'quantite' => $item->quantite,
+                    'est_perissable' => $item->article->categorie?->est_perissable ?? false,
+                ];
+            }),
+        ]);
     }
     
     /**

@@ -43,33 +43,14 @@
                                 <a href="{{ route('caisse.edit', $caisse->id_caisse) }}" class="btn btn-sm btn-warning" title="Modifier">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
-                                    data-bs-target="#deleteModal{{ $caisse->id_caisse }}" title="Supprimer">
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteConfirmModal"
+                                    data-bs-url="{{ route('caisse.destroy', $caisse->id_caisse) }}"
+                                    data-bs-item="la caisse {{ $caisse->libelle }}"
+                                    title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
-                            </div>
-
-                            <!-- Modal de suppression -->
-                            <div class="modal fade" id="deleteModal{{ $caisse->id_caisse }}" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Confirmer la suppression</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Êtes-vous sûr de vouloir supprimer cette caisse ?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                            <form action="{{ route('caisse.destroy', $caisse->id_caisse) }}" method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Supprimer</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </td>
                     </tr>

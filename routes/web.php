@@ -14,6 +14,9 @@ use App\Http\Controllers\FactureFournisseurController;
 use App\Http\Controllers\BonReceptionController;
 use App\Http\Controllers\MvtStockController;
 use App\Http\Controllers\MagasinController;
+use App\Http\Controllers\GroupeController;
+use App\Http\Controllers\EntiteController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,11 +29,45 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/', function () {
+    return view('dashboard.dashboard');
     if (session('user_role')) {
         return redirect('/dashboard');
     }
     return redirect('/login');
 })->name('home');
+
+// Routes Organigramme - Groupe
+Route::prefix('groupe')->group(function () {
+    Route::get('/list', [GroupeController::class, 'list'])->name('groupe.list');
+    Route::get('/create', [GroupeController::class, 'create'])->name('groupe.create');
+    Route::post('/', [GroupeController::class, 'store'])->name('groupe.store');
+    Route::get('/{id}', [GroupeController::class, 'show'])->name('groupe.show');
+    Route::get('/{id}/edit', [GroupeController::class, 'edit'])->name('groupe.edit');
+    Route::put('/{id}', [GroupeController::class, 'update'])->name('groupe.update');
+    Route::delete('/{id}', [GroupeController::class, 'destroy'])->name('groupe.destroy');
+});
+
+// Routes Organigramme - Entite
+Route::prefix('entite')->group(function () {
+    Route::get('/list', [EntiteController::class, 'list'])->name('entite.list');
+    Route::get('/create', [EntiteController::class, 'create'])->name('entite.create');
+    Route::post('/', [EntiteController::class, 'store'])->name('entite.store');
+    Route::get('/{id}', [EntiteController::class, 'show'])->name('entite.show');
+    Route::get('/{id}/edit', [EntiteController::class, 'edit'])->name('entite.edit');
+    Route::put('/{id}', [EntiteController::class, 'update'])->name('entite.update');
+    Route::delete('/{id}', [EntiteController::class, 'destroy'])->name('entite.destroy');
+});
+
+// Routes Organigramme - Site
+Route::prefix('site')->group(function () {
+    Route::get('/list', [SiteController::class, 'list'])->name('site.list');
+    Route::get('/create', [SiteController::class, 'create'])->name('site.create');
+    Route::post('/', [SiteController::class, 'store'])->name('site.store');
+    Route::get('/{id}', [SiteController::class, 'show'])->name('site.show');
+    Route::get('/{id}/edit', [SiteController::class, 'edit'])->name('site.edit');
+    Route::put('/{id}', [SiteController::class, 'update'])->name('site.update');
+    Route::delete('/{id}', [SiteController::class, 'destroy'])->name('site.destroy');
+});
 
 // Page de login
 Route::get('/login', function () {
@@ -106,6 +143,17 @@ Route::prefix('unites')->group(function () {
     Route::get('/search/query', [UniteController::class, 'search'])->name('unites.search');
 });
 
+// Routes Types d'Évaluation de Stock
+Route::prefix('type-evaluation-stock')->group(function () {
+    Route::get('/list', [\App\Http\Controllers\TypeEvaluationStockController::class, 'index'])->name('type-evaluation-stock.list');
+    Route::get('/create', [\App\Http\Controllers\TypeEvaluationStockController::class, 'create'])->name('type-evaluation-stock.create');
+    Route::post('/', [\App\Http\Controllers\TypeEvaluationStockController::class, 'store'])->name('type-evaluation-stock.store');
+    Route::get('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'show'])->name('type-evaluation-stock.show');
+    Route::get('/{id}/edit', [\App\Http\Controllers\TypeEvaluationStockController::class, 'edit'])->name('type-evaluation-stock.edit');
+    Route::put('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'update'])->name('type-evaluation-stock.update');
+    Route::delete('/{id}', [\App\Http\Controllers\TypeEvaluationStockController::class, 'destroy'])->name('type-evaluation-stock.destroy');
+});
+
 // Routes Caisse (Finance)
 Route::prefix('caisse')->group(function () {
     Route::get('/list', [CaisseController::class, 'list'])->name('caisse.list');
@@ -172,6 +220,7 @@ Route::prefix('facture-fournisseur')->group(function () {
 Route::prefix('bon-reception')->group(function () {
     Route::get('/list', [BonReceptionController::class, 'list'])->name('bon-reception.list');
     Route::get('/create', [BonReceptionController::class, 'create'])->name('bon-reception.create');
+    Route::get('/api/bon-commande/{id}', [BonReceptionController::class, 'getBonCommandeData'])->name('bon-reception.api.bon-commande');
     Route::post('/', [BonReceptionController::class, 'store'])->name('bon-reception.store');
     Route::get('/{id}', [BonReceptionController::class, 'show'])->name('bon-reception.show');
     Route::get('/{id}/export-pdf', [BonReceptionController::class, 'exportPdf'])->name('bon-reception.exportPdf');
@@ -185,9 +234,12 @@ Route::prefix('bon-reception')->group(function () {
 Route::prefix('mvt-stock')->group(function () {
     Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
     Route::get('/create', [MvtStockController::class, 'create'])->name('mvt-stock.create');
+    Route::get('/api/prix-actuel', [MvtStockController::class, 'getPrixActuel'])->name('mvt-stock.api.prix-actuel');
     Route::post('/', [MvtStockController::class, 'store'])->name('mvt-stock.store');
     Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
     Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
+    Route::delete('/{id}', [MvtStockController::class, 'destroy'])->name('mvt-stock.destroy');
+    Route::delete('/fille/{id}', [MvtStockController::class, 'destroyFille'])->name('mvt-stock.destroyFille');
 });
 
 // Détails des mouvements (articles enfants)
@@ -204,6 +256,9 @@ Route::prefix('magasin')->group(function () {
     // Routes spécifiques AVANT les paramètres
     Route::get('/carte', [MagasinController::class, 'carte'])->name('magasin.carte');
     Route::get('/api/magasins', [MagasinController::class, 'getMagasins'])->name('magasin.magasins');
+    Route::get('/api/entites-by-groupe', [MagasinController::class, 'getEntitesByGroupe'])->name('magasin.entitesByGroupe');
+    Route::get('/api/sites-by-entite', [MagasinController::class, 'getSitesByEntite'])->name('magasin.sitesByEntite');
+    Route::get('/api/magasins-by-site', [MagasinController::class, 'getMagasinsBySite'])->name('magasin.magasinsBySite');
     Route::get('/list', [MagasinController::class, 'list'])->name('magasin.list');
     Route::get('/create', [MagasinController::class, 'create'])->name('magasin.create');
     Route::post('/', [MagasinController::class, 'store'])->name('magasin.store');
@@ -215,10 +270,3 @@ Route::prefix('magasin')->group(function () {
     Route::delete('/{id}', [MagasinController::class, 'destroy'])->name('magasin.destroy');
 });
 
-Route::get('/about', function () {
-    return view('about');
-});
-
-Route::get('/contact', function () {
-    return view('contact');
-});

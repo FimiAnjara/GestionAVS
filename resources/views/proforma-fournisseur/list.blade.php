@@ -18,14 +18,27 @@
         </div>
         <div class="card-body p-3">
             <form method="GET" action="{{ route('proforma-fournisseur.list') }}" class="row g-2 align-items-end">
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <label for="fournisseur" class="form-label">Fournisseur</label>
                     <select class="form-select form-select-sm" id="fournisseur" name="fournisseur">
-                        <option value="">-- Tous les fournisseurs --</option>
+                        <option value="">-- Tous --</option>
                         @foreach ($fournisseurs as $fournisseur)
                             <option value="{{ $fournisseur->id_fournisseur }}"
                                 {{ request('fournisseur') == $fournisseur->id_fournisseur ? 'selected' : '' }}>
                                 {{ $fournisseur->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="id_magasin" class="form-label">Magasin</label>
+                    <select class="form-select form-select-sm" id="id_magasin" name="id_magasin">
+                        <option value="">-- Tous --</option>
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}"
+                                {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                {{ $magasin->nom }}
                             </option>
                         @endforeach
                     </select>
@@ -46,21 +59,21 @@
                 <div class="col-lg-2">
                     <label for="etat" class="form-label">État</label>
                     <select class="form-select form-select-sm" id="etat" name="etat">
-                        <option value="">-- Tous les états --</option>
+                        <option value="">-- Tous --</option>
                         <option value="1" {{ request('etat') == '1' ? 'selected' : '' }}>Créée</option>
-                        <option value="5" {{ request('etat') == '5' ? 'selected' : '' }}>Validée par Finance</option>
-                        <option value="11" {{ request('etat') == '11' ? 'selected' : '' }}>Validée par DG</option>
+                        <option value="5" {{ request('etat') == '5' ? 'selected' : '' }}>Validée Finance</option>
+                        <option value="11" {{ request('etat') == '11' ? 'selected' : '' }}>Validée DG</option>
                         <option value="0" {{ request('etat') == '0' ? 'selected' : '' }}>Annulée</option>
                     </select>
                 </div>
 
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                            <i class="bi bi-search me-2"></i>Rechercher
+                            <i class="bi bi-search me-2"></i>Filtrer
                         </button>
                         <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-sm"
-                            title="Réinitialiser les filtres">
+                            title="Réinitialiser">
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </a>
                     </div>
@@ -84,6 +97,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Date</th>
+                                <th>Magasin</th>
                                 <th>Fournisseur</th>
                                 <th>Description</th>
                                 <th>État</th>
@@ -100,10 +114,18 @@
                                         <small>{{ $proforma->date_->format('d/m/Y') }}</small>
                                     </td>
                                     <td>
+                                        @if($proforma->magasin)
+                                            <span class="fw-bold">{{ $proforma->magasin->nom }}</span><br>
+                                            <small class="text-muted">{{ $proforma->magasin->site?->localisation }}</small>
+                                        @else
+                                            <small class="text-muted">N/A</small>
+                                        @endif
+                                    </td>
+                                    <td>
                                         <span class="badge bg-info text-dark">{{ $proforma->fournisseur->nom }}</span>
                                     </td>
                                     <td>
-                                        <small>{{ Str::limit($proforma->description, 40) }}</small>
+                                        <small>{{ Str::limit($proforma->description, 30) }}</small>
                                     </td>
                                     <td>
                                         <span
@@ -125,8 +147,11 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             @endif
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $proforma->id_proformaFournisseur }}"
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('proforma-fournisseur.destroy', $proforma->id_proformaFournisseur) }}"
+                                                data-bs-item="la proforma {{ $proforma->id_proformaFournisseur }}"
                                                 title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -170,34 +195,6 @@
                                                     <button type="submit" class="btn btn-primary">Valider</button>
                                                 </div>
                                             </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $proforma->id_proformaFournisseur }}"
-                                    tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer cette proforma?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Annuler</button>
-                                                <form
-                                                    action="{{ route('proforma-fournisseur.destroy', $proforma->id_proformaFournisseur) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

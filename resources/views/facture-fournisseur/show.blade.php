@@ -52,10 +52,6 @@
                         <div class="col-sm-5"><strong>Bon Commande:</strong></div>
                         <div class="col-sm-7"><span class="badge bg-info text-dark">{{ $facture->bonCommande->id_bonCommande }}</span></div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-5"><strong>Fournisseur:</strong></div>
-                        <div class="col-sm-7"><span class="badge bg-warning text-dark">{{ $facture->bonCommande->fournisseur->nom ?? 'N/A' }}</span></div>
-                    </div>
                     @endif
                     <div class="row mb-3">
                         <div class="col-sm-5"><strong>État:</strong></div>
@@ -63,6 +59,15 @@
                             <span class="badge bg-{{ $facture->etat_badge }}">{{ $facture->etat_label }}</span>
                         </div>
                     </div>
+                    @if($facture->magasin)
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Magasin Destination:</strong></div>
+                        <div class="col-sm-7">
+                            <span class="fw-bold">{{ $facture->magasin->nom }}</span><br>
+                            <small class="text-muted">{{ $facture->magasin->site?->localisation }}</small>
+                        </div>
+                    </div>
+                    @endif
                     @if($facture->description)
                     <div class="row">
                         <div class="col-sm-5"><strong>Description:</strong></div>
@@ -115,6 +120,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th width="5%">Photo</th>
                             <th>Article</th>
                             <th>Quantité</th>
                             <th>Prix Achat</th>
@@ -125,8 +131,23 @@
                         @php $total = 0; @endphp
                         @foreach($facture->factureFournisseurFille as $ligne)
                         <tr>
+                            <td class="text-center">
+                                @if($ligne->article->photo)
+                                    <img src="{{ asset('storage/' . $ligne->article->photo) }}" 
+                                         class="rounded shadow-sm" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                @else
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                         style="width: 40px; height: 40px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td><strong>{{ $ligne->article->nom ?? 'N/A' }}</strong></td>
-                            <td class="text-center">{{ $ligne->quantite }}</td>
+                            <td class="text-center">
+                                {{ $ligne->quantite }}
+                                <span class="badge bg-success ms-1">{{ $ligne->article->unite->libelle ?? '-' }}</span>
+                            </td>
                             <td class="text-end">{{ number_format($ligne->prix_achat, 0, ',', ' ') }} Ar</td>
                             <td class="text-end">
                                 @php 
@@ -216,36 +237,14 @@
                     </a>
                     @if($facture->etat != 11)
                     <button type="button" class="btn btn-outline-danger btn-sm w-100" 
-                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deleteConfirmModal"
+                            data-bs-url="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
+                            data-bs-item="la facture {{ $facture->id_factureFournisseur }}"
+                            title="Supprimer">
                         <i class="bi bi-trash me-2"></i>Supprimer
                     </button>
                     @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Suppression -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmer la suppression</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Êtes-vous sûr de vouloir supprimer la facture <strong>{{ $facture->id_factureFournisseur }}</strong> ?
-                    <br><small class="text-muted">Cette action est irréversible.</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form action="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash me-2"></i>Supprimer
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>

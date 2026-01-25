@@ -12,29 +12,20 @@ class UniteSeeder extends Seeder
      */
     public function run(): void
     {
-        Unite::create([
-            'id_unite' => 'UNI-' . time() . '001',
-            'libelle' => 'Litre (L)',
-        ]);
+        $unites = [
+            ['id' => 'UNI_L', 'libelle' => 'Litre (L)'],
+            ['id' => 'UNI_KG', 'libelle' => 'Kilogramme (kg)'],
+            ['id' => 'UNI_PCE', 'libelle' => 'Unité (pce)'],
+            ['id' => 'UNI_SAC', 'libelle' => 'Sac'],
+            ['id' => 'UNI_CARTON', 'libelle' => 'Carton'],
+            ['id' => 'UNI_PK', 'libelle' => 'Paquet'],
+        ];
 
-        Unite::create([
-            'id_unite' => 'UNI-' . time() . '002',
-            'libelle' => 'Kilogramme (kg)',
-        ]);
-
-        Unite::create([
-            'id_unite' => 'UNI-' . time() . '003',
-            'libelle' => 'Carton',
-        ]);
-
-        Unite::create([
-            'id_unite' => 'UNI-' . time() . '004',
-            'libelle' => 'Unité (pce)',
-        ]);
-
-        Unite::create([
-            'id_unite' => 'UNI-' . time() . '005',
-            'libelle' => 'Paquet (pk)',
-        ]);
+        foreach ($unites as $unite) {
+            Unite::updateOrCreate(
+                ['id_unite' => $unite['id']],
+                ['libelle' => $unite['libelle']]
+            );
+        }
     }
 }

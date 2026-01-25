@@ -6,7 +6,6 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="bi bi-tag"></i> Détails de la Catégorie</h2>
         </div>
         <div>
             <a href="{{ route('categories.edit', $categorie->id_categorie) }}" class="btn btn-warning">
@@ -27,6 +26,16 @@
                 <div class="card-body">
                     <p><label class="text-muted small">ID</label><p class="fw-bold">{{ $categorie->id_categorie }}</p></p>
                     <p><label class="text-muted small">Libellé</label><p class="fw-bold">{{ $categorie->libelle }}</p></p>
+                    <p><label class="text-muted small">Type</label>
+                        <p>
+                            @if($categorie->est_perissable)
+                                <span class="badge bg-danger"><i class="bi bi-clock-history"></i> Catégorie Périssable</span>
+                                <br><small class="text-muted">Les articles de cette catégorie nécessitent une date d'expiration lors des mouvements de stock.</small>
+                            @else
+                                <span class="badge bg-light text-dark border">Non périssable</span>
+                            @endif
+                        </p>
+                    </p>
                     <p><label class="text-muted small">Créé le</label><p>{{ $categorie->created_at->format('d/m/Y H:i') }}</p></p>
                 </div>
             </div>

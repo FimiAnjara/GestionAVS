@@ -4,10 +4,6 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="mb-4">
-        <h2><i class="bi bi-pencil-square"></i> Modifier la Catégorie</h2>
-    </div>
-
     <div class="row">
         <div class="col-lg-6">
             <div class="card shadow-sm">
@@ -21,6 +17,12 @@
                         <div class="mb-3">
                             <label for="libelle" class="form-label"><i class="bi bi-tag"></i> Libellé</label>
                             <input type="text" class="form-control" id="libelle" name="libelle" value="{{ $categorie->libelle }}" required>
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="est_perissable" name="est_perissable" value="1" {{ $categorie->est_perissable ? 'checked' : '' }}>
+                                <label class="form-check-label" for="est_perissable">Est périssable (produit avec date d'expiration)</label>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-warning btn-lg me-2">
                             <i class="bi bi-check-circle"></i> Modifier

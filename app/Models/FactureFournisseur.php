@@ -15,7 +15,7 @@ class FactureFournisseur extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_factureFournisseur', 'date_', 'etat', 'description', 'id_bonCommande', 'montant_total', 'montant_paye'];
+    protected $fillable = ['id_factureFournisseur', 'date_', 'etat', 'description', 'id_bonCommande', 'montant_total', 'montant_paye', 'id_magasin'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -60,6 +60,11 @@ class FactureFournisseur extends Model
     public function bonCommande()
     {
         return $this->belongsTo(BonCommande::class, 'id_bonCommande', 'id_bonCommande');
+    }
+
+    public function magasin()
+    {
+        return $this->belongsTo(Magasin::class, 'id_magasin', 'id_magasin');
     }
 
     public function articles()

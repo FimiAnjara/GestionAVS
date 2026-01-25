@@ -5,9 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Laravel App')</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/tables.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/forms.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/components.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 
@@ -18,11 +27,8 @@
     @endphp
 
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3 class="mb-0">
-                <i class="bi bi-shop"></i>
-                <span class="ms-2">GROSSISTE</span>
-            </h3>
+        <div class="sidebar-header text-center">
+            <img src="{{ asset('assets/logo/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px; max-width: 300px;">
         </div>
 
         <div class="sidebar-menu">
@@ -248,6 +254,100 @@
                 <!-- SECTION TIERS -->
                 @if(PermissionHelper::hasModuleAccess($userRole, 'tiers'))
                 <div class="menu-divider"></div>
+
+                <li class="menu-title">Organigramme</li>
+                <!-- GROUPE MENU -->
+                <li class="has-submenu {{ request()->is('groupe*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-diagram-3"></i>
+                        <span class="menu-text">Groupes</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('groupe*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('groupe.create') }}"
+                            class="submenu-item {{ request()->is('groupe/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('groupe.list') }}"
+                            class="submenu-item {{ request()->is('groupe/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- ENTITE MENU -->
+                <li class="has-submenu {{ request()->is('entite*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-grid-3x3"></i>
+                        <span class="menu-text">Entités</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('entite*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('entite.create') }}"
+                            class="submenu-item {{ request()->is('entite/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('entite.list') }}"
+                            class="submenu-item {{ request()->is('entite/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- SITE MENU -->
+                <li class="has-submenu {{ request()->is('site*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-geo-alt"></i>
+                        <span class="menu-text">Sites</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('site*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('site.create') }}"
+                            class="submenu-item {{ request()->is('site/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('site.list') }}"
+                            class="submenu-item {{ request()->is('site/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- MAGASIN MENU (Organigramme) -->
+                <li class="has-submenu {{ request()->is('magasin*') && !request()->is('magasin/carte') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-shop-window"></i>
+                        <span class="menu-text">Magasins</span>
+                    </a>
+                    <div class="sidebar-submenu"
+                        style="{{ request()->is('magasin*') && !request()->is('magasin/carte') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('magasin.create') }}"
+                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        <a href="{{ route('magasin.list') }}"
+                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- CARTE MENU -->
+                <li>
+                    <a href="{{ route('magasin.carte') }}" class="{{ request()->is('magasin/carte') ? 'active' : '' }}">
+                        <i class="bi bi-map"></i>
+                        <span class="menu-text">Carte</span>
+                    </a>
+                </li>
+                <div class="menu-divider"></div>
                 <li class="menu-title">Tiers</li>
 
                 <!-- CLIENT MENU -->
@@ -437,22 +537,29 @@
                 <!-- MAGASIN MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'magasin'))
                 <li class="has-submenu {{ request()->is('magasin*') ? 'active' : '' }}">
+                <!-- TYPE EVALUATION STOCK MENU -->
+                <li class="has-submenu {{ request()->is('type-evaluation-stock*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-shop-window"></i>
-                        <span class="menu-text">Magasin</span>
+                        <i class="bi bi-calculator"></i>
+                        <span class="menu-text">Évaluation Stock</span>
                     </a>
                     <div class="sidebar-submenu"
                         style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'create'))
                         <a href="{{ route('magasin.create') }}"
                             class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
+                        style="{{ request()->is('type-evaluation-stock*') ? 'display: block;' : 'display: none;' }}">
+                        <a href="{{ route('type-evaluation-stock.create') }}"
+                            class="submenu-item {{ request()->is('type-evaluation-stock/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
-                            <span>Saisie</span>
+                            <span>Ajout</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'list'))
                         <a href="{{ route('magasin.list') }}"
                             class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
+                        <a href="{{ route('type-evaluation-stock.list') }}"
+                            class="submenu-item {{ request()->is('type-evaluation-stock/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -670,15 +777,7 @@
                         @yield('header-buttons')
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                @yield('content')
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @yield('content')
 
                 <!-- Affichage des erreurs de validation -->
                 @if ($errors->any())
@@ -715,6 +814,8 @@
             </div>
         </footer>
     </div>
+
+    @include('partials.delete-modal')
 
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -850,6 +951,22 @@
         // Run on load
         document.addEventListener('DOMContentLoaded', function() {
             updateTime();
+
+            // Unified Delete Confirmation Modal Handler
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const url = button.getAttribute('data-bs-url');
+                    const itemName = button.getAttribute('data-bs-item');
+
+                    const form = deleteModal.querySelector('#deleteConfirmForm');
+                    const nameContainer = deleteModal.querySelector('#deleteItemName');
+
+                    if (form) form.action = url;
+                    if (nameContainer) nameContainer.textContent = itemName || 'cet élément';
+                });
+            }
         });
     </script>
 

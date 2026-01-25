@@ -32,6 +32,21 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="id_site" class="form-label">Site</label>
+                            <select class="form-select @error('id_site') is-invalid @enderror" id="id_site" name="id_site">
+                                <option value="">-- Aucun site --</option>
+                                @foreach ($sites as $site)
+                                    <option value="{{ $site->id_site }}" {{ old('id_site', $magasin->id_site) == $site->id_site ? 'selected' : '' }}>
+                                        {{ $site->localisation }} ({{ $site->entite->nom ?? '-' }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('id_site')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">

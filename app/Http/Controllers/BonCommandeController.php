@@ -19,8 +19,13 @@ class BonCommandeController extends Controller
      */
     public function list(Request $request)
     {
-        $query = BonCommande::query();
+        $query = BonCommande::with(['proformaFournisseur.fournisseur', 'magasin.site.entite']);
         
+        // Filtrer par magasin
+        if ($request->filled('id_magasin')) {
+            $query->where('id_magasin', $request->id_magasin);
+        }
+
         // Filtrer par fournisseur
         if ($request->filled('fournisseur')) {
             $query->whereHas('proformaFournisseur', function ($q) {
@@ -48,8 +53,9 @@ class BonCommandeController extends Controller
         
         $bonCommandes = $query->latest('date_')->paginate(10);
         $fournisseurs = Fournisseur::all();
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
         
-        return view('bon-commande.list', compact('bonCommandes', 'fournisseurs'));
+        return view('bon-commande.list', compact('bonCommandes', 'fournisseurs', 'magasins'));
     }
     
     /**
@@ -63,6 +69,7 @@ class BonCommandeController extends Controller
         $proformaFournisseur = null;
         $articlesProforma = [];
         $descriptionProforma = '';
+        $idMagasinProforma = null;
         
         if ($request->has('proforma_id')) {
             $proformaFournisseur = ProformaFournisseur::find($request->proforma_id);
@@ -73,12 +80,21 @@ class BonCommandeController extends Controller
             // Récupérer les articles de la proforma
             $articlesProforma = $proformaFournisseur->proformaFournisseurFille()->with('article')->get();
             $descriptionProforma = $proformaFournisseur->description ?? '';
+            $idMagasinProforma = $proformaFournisseur->id_magasin;
         }
         
         $proformas = ProformaFournisseur::where('etat', '>=', 5)->get();
-        $articles = Article::all();
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
         
-        return view('bon-commande.create', compact('fournisseurs', 'proformas', 'articles', 'proformaFournisseur', 'articlesProforma', 'descriptionProforma'));
+        $articles = Article::with('unite')->get();
+        $articlesJS = $articles->map(fn($a) => [
+            'id' => $a->id_article, 
+            'nom' => $a->nom,
+            'unite' => $a->unite?->libelle,
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+        ])->values();
+        
+        return view('bon-commande.create', compact('fournisseurs', 'proformas', 'articles', 'proformaFournisseur', 'articlesProforma', 'descriptionProforma', 'articlesJS', 'magasins', 'idMagasinProforma'));
     }
     
     /**
@@ -113,6 +129,8 @@ class BonCommandeController extends Controller
             'etat' => 1, // Créée
             'id_utilisateur' => $userId,
             'id_proformaFournisseur' => $request->id_proformaFournisseur,
+            'id_magasin' => $request->id_magasin,
+            'description' => $request->description,
         ]);
         
         // Ajouter les articles
@@ -137,7 +155,7 @@ class BonCommandeController extends Controller
     public function show($id)
     {
         $bonCommande = BonCommande::findOrFail($id);
-        $articles = $bonCommande->bonCommandeFille()->with('article')->get();
+        $articles = $bonCommande->bonCommandeFille()->with('article.unite')->get();
         
         return view('bon-commande.show', compact('bonCommande', 'articles'));
     }
@@ -173,10 +191,13 @@ class BonCommandeController extends Controller
             'fournisseur_id' => $proforma->id_fournisseur,
             'fournisseur_nom' => $proforma->fournisseur->nom,
             'description' => $proforma->description,
+            'id_magasin' => $proforma->id_magasin,
             'articles' => $proforma->proformaFournisseurFille->map(function($item) {
                 return [
                     'id_article' => $item->id_article,
                     'nom' => $item->article->nom,
+                    'unite' => $item->article->unite?->libelle,
+                    'photo' => $item->article->photo ? asset('storage/' . $item->article->photo) : '',
                     'quantite' => $item->quantite,
                     'prix' => $item->prix_achat,
                 ];

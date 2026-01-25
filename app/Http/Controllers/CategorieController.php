@@ -31,6 +31,7 @@ class CategorieController extends Controller
     {
         $validated = $request->validate([
             'libelle' => 'required|string|max:250|unique:categorie,libelle',
+            'est_perissable' => 'boolean',
         ]);
 
         try {
@@ -39,6 +40,7 @@ class CategorieController extends Controller
             Categorie::create([
                 'id_categorie' => $idCategorie,
                 'libelle' => $validated['libelle'],
+                'est_perissable' => $request->boolean('est_perissable'),
             ]);
 
             return response()->json([
@@ -65,10 +67,14 @@ class CategorieController extends Controller
         
         $validated = $request->validate([
             'libelle' => 'required|string|max:250|unique:categorie,libelle,' . $id . ',id_categorie',
+            'est_perissable' => 'boolean',
         ]);
 
         try {
-            $categorie->update($validated);
+            $categorie->update([
+                'libelle' => $validated['libelle'],
+                'est_perissable' => $request->boolean('est_perissable'),
+            ]);
             
             return response()->json([
                 'success' => true,
