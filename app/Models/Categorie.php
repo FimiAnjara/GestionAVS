@@ -24,4 +24,10 @@ class Categorie extends Model
     {
         return $this->hasMany(Article::class, 'id_categorie', 'id_categorie');
     }
+
+    public function getLibelleWithStatusAttribute()
+    {
+        $status = $this->est_perissable ? 'PERISSABLE' : 'NON PÉRISSABLE';
+        return "{$this->libelle} ({$status})";
+    }
 }

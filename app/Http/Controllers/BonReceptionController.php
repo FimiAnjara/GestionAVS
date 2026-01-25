@@ -63,7 +63,8 @@ class BonReceptionController extends Controller
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
-            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : '',
+            'est_perissable' => $a->categorie?->est_perissable ?? false
         ])->values();
         
         return view('bon-reception.create', compact('bonCommandes', 'articles', 'fournisseurs', 'magasins', 'emplacements', 'articlesJS'));
@@ -92,6 +93,7 @@ class BonReceptionController extends Controller
                     'unite' => $item->article->unite?->libelle,
                     'photo' => $item->article->photo ? asset('storage/' . $item->article->photo) : '',
                     'quantite' => $item->quantite,
+                    'est_perissable' => $item->article->categorie?->est_perissable ?? false,
                 ];
             }),
         ]);

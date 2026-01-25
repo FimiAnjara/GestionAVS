@@ -207,9 +207,12 @@ Route::prefix('bon-reception')->group(function () {
 Route::prefix('mvt-stock')->group(function () {
     Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
     Route::get('/create', [MvtStockController::class, 'create'])->name('mvt-stock.create');
+    Route::get('/api/prix-actuel', [MvtStockController::class, 'getPrixActuel'])->name('mvt-stock.api.prix-actuel');
     Route::post('/', [MvtStockController::class, 'store'])->name('mvt-stock.store');
     Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
     Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
+    Route::delete('/{id}', [MvtStockController::class, 'destroy'])->name('mvt-stock.destroy');
+    Route::delete('/fille/{id}', [MvtStockController::class, 'destroyFille'])->name('mvt-stock.destroyFille');
 });
 
 // Détails des mouvements (articles enfants)

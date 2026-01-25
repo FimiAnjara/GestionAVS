@@ -12,16 +12,20 @@
 @endsection
 
 @section('content')
+    @php
+        $isFiltering = request()->hasAny(['id_article', 'date_from', 'date_to']);
+    @endphp
+
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-4" id="magasinTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+            <button class="nav-link {{ !$isFiltering ? 'active' : '' }}" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="{{ !$isFiltering ? 'true' : 'false' }}">
                 <i class="bi bi-info-circle me-2"></i>Info générale
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="evaluation-tab" data-bs-toggle="tab" data-bs-target="#evaluation" type="button" role="tab" aria-controls="evaluation" aria-selected="false">
-                <i class="bi bi-calculator me-2"></i>Evaluation stock
+            <button class="nav-link {{ $isFiltering ? 'active' : '' }}" id="evaluation-tab" data-bs-toggle="tab" data-bs-target="#evaluation" type="button" role="tab" aria-controls="evaluation" aria-selected="{{ $isFiltering ? 'true' : 'false' }}">
+                <i class="bi bi-box-seam me-2"></i>Inventaire de stock
             </button>
         </li>
     </ul>
@@ -30,7 +34,7 @@
     <div class="tab-content" id="magasinTabsContent">
         
         <!-- Tab 1: Info générale -->
-        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <div class="tab-pane fade {{ !$isFiltering ? 'show active' : '' }}" id="info" role="tabpanel" aria-labelledby="info-tab">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm">
@@ -130,13 +134,51 @@
             </div>
         </div>
 
-        <!-- Tab 2: Evaluation stock -->
-        <div class="tab-pane fade" id="evaluation" role="tabpanel" aria-labelledby="evaluation-tab">
+        <!-- Tab 2: Inventaire stock -->
+        <div class="tab-pane fade {{ $isFiltering ? 'show active' : '' }}" id="evaluation" role="tabpanel" aria-labelledby="evaluation-tab">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-light border-0 py-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-list-check me-2"></i>Détails des Mouvements et Evaluation
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-list-check me-2"></i>Inventaire de stock (Mouvements)
+                        </h6>
+                    </div>
+                    
+                    <!-- Filtres -->
+                    <form action="{{ route('magasin.show', $magasin->id_magasin) }}" method="GET" class="row g-2">
+                        <div class="col-md-5">
+                            <select name="id_article" class="form-select form-select-sm select2-article">
+                                <option value="">-- Tous les produits de l'entité --</option>
+                                @foreach($articles as $art)
+                                    <option value="{{ $art->id_article }}" @selected(request('id_article') == $art->id_article)>
+                                        {{ $art->id_article }} - {{ $art->nom }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Du</span>
+                                <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Au</span>
+                                <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-filter me-1"></i>Filtrer
+                            </button>
+                        </div>
+                        <div class="col-md-1">
+                            <a href="{{ route('magasin.show', $magasin->id_magasin) }}" class="btn btn-sm btn-outline-secondary w-100" title="Réinitialiser">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        </div>
+                    </form>
                 </div>
                 <div class="card-body p-0">
                     @if($mouvements->count() > 0)
@@ -145,12 +187,14 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
+                                        <th class="text-center">Photo</th>
                                         <th>ID Mouvement</th>
                                         <th>Article</th>
                                         <th>Unité</th>
                                         <th class="text-center">Entrée</th>
                                         <th class="text-center">Sortie</th>
                                         <th class="text-center text-primary">Reste</th>
+                                        <th>Date Exp.</th>
                                         <th class="text-end">Prix Unit.</th>
                                         <th class="text-end">Total</th>
                                         <th class="text-center">Type Eval</th>
@@ -160,33 +204,60 @@
                                     @foreach($mouvements as $mvt)
                                         <tr>
                                             <td>{{ $mvt->mvtStock->date_?->format('d/m/Y') ?? 'N/A' }}</td>
+                                            <td class="text-center">
+                                                @if($mvt->article?->photo)
+                                                    <img src="{{ asset('storage/' . $mvt->article->photo) }}" 
+                                                         class="rounded shadow-sm" 
+                                                         style="width: 35px; height: 35px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-light rounded d-inline-flex align-items-center justify-content-center" 
+                                                         style="width: 35px; height: 35px;">
+                                                        <i class="bi bi-image text-muted" style="font-size: 0.8rem;"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
                                             <td>
-                                                <a href="{{ route('mvt-stock.show', $mvt->id_mvt_stock) }}">
+                                                <a href="{{ route('mvt-stock.show', $mvt->id_mvt_stock) }}" class="text-decoration-none fw-bold">
                                                     {{ $mvt->id_mvt_stock }}
                                                 </a>
                                             </td>
                                             <td>
-                                                <strong>{{ $mvt->article?->designation ?? $mvt->id_article }}</strong>
+                                                <strong>
+                                                    <a href="{{ route('articles.show', $mvt->id_article) }}" class="text-decoration-none text-dark">
+                                                        {{ $mvt->article?->nom ?? $mvt->id_article }}
+                                                    </a>
+                                                </strong>
+                                                <br>
+                                                <small class="text-muted">{{ $mvt->article?->designation }}</small>
                                             </td>
                                             <td>
                                                 {{ $mvt->article?->unite?->libelle ?? '-' }}
                                             </td>
                                             <td class="text-center">
                                                 @if($mvt->entree > 0)
-                                                    <span class="badge bg-success">+{{ number_format($mvt->entree, 0) }}</span>
+                                                    <span class="text-success fw-bold">{{ number_format($mvt->entree, 0) }}</span>
                                                 @else
                                                     -
                                                 @endif
                                             </td>
                                             <td class="text-center">
                                                 @if($mvt->sortie > 0)
-                                                    <span class="badge bg-danger">-{{ number_format($mvt->sortie, 0) }}</span>
+                                                    <span class="text-danger fw-bold">{{ number_format($mvt->sortie, 0) }}</span>
                                                 @else
                                                     -
                                                 @endif
                                             </td>
-                                            <td class="text-center fw-bold text-primary">
-                                                {{ number_format($mvt->reste, 0) }}
+                                            <td class="text-center">
+                                                <span class="badge bg-success">{{ number_format($mvt->reste, 0) }}</span>
+                                            </td>
+                                            <td>
+                                                @if($mvt->date_expiration)
+                                                    <span class="text-{{ $mvt->date_expiration->isPast() ? 'danger' : 'dark' }} fw-bold">
+                                                        {{ $mvt->date_expiration->format('d/m/Y') }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted small">-</span>
+                                                @endif
                                             </td>
                                             <td class="text-end">
                                                 {{ number_format($mvt->prix_unitaire, 0, ',', ' ') }} Ar
@@ -216,16 +287,52 @@
                             </table>
                         </div>
                         <div class="p-3">
-                            {{ $mouvements->links() }}
+                            {{ $mouvements->appends(request()->all())->links() }}
                         </div>
                     @else
                         <div class="p-5 text-center text-muted">
                             <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                            <p>Aucun mouvement de stock pour ce magasin.</p>
+                            <p>Aucun mouvement de stock correspondant pour ce magasin.</p>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialiser Select2
+            $('.select2-article').select2({
+                placeholder: "-- Sélectionner un produit --",
+                allowClear: true,
+                theme: 'bootstrap-5'
+            });
+
+            // Persistance des onglets après filtrage
+            // Si on a des paramètres de filtre dans l'URL, on active l'onglet Inventaire
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id_article') || urlParams.has('date_from') || urlParams.has('date_to')) {
+                const triggerEl = document.querySelector('#evaluation-tab');
+                if (triggerEl) {
+                    bootstrap.Tab.getInstance(triggerEl)?.show() || new bootstrap.Tab(triggerEl).show();
+                }
+            }
+
+            // Optionnel : Gérer le hash dans l'URL pour la navigation directe
+            const hash = window.location.hash;
+            if (hash) {
+                const targetTab = document.querySelector(`button[data-bs-target="${hash}"]`);
+                if (targetTab) {
+                    new bootstrap.Tab(targetTab).show();
+                }
+            }
+
+            // Mettre à jour le hash de l'URL quand on change d'onglet
+            $('.nav-link').on('shown.bs.tab', function (e) {
+                const target = $(e.target).data('bs-target');
+                history.replaceState(null, null, target);
+            });
+        });
+    </script>
 @endsection

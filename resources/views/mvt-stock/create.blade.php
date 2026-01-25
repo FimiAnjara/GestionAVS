@@ -156,6 +156,7 @@
                                             <option value="{{ $article->id_article }}" 
                                                     data-id-entite="{{ $article->id_entite }}"
                                                     data-unite="{{ $article->unite?->libelle }}"
+                                                    data-perissable="{{ $article->categorie?->est_perissable ? '1' : '0' }}"
                                                     data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
                                                 {{ $article->id_article }} - {{ $article->nom }}
                                             </option>
@@ -167,15 +168,15 @@
                                 </td>
                                 <td>
                                     <input type="number" class="form-control form-control-sm entree-input @error('articles.0.entree') is-invalid @enderror" 
-                                           name="articles[0][entree]" min="0" step="0.01" value="0" data-index="0">
+                                           name="articles[0][entree]" min="0" step="any" value="0" data-index="0">
                                 </td>
                                 <td>
                                     <input type="number" class="form-control form-control-sm sortie-input @error('articles.0.sortie') is-invalid @enderror" 
-                                           name="articles[0][sortie]" min="0" step="0.01" value="0" data-index="0">
+                                           name="articles[0][sortie]" min="0" step="any" value="0" data-index="0">
                                 </td>
                                 <td>
                                     <input type="number" class="form-control form-control-sm prix-input @error('articles.0.prix_unitaire') is-invalid @enderror" 
-                                           name="articles[0][prix_unitaire]" min="0" step="0.01" value="0" data-index="0">
+                                           name="articles[0][prix_unitaire]" min="0" step="any" value="0" data-index="0">
                                 </td>
                                 <td class="text-end">
                                     <span class="montant-display">0</span>
@@ -299,13 +300,14 @@ $(document).ready(function() {
         
         document.querySelectorAll('.article-row').forEach((row) => {
             const entree = parseFloat(row.querySelector('.entree-input').value) || 0;
+            const sortie = parseFloat(row.querySelector('.sortie-input').value) || 0;
             const prix = parseFloat(row.querySelector('.prix-input').value) || 0;
-            const montant = entree * prix;
+            const montant = (entree + sortie) * prix;
             
             // Afficher le montant formaté
             row.querySelector('.montant-display').textContent = montant.toLocaleString('fr-FR', { 
                 minimumFractionDigits: 0, 
-                maximumFractionDigits: 0 
+                maximumFractionDigits: 2 
             });
             
             total += montant;
@@ -314,9 +316,9 @@ $(document).ready(function() {
         // Mettre à jour le total
         document.getElementById('totalMontant').textContent = total.toLocaleString('fr-FR', { 
             minimumFractionDigits: 0, 
-            maximumFractionDigits: 0 
+            maximumFractionDigits: 2 
         });
-        document.getElementById('montant_total').value = Math.round(total);
+        document.getElementById('montant_total').value = total.toFixed(2);
     }
     
     // Fonction pour ajouter une ligne d'article (réutilisable pour pré-remplissage)
@@ -339,6 +341,7 @@ $(document).ready(function() {
                             <option value="{{ $article->id_article }}" 
                                     data-id-entite="{{ $article->id_entite }}"
                                     data-unite="{{ $article->unite?->libelle }}"
+                                    data-perissable="{{ $article->categorie?->est_perissable ? '1' : '0' }}"
                                     data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}"
                                     ${articleData.id_article === '{{ $article->id_article }}' ? 'selected' : ''}>
                                 {{ $article->id_article }} - {{ $article->nom }}
@@ -349,11 +352,11 @@ $(document).ready(function() {
                 <td class="text-center">
                     <span class="badge bg-success article-unite">${articleData.unite || '-'}</span>
                 </td>
-                <td><input type="number" class="form-control entree-input" name="articles[${index}][entree]" min="0" step="0.01" value="${articleData.quantite || 0}"></td>
-                <td><input type="number" class="form-control sortie-input" name="articles[${index}][sortie]" min="0" step="0.01" value="0"></td>
-                <td><input type="number" class="form-control prix-input" name="articles[${index}][prix_unitaire]" min="0" step="0.01" value="${articleData.prix_unitaire || 0}"></td>
+                <td><input type="number" class="form-control entree-input" name="articles[${index}][entree]" min="0" step="any" value="${articleData.quantite || 0}"></td>
+                <td><input type="number" class="form-control sortie-input" name="articles[${index}][sortie]" min="0" step="any" value="0"></td>
+                <td><input type="number" class="form-control prix-input" name="articles[${index}][prix_unitaire]" min="0" step="any" value="${articleData.prix_unitaire || 0}"></td>
                 <td class="text-center"><span class="montant-display">0</span></td>
-                <td><input type="date" class="form-control" name="articles[${index}][date_expiration]"></td>
+                <td><input type="date" class="form-control" name="articles[${index}][date_expiration]" value="${articleData.date_expiration || ''}"></td>
                 <td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-article" style="display:none;"><i class="bi bi-trash"></i></button></td>
             </tr>
         `;
@@ -471,6 +474,55 @@ $(document).ready(function() {
             unitDisplay.removeClass('d-none');
         } else {
             unitDisplay.addClass('d-none');
+        }
+
+        // Date d'expiration par défaut si périssable
+        const selectedOption = $(this).find('option:selected');
+        const isPerissable = selectedOption.attr('data-perissable') === '1';
+        const dateInput = row.find('input[type="date"]');
+        
+        if (isPerissable) {
+            // Si le champ est vide, on met une date par défaut en 2027 (ex: 1er Janvier 2027)
+            if (!dateInput.val()) {
+                dateInput.val('2027-01-01');
+            }
+        }
+
+        // Auto-remplir le prix unitaire pour les sorties
+        const idTypeMvt = $('#id_type_mvt').val();
+        const idMagasin = $('#id_magasin').val();
+        const idArticle = $(this).val();
+        const prixInput = row.find('.prix-input');
+
+        // Vérifier si c'est un mouvement de sortie (ne contient pas "entrée" ou "réception")
+        if (idTypeMvt && idMagasin && idArticle) {
+            const typeMvtText = $('#id_type_mvt option:selected').text().toLowerCase();
+            const isSortie = !typeMvtText.includes('entrée') && 
+                           !typeMvtText.includes('entree') && 
+                           !typeMvtText.includes('réception') &&
+                           !typeMvtText.includes('reception');
+
+            if (isSortie) {
+                // Appel AJAX pour obtenir le prix actuel
+                $.ajax({
+                    url: '{{ route('mvt-stock.api.prix-actuel') }}',
+                    method: 'GET',
+                    data: {
+                        id_article: idArticle,
+                        id_magasin: idMagasin
+                    },
+                    success: function(response) {
+                        if (response.prix && response.prix > 0) {
+                            prixInput.val(response.prix);
+                            // Recalculer le total
+                            calculateTotal();
+                        }
+                    },
+                    error: function() {
+                        console.error('Erreur lors de la récupération du prix actuel');
+                    }
+                });
+            }
         }
     });
 

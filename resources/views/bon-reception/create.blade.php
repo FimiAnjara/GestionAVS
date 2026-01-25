@@ -143,15 +143,18 @@
                                             @foreach ($articles as $article)
                                                 <option value="{{ $article->id_article }}"
                                                     data-unite="{{ $article->unite?->libelle }}"
+                                                    data-perissable="{{ $article->categorie?->est_perissable ? '1' : '0' }}"
                                                     data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
                                                     {{ $article->id_article }} - {{ $article->nom }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="text-center article-unite text-muted small">-</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success article-unite">-</span>
+                                    </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm" name="articles[0][quantite]" placeholder="0" min="0.01" step="0.01" required>
+                                        <input type="number" class="form-control form-control-sm" name="articles[0][quantite]" placeholder="0" min="0.01" step="any" required>
                                     </td>
                                     <td>
                                         <input type="date" class="form-control form-control-sm" name="articles[0][date_expiration]">
@@ -242,6 +245,16 @@
                 } else {
                     row.find('.article-photo-container').html(`<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`);
                 }
+
+                // Date d'expiration par défaut si périssable
+                const isPerissable = selected.data('perissable') == '1';
+                const dateInput = row.find('input[type="date"]');
+                if (isPerissable) {
+                    const today = new Date().toISOString().split('T')[0];
+                    dateInput.val(today);
+                } else {
+                    dateInput.val('');
+                }
             });
 
             function addArticleRow(data = null, index) {
@@ -249,7 +262,7 @@
                 let options = '<option value="">-- Sélectionner --</option>';
                 articlesData.forEach(art => {
                     const selected = data && art.id === data.id_article ? 'selected' : '';
-                    options += `<option value="${art.id}" ${selected} data-unite="${art.unite}" data-photo="${art.photo}">${art.id} - ${art.nom}</option>`;
+                    options += `<option value="${art.id}" ${selected} data-unite="${art.unite}" data-perissable="${art.est_perissable ? '1' : '0'}" data-photo="${art.photo}">${art.id} - ${art.nom}</option>`;
                 });
 
                 const photoHtml = data && data.photo 
@@ -264,9 +277,11 @@
                                 ${options}
                             </select>
                         </td>
-                        <td class="text-center article-unite text-muted small">${data ? (data.unite || '-') : '-'}</td>
+                        <td class="text-center">
+                            <span class="badge bg-success article-unite">${data ? (data.unite || '-') : '-'}</span>
+                        </td>
                         <td>
-                            <input type="number" class="form-control form-control-sm" name="articles[${index}][quantite]" value="${data ? data.quantite : ''}" placeholder="0" min="0.01" step="0.01" required>
+                            <input type="number" class="form-control form-control-sm" name="articles[${index}][quantite]" value="${data ? data.quantite : ''}" placeholder="0" min="0.01" step="any" required>
                         </td>
                         <td>
                             <input type="date" class="form-control form-control-sm" name="articles[${index}][date_expiration]">
@@ -279,7 +294,14 @@
                     </tr>
                 `;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                initSelect2($(container).find('.searchable-select:last'));
+                const lastRowSelect = $(container).find('.searchable-select:last');
+                initSelect2(lastRowSelect);
+                
+                // Si on a des données de pré-remplissage, on déclenche le changement pour activer la logique de date
+                if (data) {
+                    lastRowSelect.trigger('change');
+                }
+                
                 updateRemoveButtons();
             }
 

@@ -58,20 +58,21 @@
                             <tr>
                                 <th width="5%">Photo</th>
                                 <th>ID</th>
-                                <th>ID mere</th>
                                 <th>Date</th>
                                 <th>Magasin</th>
                                 <th>Article</th>
                                 <th class="text-center">Unité</th>
-                                <th class="text-center" width="10%">
+                                <th class="text-center" width="8%">
                                     <i class="bi bi-plus-circle text-success me-1"></i>Entrée
                                 </th>
-                                <th class="text-center" width="10%">
+                                <th class="text-center" width="8%">
                                     <i class="bi bi-dash-circle text-danger me-1"></i>Sortie
                                 </th>
-                                <th class="text-center" width="12%">Prix Unit. (Ar)</th>
-                                <th class="text-end" width="12%">Montant (Ar)</th>
-                                <th class="text-center" width="12%">Date Exp.</th>
+                                <th class="text-center" width="8%">Reste</th>
+                                <th class="text-center" width="10%">Prix Unit. (Ar)</th>
+                                <th class="text-end" width="10%">Montant (Ar)</th>
+                                <th class="text-center" width="10%">Date Exp.</th>
+                                <th class="text-center" width="5%">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -90,59 +91,71 @@
                                         @endif
                                     </td>
                                     <td>
-                                        {{ $fille->id_mvt_stock_fille }}
+                                        <small class="fw-bold">{{ $fille->id_mvt_stock_fille }}</small>
                                     </td>
+                                    <td><small>{{ $fille->mvtStock->date_?->format('d/m/Y') ?? 'N/A' }}</small></td>
                                     <td>
-                                        <a href="{{ route('mvt-stock.show', $fille->mvtStock->id_mvt_stock) }}"
-                                            class="text-decoration-none fw-bold">
-                                            {{ $fille->mvtStock->id_mvt_stock }}
-                                        </a>
-                                    </td>
-
-                                    <td>{{ $fille->mvtStock->date_?->format('d/m/Y H:i') ?? 'N/A' }}</td>
-                                    <td>
-                                        <small class="badge bg-info text-dark">
-                                            [{{ $fille->mvtStock->magasin?->site?->entite?->nom ?? 'N/A' }}] 
-                                            {{ $fille->mvtStock->magasin?->site?->localisation ?? 'N/A' }} - 
+                                        <small class="badge bg-light text-dark border">
                                             {{ $fille->mvtStock->magasin?->nom ?? ($fille->mvtStock->magasin?->designation ?? 'N/A') }}
                                         </small>
                                     </td>
                                     <td>
-                                        <a href="{{ route('articles.show', $fille->id_article) }}" class="text-decoration-none fw-bold">
+                                        <a href="{{ route('articles.show', $fille->id_article) }}" class="text-decoration-none fw-bold small">
                                             {{ $fille->id_article }}
                                         </a>
                                         <br>
-                                        <small class="text-muted">{{ $fille->article?->designation ?? '-' }}</small>
+                                        <small class="text-muted d-block" style="font-size: 0.75rem;">{{ Str::limit($fille->article?->designation ?? '-', 20) }}</small>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge bg-secondary">{{ $fille->article->unite->libelle ?? '-' }}</span>
+                                        <span class="badge bg-secondary" style="font-size: 0.7rem;">{{ $fille->article->unite->libelle ?? '-' }}</span>
                                     </td>
                                     <td class="text-center">
                                         @if ($fille->entree > 0)
-                                            <span class="badge bg-success">{{ number_format($fille->entree, 0) }}</span>
+                                            <span class="text-success fw-bold">{{ number_format($fille->entree, 0) }}</span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
                                         @if ($fille->sortie > 0)
-                                            <span class="badge bg-danger">{{ number_format($fille->sortie, 0) }}</span>
+                                            <span class="text-danger fw-bold">{{ number_format($fille->sortie, 0) }}</span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
+                                        @if($fille->entree > 0)
+                                            <span class="badge {{ $fille->reste > 0 ? 'bg-success' : 'bg-light text-muted' }}">
+                                                {{ number_format($fille->reste, 0) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center small">
                                         {{ number_format($fille->prix_unitaire, 0) }}
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-end small">
                                         <strong>{{ number_format($fille->getMontantAttribute(), 0) }}</strong>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center small">
                                         @if ($fille->date_expiration)
-                                            <small>{{ $fille->date_expiration->format('d/m/Y') }}</small>
+                                            <span class="{{ $fille->date_expiration->isPast() ? 'text-danger fw-bold' : '' }}">
+                                                {{ $fille->date_expiration->format('d/m/Y') }}
+                                            </span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <form action="{{ route('mvt-stock.destroyFille', $fille->id_mvt_stock_fille) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1" 
+                                                onclick="return confirm('Supprimer cette ligne de mouvement ?')" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

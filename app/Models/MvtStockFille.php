@@ -13,7 +13,7 @@ class MvtStockFille extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     
-    protected $fillable = ['id_mvt_stock_fille', 'id_mvt_stock', 'id_article', 'entree', 'sortie', 'prix_unitaire', 'reste', 'date_expiration'];
+    protected $fillable = ['id_mvt_stock_fille', 'id_mvt_stock', 'id_article', 'id_mvt_source', 'entree', 'sortie', 'prix_unitaire', 'reste', 'date_expiration'];
 
     protected $casts = [
         'date_expiration' => 'date',
@@ -27,6 +27,16 @@ class MvtStockFille extends Model
     public function article()
     {
         return $this->belongsTo(Article::class, 'id_article', 'id_article');
+    }
+
+    public function sourceMovement()
+    {
+        return $this->belongsTo(MvtStockFille::class, 'id_mvt_source', 'id_mvt_stock_fille');
+    }
+
+    public function derivativeMovements()
+    {
+        return $this->hasMany(MvtStockFille::class, 'id_mvt_source', 'id_mvt_stock_fille');
     }
 
     public function getMontantAttribute()

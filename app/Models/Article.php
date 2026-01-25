@@ -80,4 +80,21 @@ class Article extends Model
     {
         return $this->hasMany(BonLivraisonFille::class, 'id_article', 'id_article');
     }
+
+    /**
+     * Obtenir le prix unitaire actuel de cet article dans un magasin donné
+     * en utilisant la méthode d'évaluation configurée pour l'article
+     *
+     * @param string $idMagasin
+     * @return float
+     */
+    public function getPrixActuel(string $idMagasin): float
+    {
+        $articleService = app(\App\Services\ArticleService::class);
+        
+        // Utiliser la méthode d'évaluation de l'article, ou CMUP par défaut
+        $methode = $this->typeEvaluation?->id_type_evaluation_stock ?? 'CMUP';
+        
+        return $articleService->getPrixUnitaireActuel($this->id_article, $idMagasin, $methode);
+    }
 }

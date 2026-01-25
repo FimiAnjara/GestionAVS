@@ -84,22 +84,43 @@ class MagasinController extends Controller
     /**
      * Afficher les détails d'un magasin
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $magasin = Magasin::with('site.entite')->findOrFail($id);
         
-        // Récupérer les mouvements de stock de ce magasin avec le type d'évaluation de l'article
-        $mouvements = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
+        $query = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
                 $q->where('id_magasin', $id);
             })
-            ->with(['mvtStock', 'article.typeEvaluation', 'article.unite'])
-            ->orderByDesc(
+            ->with(['mvtStock', 'article.typeEvaluation', 'article.unite']);
+
+        // Filtres
+        if ($request->filled('id_article')) {
+            $query->where('id_article', $request->id_article);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereHas('mvtStock', function($q) use ($request) {
+                $q->whereDate('date_', '>=', $request->date_from);
+            });
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereHas('mvtStock', function($q) use ($request) {
+                $q->whereDate('date_', '<=', $request->date_to);
+            });
+        }
+        
+        $mouvements = $query->orderByDesc(
                 \App\Models\MvtStock::select('date_')
                     ->whereColumn('mvt_stock.id_mvt_stock', 'mvt_stock_fille.id_mvt_stock')
             )
             ->paginate(15);
+
+        $articles = \App\Models\Article::where('id_entite', $magasin->site->id_entite)
+            ->orderBy('nom')
+            ->get();
         
-        return view('organigramme.magasin.show', compact('magasin', 'mouvements'));
+        return view('organigramme.magasin.show', compact('magasin', 'mouvements', 'articles'));
     }
 
     /**
