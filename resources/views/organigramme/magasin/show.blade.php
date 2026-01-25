@@ -150,6 +150,9 @@
                                         <th>Unité</th>
                                         <th class="text-center">Entrée</th>
                                         <th class="text-center">Sortie</th>
+                                        <th class="text-center text-primary">Reste</th>
+                                        <th class="text-end">Prix Unit.</th>
+                                        <th class="text-end">Total</th>
                                         <th class="text-center">Type Eval</th>
                                     </tr>
                                 </thead>
@@ -170,17 +173,30 @@
                                             </td>
                                             <td class="text-center">
                                                 @if($mvt->entree > 0)
-                                                    <span class="badge bg-success">+{{ $mvt->entree }}</span>
+                                                    <span class="badge bg-success">+{{ number_format($mvt->entree, 0) }}</span>
                                                 @else
                                                     -
                                                 @endif
                                             </td>
                                             <td class="text-center">
                                                 @if($mvt->sortie > 0)
-                                                    <span class="badge bg-danger">-{{ $mvt->sortie }}</span>
+                                                    <span class="badge bg-danger">-{{ number_format($mvt->sortie, 0) }}</span>
                                                 @else
                                                     -
                                                 @endif
+                                            </td>
+                                            <td class="text-center fw-bold text-primary">
+                                                {{ number_format($mvt->reste, 0) }}
+                                            </td>
+                                            <td class="text-end">
+                                                {{ number_format($mvt->prix_unitaire, 0, ',', ' ') }} Ar
+                                            </td>
+                                            <td class="text-end fw-bold">
+                                                @php 
+                                                    $qty = ($mvt->entree > 0) ? $mvt->entree : $mvt->sortie;
+                                                    $total = $qty * $mvt->prix_unitaire;
+                                                @endphp
+                                                {{ number_format($total, 0, ',', ' ') }} Ar
                                             </td>
                                             <td class="text-center">
                                                 @php

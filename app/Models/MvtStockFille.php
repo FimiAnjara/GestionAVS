@@ -13,7 +13,7 @@ class MvtStockFille extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     
-    protected $fillable = ['id_mvt_stock_fille', 'id_mvt_stock', 'id_article', 'entree', 'sortie', 'prix_unitaire', 'date_expiration'];
+    protected $fillable = ['id_mvt_stock_fille', 'id_mvt_stock', 'id_article', 'entree', 'sortie', 'prix_unitaire', 'reste', 'date_expiration'];
 
     protected $casts = [
         'date_expiration' => 'date',
