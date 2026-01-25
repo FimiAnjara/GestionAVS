@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Entite extends Model
 {
     use SoftDeletes;
-
     protected $table = 'entite';
     protected $primaryKey = 'id_entite';
     protected $keyType = 'string';

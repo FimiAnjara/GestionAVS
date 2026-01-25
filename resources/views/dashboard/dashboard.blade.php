@@ -3,140 +3,237 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="container-fluid py-5">
+@php
+    use App\Helpers\PermissionHelper;
+    $userRole = session('user_role');
+@endphp
+
+<div class="container-fluid py-3">
     <!-- En-tête du Dashboard -->
-    <div class="mb-5">
-        <h1 class="display-4 fw-bold">
-            <i class="bi bi-speedometer2 text-primary"></i> Dashboard
-        </h1>
-        <p class="text-muted lead">Bienvenue sur votre tableau de bord de gestion</p>
-    </div>
-
-    <!-- Statistiques -->
-    <div class="row mb-5">
-        <!-- Carte Clients -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-people text-primary" style="font-size: 2.5rem;"></i>
-                    <h6 class="card-title mt-3 text-muted">Total Clients</h6>
-                    <p class="display-6 fw-bold text-primary">
-                        {{ \App\Models\Client::whereNull('deleted_at')->count() }}
-                    </p>
-                    <a href="{{ route('clients.list') }}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-arrow-right"></i> Voir la liste
-                    </a>
-                </div>
+    <div class="mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-speedometer2 text-primary"></i> Tableau de bord
+                </h2>
+                <p class="text-muted mb-0">
+                    Bienvenue, <strong>{{ session('user_email', 'Utilisateur') }}</strong> 
+                    <span class="badge bg-primary">{{ $userRole ?? 'Non défini' }}</span>
+                </p>
             </div>
-        </div>
-
-        <!-- Carte Fournisseurs -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-briefcase text-success" style="font-size: 2.5rem;"></i>
-                    <h6 class="card-title mt-3 text-muted">Total Fournisseurs</h6>
-                    <p class="display-6 fw-bold text-success">
-                        {{ \App\Models\Fournisseur::whereNull('deleted_at')->count() }}
-                    </p>
-                    <a href="{{ route('fournisseurs.list') }}" class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-arrow-right"></i> Voir la liste
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Carte Synthèse -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-graph-up text-info" style="font-size: 2.5rem;"></i>
-                    <h6 class="card-title mt-3 text-muted">Total Tiers</h6>
-                    <p class="display-6 fw-bold text-info">
-                        {{ \App\Models\Client::whereNull('deleted_at')->count() + \App\Models\Fournisseur::whereNull('deleted_at')->count() }}
-                    </p>
-                    <a href="{{ route('clients.list') }}" class="btn btn-sm btn-outline-info">
-                        <i class="bi bi-arrow-right"></i> Gérer
-                    </a>
-                </div>
+            <div>
+                <span class="text-muted">
+                    <i class="bi bi-building me-1"></i> {{ session('user_departement', 'Non défini') }}
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Actions Rapides -->
-    <div class="row mb-5">
+    <!-- Statistiques selon les permissions -->
+    <div class="row mb-4">
+        @if(PermissionHelper::hasMenuAccess($userRole, 'clients'))
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-people text-primary" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Clients</h6>
+                            <h3 class="mb-0 fw-bold">{{ \App\Models\Client::whereNull('deleted_at')->count() }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs'))
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-briefcase text-success" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Fournisseurs</h6>
+                            <h3 class="mb-0 fw-bold">{{ \App\Models\Fournisseur::whereNull('deleted_at')->count() }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if(PermissionHelper::hasMenuAccess($userRole, 'articles'))
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-box text-warning" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Articles</h6>
+                            <h3 class="mb-0 fw-bold">{{ \App\Models\Article::whereNull('deleted_at')->count() }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if(PermissionHelper::hasMenuAccess($userRole, 'magasin'))
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-shop text-info" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Magasins</h6>
+                            <h3 class="mb-0 fw-bold">{{ \App\Models\Magasin::count() }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    <!-- Actions Rapides selon les permissions -->
+    <div class="row mb-4">
         <div class="col-lg-8">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-lightning-fill"></i> Actions Rapides
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-lightning-fill text-warning"></i> Actions Rapides
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ route('clients.create') }}" class="btn btn-primary w-100">
-                                <i class="bi bi-person-plus"></i> Ajouter un Client
+                    <div class="row g-2">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'proforma-fournisseur', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('proforma-fournisseur.create') }}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-file-earmark-plus"></i> Nouvelle Demande
                             </a>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ route('fournisseurs.create') }}" class="btn btn-success w-100">
-                                <i class="bi bi-briefcase-plus"></i> Ajouter un Fournisseur
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('bon-commande.create') }}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-cart-plus"></i> Bon de Commande
                             </a>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ route('clients.list') }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-list-ul"></i> Liste des Clients
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-reception', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('bon-reception.create') }}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-box-arrow-in-down"></i> Bon de Réception
                             </a>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ route('fournisseurs.list') }}" class="btn btn-outline-success w-100">
-                                <i class="bi bi-list-ul"></i> Liste Fournisseurs
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'clients', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('clients.create') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-person-plus"></i> Nouveau Client
                             </a>
                         </div>
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('fournisseurs.create') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-briefcase-fill"></i> Nouveau Fournisseur
+                            </a>
+                        </div>
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('mvt-stock.create') }}" class="btn btn-outline-warning w-100">
+                                <i class="bi bi-arrow-left-right"></i> Mouvement Stock
+                            </a>
+                        </div>
+                        @endif
+                        
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse', 'create'))
+                        <div class="col-md-4">
+                            <a href="{{ route('mvt-caisse.create') }}" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-cash-stack"></i> Mouvement Caisse
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Informations Système -->
+        <!-- Informations Utilisateur -->
         <div class="col-lg-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-info-circle"></i> Informations
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-person-circle text-primary"></i> Mon Profil
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="small">
-                        <strong>Application:</strong> GestionAVS<br>
-                        <strong>Version:</strong> 1.0.0<br>
-                        <strong>Langue:</strong> Français<br>
-                        <strong>Thème:</strong> Bootstrap 5<br>
-                        <strong>Date/Heure:</strong><br>
-                        <span class="text-muted">{{ now()->format('d/m/Y H:i:s') }}</span>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-person text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0 fw-bold">{{ session('user_email', 'Utilisateur') }}</h6>
+                            <small class="text-muted">{{ $userRole ?? 'Non défini' }}</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <p class="small mb-2">
+                        <i class="bi bi-building me-2 text-muted"></i>
+                        <strong>Département:</strong> {{ session('user_departement', 'Non défini') }}
+                    </p>
+                    <p class="small mb-0">
+                        <i class="bi bi-clock me-2 text-muted"></i>
+                        <strong>Connecté:</strong> {{ now()->format('d/m/Y H:i') }}
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Derniers Clients -->
+    <!-- Tableaux selon les permissions -->
     <div class="row">
+        @if(PermissionHelper::hasMenuAccess($userRole, 'clients', 'list'))
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-people"></i> Derniers Clients
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-people text-primary"></i> Derniers Clients
                     </h5>
+                    <a href="{{ route('clients.list') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tout <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
+                    <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Nom</th>
+                                <th>Contact</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -144,13 +241,12 @@
                             @forelse(\App\Models\Client::whereNull('deleted_at')->latest()->limit(5)->get() as $client)
                                 <tr>
                                     <td>{{ $client->nom }}</td>
-                                    <td>
-                                        <small class="text-muted">{{ $client->created_at->format('d/m/Y') }}</small>
-                                    </td>
+                                    <td><small class="text-muted">{{ $client->telephone ?? '-' }}</small></td>
+                                    <td><small class="text-muted">{{ $client->created_at->format('d/m/Y') }}</small></td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2" class="text-center text-muted py-3">Aucun client</td>
+                                    <td colspan="3" class="text-center text-muted py-3">Aucun client</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -158,20 +254,25 @@
                 </div>
             </div>
         </div>
+        @endif
 
-        <!-- Derniers Fournisseurs -->
+        @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs', 'list'))
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-briefcase"></i> Derniers Fournisseurs
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-briefcase text-success"></i> Derniers Fournisseurs
                     </h5>
+                    <a href="{{ route('fournisseurs.list') }}" class="btn btn-sm btn-outline-success">
+                        Voir tout <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
+                    <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Nom</th>
+                                <th>Contact</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -179,13 +280,12 @@
                             @forelse(\App\Models\Fournisseur::whereNull('deleted_at')->latest()->limit(5)->get() as $fournisseur)
                                 <tr>
                                     <td>{{ $fournisseur->nom }}</td>
-                                    <td>
-                                        <small class="text-muted">{{ $fournisseur->created_at->format('d/m/Y') }}</small>
-                                    </td>
+                                    <td><small class="text-muted">{{ $fournisseur->telephone ?? '-' }}</small></td>
+                                    <td><small class="text-muted">{{ $fournisseur->created_at->format('d/m/Y') }}</small></td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2" class="text-center text-muted py-3">Aucun fournisseur</td>
+                                    <td colspan="3" class="text-center text-muted py-3">Aucun fournisseur</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -193,6 +293,19 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Vérifier l'authentification au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            window.location.href = '/login';
+        }
+    });
+</script>
+@endpush
 @endsection
