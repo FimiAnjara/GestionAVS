@@ -89,7 +89,8 @@ class MagasinController extends Controller
         $magasin = Magasin::with('site.entite')->findOrFail($id);
         
         $query = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
-                $q->where('id_magasin', $id);
+                $q->where('id_magasin', $id)
+                  ->where('id_type_mvt', 'E'); // Uniquement les entrées pour l'inventaire
             })
             ->with(['mvtStock', 'article.typeEvaluation', 'article.unite']);
 
@@ -119,8 +120,35 @@ class MagasinController extends Controller
         $articles = \App\Models\Article::where('id_entite', $magasin->site->id_entite)
             ->orderBy('nom')
             ->get();
+
+        // Inventaire Financier (Stock Actuel + Prix Evaluation)
+        $evaluationStock = [];
+        $valeurTotaleMagasin = 0;
+
+        foreach ($articles as $article) {
+            // Calculer le stock actuel pour cet article dans ce magasin
+            $stockActuel = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
+                    $q->where('id_magasin', $id);
+                })
+                ->where('id_article', $article->id_article)
+                ->sum(\DB::raw('entree - sortie'));
+
+            if ($stockActuel > 0) {
+                $prixActuel = $article->getPrixActuel($id);
+                $valeurTotale = $stockActuel * $prixActuel;
+                
+                $evaluationStock[] = [
+                    'article' => $article,
+                    'quantite' => $stockActuel,
+                    'prix_unitaire' => $prixActuel,
+                    'valeur_totale' => $valeurTotale
+                ];
+                
+                $valeurTotaleMagasin += $valeurTotale;
+            }
+        }
         
-        return view('organigramme.magasin.show', compact('magasin', 'mouvements', 'articles'));
+        return view('organigramme.magasin.show', compact('magasin', 'mouvements', 'articles', 'evaluationStock', 'valeurTotaleMagasin'));
     }
 
     /**

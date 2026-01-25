@@ -25,7 +25,12 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link {{ $isFiltering ? 'active' : '' }}" id="evaluation-tab" data-bs-toggle="tab" data-bs-target="#evaluation" type="button" role="tab" aria-controls="evaluation" aria-selected="{{ $isFiltering ? 'true' : 'false' }}">
-                <i class="bi bi-box-seam me-2"></i>Inventaire de stock
+                <i class="bi bi-box-seam me-2"></i>Inventaire par lot
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="financial-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="financial" aria-selected="false">
+                <i class="bi bi-currency-dollar me-2"></i>Évaluation financière
             </button>
         </li>
     </ul>
@@ -188,15 +193,14 @@
                                     <tr>
                                         <th>Date</th>
                                         <th class="text-center">Photo</th>
-                                        <th>ID Mouvement</th>
+                                        <th>ID Lot/Mvt</th>
                                         <th>Article</th>
                                         <th>Unité</th>
-                                        <th class="text-center">Entrée</th>
-                                        <th class="text-center">Sortie</th>
-                                        <th class="text-center text-primary">Reste</th>
+                                        <th class="text-center">Quantité Initiale</th>
+                                        <th class="text-center text-primary">En Stock (Reste)</th>
                                         <th>Date Exp.</th>
                                         <th class="text-end">Prix Unit.</th>
-                                        <th class="text-end">Total</th>
+                                        <th class="text-end">Valeur Reste</th>
                                         <th class="text-center">Type Eval</th>
                                     </tr>
                                 </thead>
@@ -218,7 +222,7 @@
                                             </td>
                                             <td>
                                                 <a href="{{ route('mvt-stock.show', $mvt->id_mvt_stock) }}" class="text-decoration-none fw-bold">
-                                                    {{ $mvt->id_mvt_stock }}
+                                                    {{ $mvt->id_mvt_stock_fille }}
                                                 </a>
                                             </td>
                                             <td>
@@ -234,21 +238,12 @@
                                                 {{ $mvt->article?->unite?->libelle ?? '-' }}
                                             </td>
                                             <td class="text-center">
-                                                @if($mvt->entree > 0)
-                                                    <span class="text-success fw-bold">{{ number_format($mvt->entree, 0) }}</span>
-                                                @else
-                                                    -
-                                                @endif
+                                                <span class="text-secondary">{{ number_format($mvt->entree, 0) }}</span>
                                             </td>
                                             <td class="text-center">
-                                                @if($mvt->sortie > 0)
-                                                    <span class="text-danger fw-bold">{{ number_format($mvt->sortie, 0) }}</span>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="badge bg-success">{{ number_format($mvt->reste, 0) }}</span>
+                                                <span class="badge {{ $mvt->reste > 0 ? 'bg-success' : 'bg-light text-muted' }} pb-2">
+                                                    {{ number_format($mvt->reste, 0) }}
+                                                </span>
                                             </td>
                                             <td>
                                                 @if($mvt->date_expiration)
@@ -263,11 +258,7 @@
                                                 {{ number_format($mvt->prix_unitaire, 0, ',', ' ') }} Ar
                                             </td>
                                             <td class="text-end fw-bold">
-                                                @php 
-                                                    $qty = ($mvt->entree > 0) ? $mvt->entree : $mvt->sortie;
-                                                    $total = $qty * $mvt->prix_unitaire;
-                                                @endphp
-                                                {{ number_format($total, 0, ',', ' ') }} Ar
+                                                {{ number_format($mvt->reste * $mvt->prix_unitaire, 0, ',', ' ') }} Ar
                                             </td>
                                             <td class="text-center">
                                                 @php
@@ -293,6 +284,108 @@
                         <div class="p-5 text-center text-muted">
                             <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                             <p>Aucun mouvement de stock correspondant pour ce magasin.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Évaluation financière -->
+        <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="financial-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="bi bi-currency-exchange me-2"></i>Valeur actuelle du stock
+                    </h6>
+                    <div class="h5 mb-0 text-primary fw-bold">
+                        Total Magasin: {{ number_format($valeurTotaleMagasin, 0, ',', ' ') }} Ar
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if(count($evaluationStock) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-center" width="5%">Photo</th>
+                                        <th>Article</th>
+                                        <th class="text-center">Type Eval.</th>
+                                        <th class="text-center">Quantité Restante</th>
+                                        <th class="text-center">Unité</th>
+                                        <th class="text-end">Prix Actuel (Unit.)</th>
+                                        <th class="text-end">Valeur Totale</th>
+                                        <th class="text-center">État</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($evaluationStock as $item)
+                                        <tr>
+                                            <td class="text-center">
+                                                @if($item['article']->photo)
+                                                    <img src="{{ asset('storage/' . $item['article']->photo) }}" 
+                                                         class="rounded shadow-sm" 
+                                                         style="width: 35px; height: 35px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-light rounded d-inline-flex align-items-center justify-content-center" 
+                                                         style="width: 35px; height: 35px;">
+                                                        <i class="bi bi-image text-muted" style="font-size: 0.8rem;"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <strong>{{ $item['article']->id_article }} - {{ $item['article']->nom }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ $item['article']->designation }}</small>
+                                            </td>
+                                            <td class="text-center">
+                                                @php
+                                                    $typeEval = $item['article']->typeEvaluation?->libelle ?? 'Non défini';
+                                                    $badgeClass = match($typeEval) {
+                                                        'CMUP' => 'bg-primary',
+                                                        'FIFO' => 'bg-info text-dark',
+                                                        'LIFO' => 'bg-warning text-dark',
+                                                        default => 'bg-secondary'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }}">{{ $typeEval }}</span>
+                                            </td>
+                                            <td class="text-center fw-bold fs-6">
+                                                {{ number_format($item['quantite'], 0) }}
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark border">{{ $item['article']->unite?->libelle ?? '-' }}</span>
+                                            </td>
+                                            <td class="text-end">
+                                                {{ number_format($item['prix_unitaire'], 2, ',', ' ') }} Ar
+                                            </td>
+                                            <td class="text-end fw-bold text-primary">
+                                                {{ number_format($item['valeur_totale'], 0, ',', ' ') }} Ar
+                                            </td>
+                                            <td class="text-center">
+                                                @if($item['quantite'] > 10)
+                                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>En stock</span>
+                                                @elseif($item['quantite'] > 0)
+                                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Stock faible</span>
+                                                @else
+                                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rupture</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="table-light fw-bold">
+                                    <tr>
+                                        <td colspan="6" class="text-end">VALEUR TOTALE DU STOCK :</td>
+                                        <td class="text-end text-primary fs-5">{{ number_format($valeurTotaleMagasin, 0, ',', ' ') }} Ar</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @else
+                        <div class="p-5 text-center text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            <p>Aucun stock disponible dans ce magasin.</p>
                         </div>
                     @endif
                 </div>
