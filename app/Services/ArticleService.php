@@ -58,7 +58,10 @@ class ArticleService
     protected function calculateFIFO(string $idArticle, string $idMagasin): float
     {
         $batch = $this->getAvailableBatches($idArticle, $idMagasin)
-            ->sortBy('created_at')
+            ->sortBy([
+                ['created_at', 'asc'],
+                ['id_mvt_stock_fille', 'asc']
+            ])
             ->first();
 
         return $batch ? $batch->prix_unitaire : 0.0;
@@ -71,7 +74,10 @@ class ArticleService
     protected function calculateLIFO(string $idArticle, string $idMagasin): float
     {
         $batch = $this->getAvailableBatches($idArticle, $idMagasin)
-            ->sortByDesc('created_at')
+            ->sortBy([
+                ['created_at', 'desc'],
+                ['id_mvt_stock_fille', 'desc']
+            ])
             ->first();
 
         return $batch ? $batch->prix_unitaire : 0.0;

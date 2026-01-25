@@ -148,14 +148,19 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <form action="{{ route('mvt-stock.destroyFille', $fille->id_mvt_stock_fille) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1" 
-                                                onclick="return confirm('Supprimer cette ligne de mouvement ?')" title="Supprimer">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a href="{{ route('mvt-stock.editFille', $fille->id_mvt_stock_fille) }}" class="btn btn-sm btn-outline-primary border-0 p-1" title="Modifier cette ligne">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form action="{{ route('mvt-stock.destroyFille', $fille->id_mvt_stock_fille) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1" 
+                                                    onclick="return confirm('Supprimer cette ligne de mouvement ?')" title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

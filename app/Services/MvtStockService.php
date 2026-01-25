@@ -90,8 +90,8 @@ class MvtStockService
         $methodeEvaluation = $articleModel?->typeEvaluation?->id_type_evaluation_stock ?? 'CMUP';
         $prixUnitaireSortie = $articleService->getPrixUnitaireActuel($article['id_article'], $idMagasin, $methodeEvaluation);
 
-        // Allouer le stock selon FEFO/FIFO (pour déterminer d'où vient le stock physiquement)
-        $allocations = $this->allocateStock($idMagasin, $article['id_article'], $quantityNeeded, $isPerishable);
+        // Allouer le stock selon FEFO/FIFO/LIFO (pour déterminer d'où vient le stock physiquement)
+        $allocations = $this->allocateStock($idMagasin, $article['id_article'], $quantityNeeded, $isPerishable, $methodeEvaluation);
 
         // Créer les mouvements de sortie et mettre à jour les sources
         foreach ($allocations as $allocationIndex => $allocation) {
@@ -107,7 +107,7 @@ class MvtStockService
                 'entree' => 0,
                 'sortie' => $allocation['quantity_used'],
                 'reste' => 0, // Les sorties n'ont pas de reste
-                'prix_unitaire' => $prixUnitaireSortie, // Prix selon méthode d'évaluation (CMUP/FIFO/LIFO)
+                'prix_unitaire' => ($methodeEvaluation === 'CMUP') ? $prixUnitaireSortie : $allocation['prix_unitaire'], // Prix selon méthode d'évaluation
                 'date_expiration' => $allocation['date_expiration'],
             ]);
         }
@@ -151,7 +151,7 @@ class MvtStockService
      *
      * @return array Liste des allocations [['id_mvt_stock_fille' => ..., 'quantity_used' => ..., ...], ...]
      */
-    protected function allocateStock(string $idMagasin, string $idArticle, float $quantityNeeded, bool $isPerishable): array
+    protected function allocateStock(string $idMagasin, string $idArticle, float $quantityNeeded, bool $isPerishable, string $methodeEvaluation = 'FIFO'): array
     {
         // Récupérer les lots disponibles
         $query = MvtStockFille::with('mvtStock')
@@ -163,12 +163,17 @@ class MvtStockService
 
         // Appliquer le tri selon la stratégie
         if ($isPerishable) {
-            // FEFO : trier par date d'expiration (les plus proches en premier)
+            // FEFO : Priorité absolue à la date d'expiration (les plus proches en premier)
             $query->orderBy('date_expiration', 'asc')
                   ->orderBy('created_at', 'asc');
+        } elseif ($methodeEvaluation === 'LIFO') {
+            // LIFO : Dernier entré, premier sorti (pour les articles non périssables en mode LIFO)
+            $query->orderBy('created_at', 'desc')
+                  ->orderBy('id_mvt_stock_fille', 'desc');
         } else {
-            // FIFO : trier par date de création
-            $query->orderBy('created_at', 'asc');
+            // FIFO : Premier entré, premier sorti (Comportement par défaut)
+            $query->orderBy('created_at', 'asc')
+                  ->orderBy('id_mvt_stock_fille', 'asc');
         }
 
         $availableBatches = $query->get();

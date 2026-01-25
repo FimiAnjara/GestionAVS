@@ -239,6 +239,8 @@ Route::prefix('mvt-stock')->group(function () {
     Route::get('/{id}', [MvtStockController::class, 'show'])->name('mvt-stock.show');
     Route::get('/{id}/export-pdf', [MvtStockController::class, 'exportPdf'])->name('mvt-stock.exportPdf');
     Route::delete('/{id}', [MvtStockController::class, 'destroy'])->name('mvt-stock.destroy');
+    Route::get('/fille/{id}/edit', [MvtStockController::class, 'editFille'])->name('mvt-stock.editFille');
+    Route::put('/fille/{id}', [MvtStockController::class, 'updateFille'])->name('mvt-stock.updateFille');
     Route::delete('/fille/{id}', [MvtStockController::class, 'destroyFille'])->name('mvt-stock.destroyFille');
 });
 
