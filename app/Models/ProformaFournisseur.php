@@ -14,7 +14,7 @@ class ProformaFournisseur extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_proformaFournisseur', 'date_', 'etat', 'description', 'id_fournisseur'];
+    protected $fillable = ['id_proformaFournisseur', 'date_', 'etat', 'description', 'id_fournisseur', 'id_magasin'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -23,6 +23,11 @@ class ProformaFournisseur extends Model
     public function fournisseur()
     {
         return $this->belongsTo(Fournisseur::class, 'id_fournisseur', 'id_fournisseur');
+    }
+
+    public function magasin()
+    {
+        return $this->belongsTo(Magasin::class, 'id_magasin', 'id_magasin');
     }
 
     public function proformaFournisseurFille()

@@ -39,6 +39,15 @@
                             <span class="badge bg-{{ $proforma->etat_badge }}">{{ $proforma->etat_label }}</span>
                         </div>
                     </div>
+                    @if($proforma->magasin)
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Magasin Destination:</strong></div>
+                        <div class="col-sm-7">
+                            <span class="fw-bold">{{ $proforma->magasin->nom }}</span><br>
+                            <small class="text-muted">{{ $proforma->magasin->site?->localisation }}</small>
+                        </div>
+                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-sm-5"><strong>Créée le:</strong></div>
                         <div class="col-sm-7"><small class="text-muted">{{ $proforma->created_at->format('d/m/Y H:i') }}</small></div>

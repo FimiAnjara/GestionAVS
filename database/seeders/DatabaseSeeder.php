@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             FournisseurSeeder::class,
             OrganigrammeSeeder::class,
             TypeEvaluationStockSeeder::class,
+            TypeMvtStockSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
         ]);

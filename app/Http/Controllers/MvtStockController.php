@@ -16,7 +16,7 @@ class MvtStockController extends Controller
      */
     public function list(Request $request)
     {
-        $query = MvtStock::with('mvtStockFille.article', 'magasin');
+        $query = MvtStock::with('mvtStockFille.article.unite', 'magasin');
         
         if ($request->filled('date_from')) {
             $query->where('date_', '>=', $request->date_from);
@@ -49,7 +49,7 @@ class MvtStockController extends Controller
      */
     public function show($id)
     {
-        $mouvement = MvtStock::with('mvtStockFille.article')->findOrFail($id);
+        $mouvement = MvtStock::with('mvtStockFille.article.unite')->findOrFail($id);
         
         return view('mvt-stock.show', compact('mouvement'));
     }
@@ -59,8 +59,9 @@ class MvtStockController extends Controller
      */
     public function create(Request $request)
     {
-        $articles = Article::all();
+        $articles = Article::with('unite')->get();
         $magasins = Magasin::with('site.entite')->get();
+        $typeMvts = \App\Models\TypeMvtStock::all();
         
         // Pré-remplissage depuis un bon de réception
         $bonReception = null;
@@ -89,11 +90,15 @@ class MvtStockController extends Controller
                     'quantite' => $item->quantite,
                     'prix_unitaire' => $prixUnitaire,
                     'nom' => $item->article?->nom ?? $item->id_article,
+                    'photo' => $item->article?->photo,
+                    'unite' => $item->article?->unite?->libelle,
                 ];
             })->toArray();
         }
         
-        return view('mvt-stock.create', compact('articles', 'magasins', 'bonReception', 'prefilledArticles', 'prefilledMagasin'));
+        $prefilledTypeMvt = $request->id_type_mvt;
+        
+        return view('mvt-stock.create', compact('articles', 'magasins', 'bonReception', 'prefilledArticles', 'prefilledMagasin', 'typeMvts', 'prefilledTypeMvt'));
     }
 
     /**
@@ -104,7 +109,8 @@ class MvtStockController extends Controller
         $validated = $request->validate([
             'id_mvt_stock' => 'required|unique:mvt_stock',
             'date_' => 'required|date',
-            'id_magasin' => 'nullable|exists:magasin,id_magasin',
+            'id_magasin' => 'required|exists:magasin,id_magasin',
+            'id_type_mvt' => 'required|exists:type_mvt_stock,id_type_mvt',
             'description' => 'nullable|string',
             'montant_total' => 'required|numeric|min:0',
             'articles' => 'required|array|min:1',
@@ -120,6 +126,7 @@ class MvtStockController extends Controller
             'id_mvt_stock' => $validated['id_mvt_stock'],
             'date_' => $validated['date_'],
             'id_magasin' => $validated['id_magasin'],
+            'id_type_mvt' => $validated['id_type_mvt'],
             'description' => $validated['description'],
             'montant_total' => $validated['montant_total'],
         ]);
@@ -210,7 +217,7 @@ class MvtStockController extends Controller
      */
     public function details(Request $request)
     {
-        $query = MvtStockFille::with('mvtStock.magasin', 'article');
+        $query = MvtStockFille::with('mvtStock.magasin', 'article.unite');
         
         // Filtres
         if ($request->filled('id_article')) {

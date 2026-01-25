@@ -63,7 +63,9 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-light">
                                     <tr>
+                                        <th width="5%">Photo</th>
                                         <th>Article</th>
+                                        <th class="text-center">Unité</th>
                                         <th class="text-center">Entrée</th>
                                         <th class="text-center">Sortie</th>
                                         <th class="text-end">Prix Unitaire</th>
@@ -74,9 +76,24 @@
                                 <tbody>
                                     @foreach($mouvement->mvtStockFille as $fille)
                                     <tr>
+                                        <td class="text-center">
+                                            @if($fille->article->photo)
+                                                <img src="{{ asset('storage/' . $fille->article->photo) }}" 
+                                                     class="rounded shadow-sm" 
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                            @else
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                     style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td>
                                             <strong>{{ $fille->article?->id_article ?? 'N/A' }}</strong><br>
                                             <small class="text-muted">{{ $fille->article?->designation ?? '-' }}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary">{{ $fille->article->unite->libelle ?? '-' }}</span>
                                         </td>
                                         <td class="text-center">
                                             @if($fille->entree > 0)

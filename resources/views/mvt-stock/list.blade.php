@@ -75,7 +75,13 @@
                             </td>
                             <td><strong>{{ $mvt->id_mvt_stock }}</strong></td>
                             <td>{{ $mvt->date_?->format('d/m/Y H:i') ?? 'N/A' }}</td>
-                            <td>{{ $mvt->magasin?->nom ?? $mvt->magasin?->designation ?? 'N/A' }}</td>
+                            <td>
+                                <small class="text-muted">
+                                    [{{ $mvt->magasin?->site?->entite?->nom ?? '?' }}] 
+                                    {{ $mvt->magasin?->site?->localisation ?? '?' }}
+                                </small><br>
+                                {{ $mvt->magasin?->nom ?? $mvt->magasin?->designation ?? 'N/A' }}
+                            </td>
                             <td>{{ Str::limit($mvt->description, 30) ?? '-' }}</td>
                             <td class="text-end">
                                 <span class="badge bg-info">{{ number_format($mvt->montant_total, 0) }} Ar</span>
@@ -99,7 +105,9 @@
                                         <table class="table table-sm table-bordered mb-0">
                                             <thead class="table-light">
                                                 <tr>
+                                                    <th width="5%">Photo</th>
                                                     <th>Article</th>
+                                                    <th class="text-center">Unité</th>
                                                     <th class="text-center">Entrée</th>
                                                     <th class="text-center">Sortie</th>
                                                     <th class="text-center">Prix Unit.</th>
@@ -110,9 +118,24 @@
                                             <tbody>
                                                 @foreach($mvt->mvtStockFille as $fille)
                                                 <tr>
+                                                    <td class="text-center">
+                                                        @if($fille->article->photo)
+                                                            <img src="{{ asset('storage/' . $fille->article->photo) }}" 
+                                                                 class="rounded shadow-sm" 
+                                                                 style="width: 30px; height: 30px; object-fit: cover;">
+                                                        @else
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                                 style="width: 30px; height: 30px;">
+                                                                <i class="bi bi-image text-muted" style="font-size: 0.8rem;"></i>
+                                                            </div>
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         <strong>{{ $fille->article?->id_article }}</strong><br>
-                                                        <small class="text-muted">{{ $fille->article?->designation }}</small>
+                                                        <small class="text-muted">{{ $fille->article?->designation ?? $fille->article?->nom }}</small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-secondary" style="font-size: 0.7em;">{{ $fille->article->unite->libelle ?? '' }}</span>
                                                     </td>
                                                     <td class="text-center">
                                                         <span class="badge bg-success">{{ $fille->entree }}</span>

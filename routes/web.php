@@ -193,6 +193,7 @@ Route::prefix('facture-fournisseur')->group(function () {
 Route::prefix('bon-reception')->group(function () {
     Route::get('/list', [BonReceptionController::class, 'list'])->name('bon-reception.list');
     Route::get('/create', [BonReceptionController::class, 'create'])->name('bon-reception.create');
+    Route::get('/api/bon-commande/{id}', [BonReceptionController::class, 'getBonCommandeData'])->name('bon-reception.api.bon-commande');
     Route::post('/', [BonReceptionController::class, 'store'])->name('bon-reception.store');
     Route::get('/{id}', [BonReceptionController::class, 'show'])->name('bon-reception.show');
     Route::get('/{id}/export-pdf', [BonReceptionController::class, 'exportPdf'])->name('bon-reception.exportPdf');

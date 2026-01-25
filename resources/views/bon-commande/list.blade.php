@@ -38,15 +38,22 @@
                 </div>
 
                 <div class="col-lg-2">
-                    <label for="date_from" class="form-label">De</label>
-                    <input type="date" class="form-control form-control-sm" id="date_from" name="date_from"
-                        value="{{ request('date_from') }}">
+                    <label for="id_magasin" class="form-label">Magasin</label>
+                    <select class="form-select form-select-sm" id="id_magasin" name="id_magasin">
+                        <option value="">-- Tous --</option>
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}"
+                                {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                {{ $magasin->nom }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-lg-2">
-                    <label for="date_to" class="form-label">À</label>
-                    <input type="date" class="form-control form-control-sm" id="date_to" name="date_to"
-                        value="{{ request('date_to') }}">
+                    <label for="date_from" class="form-label">De</label>
+                    <input type="date" class="form-control form-control-sm" id="date_from" name="date_from"
+                        value="{{ request('date_from') }}">
                 </div>
 
                 <div class="col-lg-2">
@@ -54,8 +61,8 @@
                     <select class="form-select form-select-sm" id="etat" name="etat">
                         <option value="">-- Tous --</option>
                         <option value="1" {{ request('etat') == '1' ? 'selected' : '' }}>Créée</option>
-                        <option value="5" {{ request('etat') == '5' ? 'selected' : '' }}>Validée par Finance</option>
-                        <option value="11" {{ request('etat') == '11' ? 'selected' : '' }}>Validée par DG</option>
+                        <option value="5" {{ request('etat') == '5' ? 'selected' : '' }}>Validée Finance</option>
+                        <option value="11" {{ request('etat') == '11' ? 'selected' : '' }}>Validée DG</option>
                     </select>
                 </div>
 
@@ -89,6 +96,7 @@
                                 <th>ID</th>
                                 <th>Date</th>
                                 <th>Fournisseur</th>
+                                <th>Magasin</th>
                                 <th>Proforma</th>
                                 <th>État</th>
                                 <th class="text-center">Actions</th>
@@ -105,6 +113,15 @@
                                     </td>
                                     <td>
                                         <span class="badge bg-info text-dark">{{ $bc->proformaFournisseur->fournisseur->nom }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @if($bc->magasin)
+                                                <i class="bi bi-shop me-1 text-primary"></i>{{ $bc->magasin->nom }}
+                                            @else
+                                                <span class="text-danger italic">Non spécifié</span>
+                                            @endif
+                                        </small>
                                     </td>
                                     <td>
                                         <small>{{ $bc->proformaFournisseur->id_proformaFournisseur }}</small>

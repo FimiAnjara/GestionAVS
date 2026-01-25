@@ -25,23 +25,19 @@
                         placeholder="ID Mouvement" value="{{ request('id_mvt_stock') }}">
                 </div>
                 <div class="col-md-2">
-                    <input type="text" name="id_article" class="form-control form-control-sm" placeholder="Article"
-                        value="{{ request('id_article') }}">
-                </div>
-                <div class="col-md-1">
                     <input type="date" name="date_from" class="form-control form-control-sm"
                         value="{{ request('date_from') }}">
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <input type="date" name="date_to" class="form-control form-control-sm"
                         value="{{ request('date_to') }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <select name="id_magasin" class="form-select form-select-sm">
                         <option value="">-- Tous les magasins --</option>
-                        @foreach ($magasins as $mag)
-                            <option value="{{ $mag->id_magasin }}" @selected(request('id_magasin') == $mag->id_magasin)>
-                                {{ $mag->nom ?? $mag->designation }}
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}" {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                [{{ $magasin->site?->entite?->nom ?? 'N/A' }}] {{ $magasin->site?->localisation ?? 'N/A' }} - {{ $magasin->nom ?? $magasin->designation }}
                             </option>
                         @endforeach
                     </select>
@@ -60,11 +56,13 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th width="5%">Photo</th>
                                 <th>ID</th>
                                 <th>ID mere</th>
                                 <th>Date</th>
                                 <th>Magasin</th>
                                 <th>Article</th>
+                                <th class="text-center">Unité</th>
                                 <th class="text-center" width="10%">
                                     <i class="bi bi-plus-circle text-success me-1"></i>Entrée
                                 </th>
@@ -79,6 +77,18 @@
                         <tbody>
                             @foreach ($mouvementsFille as $fille)
                                 <tr>
+                                    <td class="text-center">
+                                        @if($fille->article->photo)
+                                            <img src="{{ asset('storage/' . $fille->article->photo) }}" 
+                                                 class="rounded shadow-sm" 
+                                                 style="width: 30px; height: 30px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 30px; height: 30px;">
+                                                <i class="bi bi-image text-muted" style="font-size: 0.8rem;"></i>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td>
                                         {{ $fille->id_mvt_stock_fille }}
                                     </td>
@@ -91,13 +101,21 @@
 
                                     <td>{{ $fille->mvtStock->date_?->format('d/m/Y H:i') ?? 'N/A' }}</td>
                                     <td>
-                                        <small class="badge bg-info">
+                                        <small class="badge bg-info text-dark">
+                                            [{{ $fille->mvtStock->magasin?->site?->entite?->nom ?? 'N/A' }}] 
+                                            {{ $fille->mvtStock->magasin?->site?->localisation ?? 'N/A' }} - 
                                             {{ $fille->mvtStock->magasin?->nom ?? ($fille->mvtStock->magasin?->designation ?? 'N/A') }}
                                         </small>
                                     </td>
                                     <td>
-                                        <strong>{{ $fille->id_article }}</strong><br>
+                                        <a href="{{ route('articles.show', $fille->id_article) }}" class="text-decoration-none fw-bold">
+                                            {{ $fille->id_article }}
+                                        </a>
+                                        <br>
                                         <small class="text-muted">{{ $fille->article?->designation ?? '-' }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ $fille->article->unite->libelle ?? '-' }}</span>
                                     </td>
                                     <td class="text-center">
                                         @if ($fille->entree > 0)

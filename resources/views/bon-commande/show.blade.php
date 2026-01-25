@@ -51,6 +51,15 @@
                             </span>
                         </p>
                     </div>
+                    @if($bonCommande->magasin)
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Magasin Destination</label>
+                        <p class="fw-bold">
+                            {{ $bonCommande->magasin->nom }}<br>
+                            <small class="text-muted fw-normal">{{ $bonCommande->magasin->site?->localisation }}</small>
+                        </p>
+                    </div>
+                    @endif
                     @if ($bonCommande->description)
                         <div class="mb-0">
                             <label class="form-label text-muted">Description</label>
@@ -73,6 +82,7 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
+                                        <th width="5%">Photo</th>
                                         <th>Article</th>
                                         <th class="text-end">Quantité</th>
                                         <th class="text-end">Prix Unitaire (Ar)</th>
@@ -84,12 +94,27 @@
                                     @foreach ($articles as $article)
                                         @php $montant = $article->quantite * $article->prix_achat; $total += $montant; @endphp
                                         <tr>
+                                            <td class="text-center">
+                                                @if($article->article->photo)
+                                                    <img src="{{ asset('storage/' . $article->article->photo) }}" 
+                                                         class="rounded shadow-sm" 
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                         style="width: 40px; height: 40px;">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <strong>{{ $article->article->nom }}</strong>
                                                 <br>
                                                 <small class="text-muted">{{ $article->id_article }}</small>
                                             </td>
-                                            <td class="text-end">{{ number_format($article->quantite, 2, ',', ' ') }}</td>
+                                            <td class="text-end">
+                                                {{ number_format($article->quantite, 2, ',', ' ') }}
+                                                <span class="badge bg-success ms-1">{{ $article->article->unite->libelle ?? '-' }}</span>
+                                            </td>
                                             <td class="text-end">{{ number_format($article->prix_achat, 2, ',', ' ') }}</td>
                                             <td class="text-end fw-bold">{{ number_format($montant, 2, ',', ' ') }}</td>
                                         </tr>

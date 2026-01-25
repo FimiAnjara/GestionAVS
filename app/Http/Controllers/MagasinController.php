@@ -17,15 +17,35 @@ class MagasinController extends Controller
      */
     public function list(Request $request)
     {
-        $query = Magasin::query();
+        $query = Magasin::with(['site.entite.groupe']);
 
         if ($request->filled('nom')) {
             $query->where('nom', 'like', '%' . $request->nom . '%');
         }
 
-        $magasins = $query->paginate(10);
+        if ($request->filled('id_groupe')) {
+            $query->whereHas('site.entite', function ($q) use ($request) {
+                $q->where('id_groupe', $request->id_groupe);
+            });
+        }
 
-        return view('organigramme.magasin.list', compact('magasins'));
+        if ($request->filled('id_entite')) {
+            $query->whereHas('site', function ($q) use ($request) {
+                $q->where('id_entite', $request->id_entite);
+            });
+        }
+
+        if ($request->filled('id_site')) {
+            $query->where('id_site', $request->id_site);
+        }
+
+        $magasins = $query->paginate(10);
+        
+        $groupes = Groupe::orderBy('nom')->get();
+        $entites = Entite::orderBy('nom')->get();
+        $sites = Site::orderBy('localisation')->get();
+
+        return view('organigramme.magasin.list', compact('magasins', 'groupes', 'entites', 'sites'));
     }
 
     /**
@@ -66,9 +86,20 @@ class MagasinController extends Controller
      */
     public function show($id)
     {
-        $magasin = Magasin::findOrFail($id);
+        $magasin = Magasin::with('site.entite')->findOrFail($id);
         
-        return view('organigramme.magasin.show', compact('magasin'));
+        // Récupérer les mouvements de stock de ce magasin avec le type d'évaluation de l'article
+        $mouvements = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
+                $q->where('id_magasin', $id);
+            })
+            ->with(['mvtStock', 'article.typeEvaluation', 'article.unite'])
+            ->orderByDesc(
+                \App\Models\MvtStock::select('date_')
+                    ->whereColumn('mvt_stock.id_mvt_stock', 'mvt_stock_fille.id_mvt_stock')
+            )
+            ->paginate(15);
+        
+        return view('organigramme.magasin.show', compact('magasin', 'mouvements'));
     }
 
     /**

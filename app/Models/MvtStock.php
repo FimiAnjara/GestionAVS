@@ -14,7 +14,7 @@ class MvtStock extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_mvt_stock', 'date_', 'id_magasin', 'montant_total', 'description'];
+    protected $fillable = ['id_mvt_stock', 'date_', 'id_magasin', 'id_type_mvt', 'montant_total', 'description'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -23,6 +23,11 @@ class MvtStock extends Model
     public function magasin()
     {
         return $this->belongsTo(Magasin::class, 'id_magasin', 'id_magasin');
+    }
+
+    public function typeMvt()
+    {
+        return $this->belongsTo(TypeMvtStock::class, 'id_type_mvt', 'id_type_mvt');
     }
 
     public function mvtStockFille()

@@ -16,8 +16,13 @@ class FactureFournisseurController extends Controller
      */
     public function list(Request $request)
     {
-        $query = FactureFournisseur::query();
+        $query = FactureFournisseur::with(['bonCommande.proformaFournisseur.fournisseur', 'magasin.site.entite']);
         
+        // Filtrer par magasin
+        if ($request->filled('id_magasin')) {
+            $query->where('id_magasin', $request->id_magasin);
+        }
+
         if ($request->filled('date_from')) {
             $query->where('date_', '>=', $request->date_from);
         }
@@ -34,8 +39,9 @@ class FactureFournisseurController extends Controller
         }
         
         $factures = $query->latest('date_')->paginate(10);
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
         
-        return view('facture-fournisseur.list', compact('factures'));
+        return view('facture-fournisseur.list', compact('factures', 'magasins'));
     }
 
     /**
@@ -45,7 +51,7 @@ class FactureFournisseurController extends Controller
     public function createFromBonCommande($id_bonCommande = null)
     {
         if ($id_bonCommande) {
-            $bonCommande = BonCommande::with('proformaFournisseur.fournisseur', 'bonCommandeFille.article')->findOrFail($id_bonCommande);
+            $bonCommande = BonCommande::with(['proformaFournisseur.fournisseur', 'bonCommandeFille.article.unite', 'magasin.site.entite'])->findOrFail($id_bonCommande);
             
             // Vérifier que le bon est en état 11
             if ($bonCommande->etat != 11) {
@@ -57,11 +63,19 @@ class FactureFournisseurController extends Controller
                 return back()->withErrors(['facture' => 'Une facture existe déjà pour ce bon de commande']);
             }
 
-            return view('facture-fournisseur.create', compact('bonCommande'));
+            // Préparer les articles pour le JS
+            $articlesJS = \App\Models\Article::with('unite')->get()->map(fn($a) => [
+                'id' => $a->id_article, 
+                'nom' => $a->nom,
+                'unite' => $a->unite?->libelle,
+                'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+            ]);
+
+            return view('facture-fournisseur.create', compact('bonCommande', 'articlesJS'));
         }
         
         // Si aucun ID n'est fourni, afficher la liste des bons de commande disponibles
-        return view('facture-fournisseur.create', ['bonCommande' => null]);
+        return view('facture-fournisseur.create', ['bonCommande' => null, 'articlesJS' => collect()]);
     }
 
     /**
@@ -72,6 +86,7 @@ class FactureFournisseurController extends Controller
         $request->validate([
             'date_' => 'required|date',
             'id_bonCommande' => 'required|exists:bonCommande,id_bonCommande',
+            'id_magasin' => 'nullable|exists:magasin,id_magasin',
             'description' => 'nullable|string',
             'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
@@ -94,6 +109,7 @@ class FactureFournisseurController extends Controller
             'etat' => 1,
             'description' => $request->description,
             'id_bonCommande' => $request->id_bonCommande,
+            'id_magasin' => $request->id_magasin ?? $bonCommande->id_magasin,
             'montant_total' => $montant_total,
             'montant_paye' => 0,
         ]);
@@ -120,7 +136,7 @@ class FactureFournisseurController extends Controller
      */
     public function show($id)
     {
-        $facture = FactureFournisseur::findOrFail($id);
+        $facture = FactureFournisseur::with(['magasin.site.entite', 'bonCommande.proformaFournisseur.fournisseur', 'factureFournisseurFille.article.unite'])->findOrFail($id);
         
         return view('facture-fournisseur.show', compact('facture'));
     }

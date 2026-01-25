@@ -18,13 +18,49 @@
         </div>
         <div class="card-body p-3">
             <form method="GET" action="{{ route('magasin.list') }}" class="row g-2 align-items-end">
-                <div class="col-lg-4">
+                <div class="col-lg-3">
                     <label for="nom" class="form-label">Nom du Magasin</label>
                     <input type="text" class="form-control form-control-sm" id="nom" name="nom"
                         placeholder="Chercher par nom..." value="{{ request('nom') }}">
                 </div>
 
                 <div class="col-lg-2">
+                    <label for="id_groupe" class="form-label">Groupe</label>
+                    <select class="form-select form-select-sm" id="id_groupe" name="id_groupe">
+                        <option value="">-- Tous --</option>
+                        @foreach ($groupes as $groupe)
+                            <option value="{{ $groupe->id_groupe }}" @selected(request('id_groupe') == $groupe->id_groupe)>
+                                {{ $groupe->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="id_entite" class="form-label">Entité</label>
+                    <select class="form-select form-select-sm" id="id_entite" name="id_entite">
+                        <option value="">-- Toutes --</option>
+                        @foreach ($entites as $entite)
+                            <option value="{{ $entite->id_entite }}" @selected(request('id_entite') == $entite->id_entite)>
+                                {{ $entite->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="id_site" class="form-label">Site</label>
+                    <select class="form-select form-select-sm" id="id_site" name="id_site">
+                        <option value="">-- Tous --</option>
+                        @foreach ($sites as $site)
+                            <option value="{{ $site->id_site }}" @selected(request('id_site') == $site->id_site)>
+                                {{ $site->localisation }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-3">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
                             <i class="bi bi-search me-2"></i>Rechercher
@@ -52,6 +88,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Nom</th>
+                                <th>Site & Entité</th>
                                 <th class="text-center">Latitude</th>
                                 <th class="text-center">Longitude</th>
                                 <th>Localisation GPS</th>
@@ -64,6 +101,10 @@
                                     <td>
                                         <strong class="text-primary">{{ $magasin->nom }}</strong><br>
                                         <small class="text-muted">{{ $magasin->id_magasin }}</small>
+                                    </td>
+                                    <td>
+                                        <div><strong>{{ $magasin->site?->localisation ?? 'N/A' }}</strong></div>
+                                        <div class="small text-muted">{{ $magasin->site?->entite?->nom ?? 'N/A' }}</div>
                                     </td>
                                     <td class="text-center">
                                         {{ number_format($magasin->latitude, 4) }}

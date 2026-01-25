@@ -46,6 +46,19 @@
                 </div>
 
                 <div class="col-lg-2">
+                    <label for="id_magasin" class="form-label">Magasin</label>
+                    <select class="form-select form-select-sm" id="id_magasin" name="id_magasin">
+                        <option value="">-- Tous --</option>
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}"
+                                {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                {{ $magasin->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
                             <i class="bi bi-search me-2"></i>Rechercher
@@ -75,6 +88,7 @@
                                 <th>ID</th>
                                 <th>Date</th>
                                 <th>Bon Commande</th>
+                                <th>Magasin</th>
                                 <th>État</th>
                                 <th class="text-center">Actions</th>
                             </tr>
@@ -90,6 +104,15 @@
                                     </td>
                                     <td>
                                         <small>{{ $br->bonCommande->id_bonCommande }}</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @if($br->magasin)
+                                                <i class="bi bi-shop me-1 text-primary"></i>{{ $br->magasin->nom }}
+                                            @else
+                                                <span class="text-danger italic">Non spécifié</span>
+                                            @endif
+                                        </small>
                                     </td>
                                     <td>
                                         <span class="badge bg-{{ $br->etat_badge }}">{{ $br->etat_label }}</span>

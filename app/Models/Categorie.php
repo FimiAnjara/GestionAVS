@@ -14,7 +14,11 @@ class Categorie extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_categorie', 'libelle'];
+    protected $fillable = ['id_categorie', 'libelle', 'est_perissable'];
+
+    protected $casts = [
+        'est_perissable' => 'boolean',
+    ];
 
     public function article()
     {

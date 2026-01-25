@@ -14,7 +14,7 @@ class BonCommande extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bonCommande', 'date_', 'etat', 'id_utilisateur', 'id_proformaFournisseur', 'id_factureFournisseur'];
+    protected $fillable = ['id_bonCommande', 'date_', 'etat', 'id_utilisateur', 'id_proformaFournisseur', 'id_factureFournisseur', 'id_magasin'];
 
     protected $casts = [
         'date_' => 'datetime',
@@ -28,6 +28,11 @@ class BonCommande extends Model
     public function proformaFournisseur()
     {
         return $this->belongsTo(ProformaFournisseur::class, 'id_proformaFournisseur', 'id_proformaFournisseur');
+    }
+
+    public function magasin()
+    {
+        return $this->belongsTo(Magasin::class, 'id_magasin', 'id_magasin');
     }
 
     public function fournisseur()

@@ -33,9 +33,9 @@
                 @csrf
 
                 <div class="row mb-4">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="date_" class="form-label">
-                            <i class="bi bi-calendar me-2" style="color: #0d0d0e;"></i>
+                            <i class="bi bi-calendar me-2"></i>
                             Date
                         </label>
                         <input type="date" class="form-control @error('date_') is-invalid @enderror" id="date_"
@@ -44,7 +44,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="id_fournisseur" class="form-label">
                             <i class="bi bi-briefcase me-2" style="color: #0056b3;"></i>
                             Fournisseur *
@@ -55,11 +55,29 @@
                             @foreach ($fournisseurs as $fournisseur)
                                 <option value="{{ $fournisseur->id_fournisseur }}"
                                     {{ old('id_fournisseur') == $fournisseur->id_fournisseur ? 'selected' : '' }}>
-                                    {{ $fournisseur->id_fournisseur }} - {{ $fournisseur->nom }}
+                                    {{ $fournisseur->nom }}
                                 </option>
                             @endforeach
                         </select>
                         @error('id_fournisseur')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="id_magasin" class="form-label">
+                            <i class="bi bi-shop me-2" style="color: #0056b3;"></i>
+                            Magasin Destination
+                        </label>
+                        <select class="form-select searchable-select @error('id_magasin') is-invalid @enderror"
+                            id="id_magasin" name="id_magasin">
+                            <option value="">-- Sélectionner un magasin --</option>
+                            @foreach ($magasins as $magasin)
+                                <option value="{{ $magasin->id_magasin }}" {{ old('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                    [{{ $magasin->site?->entite?->nom ?? 'N/A' }}] {{ $magasin->site?->localisation ?? 'N/A' }} - {{ $magasin->nom ?? $magasin->designation }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_magasin')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -71,7 +89,7 @@
                         Description (optionnel)
                     </label>
                     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
-                        rows="3" placeholder="Détails ou notes sur cette proforma">{{ old('description') }}</textarea>
+                        rows="2" placeholder="Détails ou notes sur cette proforma">{{ old('description') }}</textarea>
                     @error('description')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -81,41 +99,68 @@
                 <div class="mb-4">
                     <label class="form-label">
                         <i class="bi bi-basket me-2" style="color: #0056b3;"></i>
-                        Articles à Acheter
+                        Articles de la Proforma
                     </label>
-                    <div id="articlesContainer">
-                        <div class="row g-2 article-row mb-3">
-                            <div class="col-lg-5">
-                                <select
-                                    class="form-select searchable-select @error('articles.0.id_article') is-invalid @enderror"
-                                    name="articles[0][id_article]" required>
-                                    <option value="">-- Sélectionner un article --</option>
-                                    @foreach ($articles as $article)
-                                        <option value="{{ $article->id_article }}">{{ $article->id_article }} -
-                                            {{ $article->nom }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <input type="number"
-                                    class="form-control @error('articles.0.quantite') is-invalid @enderror"
-                                    name="articles[0][quantite]" placeholder="Quantité" min="1" step="0.01"
-                                    required>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="input-group">
-                                    <input type="number"
-                                        class="form-control @error('articles.0.prix') is-invalid @enderror"
-                                        name="articles[0][prix]" placeholder="Prix" min="0" step="0.01" required>
-                                    <span class="input-group-text">Ar</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-1">
-                                <button type="button" class="btn btn-danger btn-remove-article" style="display: none;">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" id="articlesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">Photo</th>
+                                    <th>Article</th>
+                                    <th class="text-center" width="8%">Unité</th>
+                                    <th class="text-center" width="15%">Quantité</th>
+                                    <th class="text-center" width="15%">Prix Unit. (Ar)</th>
+                                    <th class="text-center" width="15%">Total (Ar)</th>
+                                    <th class="text-center" width="8%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="articlesContainer">
+                                <tr class="article-row">
+                                    <td class="text-center article-photo-container">
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm searchable-select article-select @error('articles.0.id_article') is-invalid @enderror"
+                                            name="articles[0][id_article]" required>
+                                            <option value="">-- Sélectionner --</option>
+                                            @foreach ($articles as $article)
+                                                <option value="{{ $article->id_article }}"
+                                                    data-unite="{{ $article->unite?->libelle }}"
+                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
+                                                    {{ $article->id_article }} - {{ $article->nom }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="text-center article-unite text-muted small">-</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm quantite-input @error('articles.0.quantite') is-invalid @enderror"
+                                            name="articles[0][quantite]" placeholder="0" min="0.01" step="0.01" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm prix-input @error('articles.0.prix') is-invalid @enderror"
+                                            name="articles[0][prix]" placeholder="0" min="0" step="0.01" required>
+                                    </td>
+                                    <td class="text-end fw-bold text-primary">
+                                        <span class="row-total">0</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-danger btn-remove-article" style="display: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-light fw-bold">
+                                    <td colspan="5" class="text-end">Montant Total :</td>
+                                    <td class="text-end text-primary" id="grandTotalDisplay">0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                     @error('articles')
                         <div class="alert alert-danger mt-2">{{ $message }}</div>
@@ -129,7 +174,7 @@
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="bi bi-check-circle me-2"></i>
-                        Créer la Proforma
+                        Enregistrer la Proforma
                     </button>
                     <a href="{{ route('proforma-fournisseur.list') }}" class="btn btn-secondary btn-lg">
                         <i class="bi bi-x-lg me-2"></i>
@@ -183,46 +228,53 @@ $(document).ready(function() {
     $('#btnAddArticle').on('click', function() {
         const container = document.getElementById('articlesContainer');
         const html = `
-            <div class="row g-2 article-row mb-3">
-                <div class="col-lg-5">
-                    <select class="form-select searchable-select" name="articles[${articleCount}][id_article]" required>
-                        <option value="">-- Sélectionner un article --</option>
+            <tr class="article-row">
+                <td class="text-center article-photo-container">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-image text-muted"></i>
+                    </div>
+                </td>
+                <td>
+                    <select class="form-select form-select-sm searchable-select article-select" name="articles[${articleCount}][id_article]" required>
+                        <option value="">-- Sélectionner --</option>
                         @foreach ($articles as $article)
-                            <option value="{{ $article->id_article }}">
+                            <option value="{{ $article->id_article }}"
+                                data-unite="{{ $article->unite?->libelle }}"
+                                data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
                                 {{ $article->id_article }} - {{ $article->nom }}
                             </option>
                         @endforeach
                     </select>
-                </div>
-                <div class="col-lg-3">
-                    <input type="number" class="form-control" name="articles[${articleCount}][quantite]" 
-                           placeholder="Quantité" min="1" step="0.01" required>
-                </div>
-                <div class="col-lg-3">
-                    <div class="input-group">
-                        <input type="number" class="form-control" name="articles[${articleCount}][prix]" 
-                               placeholder="Prix" min="0" step="0.01" required>
-                        <span class="input-group-text">Ar</span>
-                    </div>
-                </div>
-                <div class="col-lg-1">
-                    <button type="button" class="btn btn-danger btn-remove-article" style="width: 100%;">
+                </td>
+                <td class="text-center article-unite text-muted small">-</td>
+                <td>
+                    <input type="number" class="form-control form-control-sm quantite-input" name="articles[${articleCount}][quantite]" placeholder="0" min="0.01" step="0.01" required>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm prix-input" name="articles[${articleCount}][prix]" placeholder="0" min="0" step="0.01" required>
+                </td>
+                <td class="text-end fw-bold text-primary">
+                    <span class="row-total">0</span>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-article">
                         <i class="bi bi-trash"></i>
                     </button>
-                </div>
-            </div>
+                </td>
+            </tr>
         `;
         container.insertAdjacentHTML('beforeend', html);
-        articleCount++;
         
         // Initialiser Select2 pour le nouveau select
-        $(container).find('.searchable-select:last').select2({
+        const newSelect = $(container).find('.article-select:last');
+        newSelect.select2({
             language: 'fr',
             placeholder: '-- Sélectionner --',
             allowClear: true,
             width: '100%'
         });
         
+        articleCount++;
         updateRemoveButtons();
     });
 
@@ -231,7 +283,47 @@ $(document).ready(function() {
         e.preventDefault();
         $(this).closest('.article-row').remove();
         updateRemoveButtons();
+        calculateGrandTotal();
     });
+
+    // Mise à jour de la photo et de l'unité lors de la sélection d'un article
+    $(document).on('change', '.article-select', function() {
+        const selected = $(this).find(':selected');
+        const photoUrl = selected.data('photo');
+        const unit = selected.data('unite');
+        const row = $(this).closest('tr');
+        const container = row.find('.article-photo-container');
+        const unitDisplay = row.find('.article-unite');
+        
+        if (photoUrl) {
+            container.html(`<img src="${photoUrl}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">`);
+        } else {
+            container.html(`<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`);
+        }
+
+        unitDisplay.text(unit || '-');
+    });
+
+    // Calculs en temps réel
+    $(document).on('input', '.quantite-input, .prix-input', function() {
+        const row = $(this).closest('tr');
+        const qty = parseFloat(row.find('.quantite-input').val()) || 0;
+        const price = parseFloat(row.find('.prix-input').val()) || 0;
+        const total = qty * price;
+        
+        row.find('.row-total').text(total.toLocaleString('fr-FR'));
+        calculateGrandTotal();
+    });
+
+    function calculateGrandTotal() {
+        let grandTotal = 0;
+        $('.article-row').each(function() {
+            const qty = parseFloat($(this).find('.quantite-input').val()) || 0;
+            const price = parseFloat($(this).find('.prix-input').val()) || 0;
+            grandTotal += qty * price;
+        });
+        $('#grandTotalDisplay').text(grandTotal.toLocaleString('fr-FR'));
+    }
 
     function updateRemoveButtons() {
         const rows = document.querySelectorAll('.article-row');

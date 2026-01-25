@@ -39,7 +39,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($bonReception->articles as $article)
+            @forelse ($bonReception->bonReceptionFille as $article)
                 <tr>
                     <td>
                         <strong>{{ $article->article->nom }}</strong><br>
@@ -66,11 +66,11 @@
     <div class="total-box">
         <div class="total-row">
             <span class="total-label">Nombre de lignes</span>
-            <span class="total-value">{{ $bonReception->articles->count() }}</span>
+            <span class="total-value">{{ $bonReception->bonReceptionFille->count() }}</span>
         </div>
         <div class="total-row grand-total">
             <span class="total-label">QUANTITÉ TOTALE</span>
-            <span class="total-value fw-bold">{{ number_format($bonReception->articles->sum('quantite'), 2, ',', ' ') }}</span>
+            <span class="total-value fw-bold">{{ number_format($bonReception->bonReceptionFille->sum('quantite'), 2, ',', ' ') }}</span>
         </div>
     </div>
     <div class="clear"></div>

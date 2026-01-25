@@ -52,10 +52,6 @@
                         <div class="col-sm-5"><strong>Bon Commande:</strong></div>
                         <div class="col-sm-7"><span class="badge bg-info text-dark">{{ $facture->bonCommande->id_bonCommande }}</span></div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-5"><strong>Fournisseur:</strong></div>
-                        <div class="col-sm-7"><span class="badge bg-warning text-dark">{{ $facture->bonCommande->fournisseur->nom ?? 'N/A' }}</span></div>
-                    </div>
                     @endif
                     <div class="row mb-3">
                         <div class="col-sm-5"><strong>État:</strong></div>
@@ -63,6 +59,15 @@
                             <span class="badge bg-{{ $facture->etat_badge }}">{{ $facture->etat_label }}</span>
                         </div>
                     </div>
+                    @if($facture->magasin)
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Magasin Destination:</strong></div>
+                        <div class="col-sm-7">
+                            <span class="fw-bold">{{ $facture->magasin->nom }}</span><br>
+                            <small class="text-muted">{{ $facture->magasin->site?->localisation }}</small>
+                        </div>
+                    </div>
+                    @endif
                     @if($facture->description)
                     <div class="row">
                         <div class="col-sm-5"><strong>Description:</strong></div>
@@ -115,6 +120,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th width="5%">Photo</th>
                             <th>Article</th>
                             <th>Quantité</th>
                             <th>Prix Achat</th>
@@ -125,8 +131,23 @@
                         @php $total = 0; @endphp
                         @foreach($facture->factureFournisseurFille as $ligne)
                         <tr>
+                            <td class="text-center">
+                                @if($ligne->article->photo)
+                                    <img src="{{ asset('storage/' . $ligne->article->photo) }}" 
+                                         class="rounded shadow-sm" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                @else
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                         style="width: 40px; height: 40px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td><strong>{{ $ligne->article->nom ?? 'N/A' }}</strong></td>
-                            <td class="text-center">{{ $ligne->quantite }}</td>
+                            <td class="text-center">
+                                {{ $ligne->quantite }}
+                                <span class="badge bg-success ms-1">{{ $ligne->article->unite->libelle ?? '-' }}</span>
+                            </td>
                             <td class="text-end">{{ number_format($ligne->prix_achat, 0, ',', ' ') }} Ar</td>
                             <td class="text-end">
                                 @php 
