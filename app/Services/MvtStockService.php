@@ -107,7 +107,7 @@ class MvtStockService
                 'entree' => 0,
                 'sortie' => $allocation['quantity_used'],
                 'reste' => 0, // Les sorties n'ont pas de reste
-                'prix_unitaire' => $prixUnitaireSortie, // Prix selon méthode d'évaluation (CMUP/FIFO/LIFO)
+                'prix_unitaire' => ($methodeEvaluation === 'CMUP') ? $prixUnitaireSortie : $allocation['prix_unitaire'], // Prix selon méthode d'évaluation
                 'date_expiration' => $allocation['date_expiration'],
             ]);
         }

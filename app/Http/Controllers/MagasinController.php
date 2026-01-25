@@ -121,32 +121,12 @@ class MagasinController extends Controller
             ->orderBy('nom')
             ->get();
 
-        // Inventaire Financier (Stock Actuel + Prix Evaluation)
-        $evaluationStock = [];
-        $valeurTotaleMagasin = 0;
-
-        foreach ($articles as $article) {
-            // Calculer le stock actuel pour cet article dans ce magasin
-            $stockActuel = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
-                    $q->where('id_magasin', $id);
-                })
-                ->where('id_article', $article->id_article)
-                ->sum(\DB::raw('entree - sortie'));
-
-            if ($stockActuel > 0) {
-                $prixActuel = $article->getPrixActuel($id);
-                $valeurTotale = $stockActuel * $prixActuel;
-                
-                $evaluationStock[] = [
-                    'article' => $article,
-                    'quantite' => $stockActuel,
-                    'prix_unitaire' => $prixActuel,
-                    'valeur_totale' => $valeurTotale
-                ];
-                
-                $valeurTotaleMagasin += $valeurTotale;
-            }
-        }
+        // Utiliser le service pour l'évaluation financière
+        $magasinService = app(\App\Services\MagasinService::class);
+        $evaluationData = $magasinService->getEvaluationStockComplete($id);
+        
+        $evaluationStock = $evaluationData['items'];
+        $valeurTotaleMagasin = $evaluationData['total_general'];
         
         return view('organigramme.magasin.show', compact('magasin', 'mouvements', 'articles', 'evaluationStock', 'valeurTotaleMagasin'));
     }
@@ -229,9 +209,64 @@ class MagasinController extends Controller
         }
 
         $magasins = $query->get();
+        $magasinIds = $magasins->pluck('id_magasin')->toArray();
 
-        $locations = $magasins->map(function ($magasin) {
+        // Calculer les évaluations de stock en VRAC (Optimisé)
+        $magasinService = app(\App\Services\MagasinService::class);
+        $valuationsMap = $magasinService->getValuationsBulk($magasinIds);
+        
+        $totalStockGlobal = 0;
+        
+        // Agrégations par niveau hiérarchique
+        $stockParGroupe = [];
+        $stockParEntite = [];
+        $stockParSite = [];
+
+        $locations = $magasins->map(function ($magasin) use ($valuationsMap, &$totalStockGlobal, &$stockParGroupe, &$stockParEntite, &$stockParSite) {
             $entite = $magasin->site?->entite;
+            $groupe = $entite?->groupe;
+            
+            // Récupérer la valeur pré-calculée
+            $valeurStock = $valuationsMap[$magasin->id_magasin] ?? 0;
+            $totalStockGlobal += $valeurStock;
+            
+            // Agréger par groupe
+            if ($groupe) {
+                $idGroupe = $groupe->id_groupe;
+                if (!isset($stockParGroupe[$idGroupe])) {
+                    $stockParGroupe[$idGroupe] = [
+                        'nom' => $groupe->nom,
+                        'valeur' => 0
+                    ];
+                }
+                $stockParGroupe[$idGroupe]['valeur'] += $valeurStock;
+            }
+            
+            // Agréger par entité
+            if ($entite) {
+                $idEntite = $entite->id_entite;
+                if (!isset($stockParEntite[$idEntite])) {
+                    $stockParEntite[$idEntite] = [
+                        'nom' => $entite->nom,
+                        'valeur' => 0
+                    ];
+                }
+                $stockParEntite[$idEntite]['valeur'] += $valeurStock;
+            }
+            
+            // Agréger par site
+            if ($magasin->site) {
+                $idSite = $magasin->site->id_site;
+                if (!isset($stockParSite[$idSite])) {
+                    $stockParSite[$idSite] = [
+                        'id' => $idSite,
+                        'nom' => $magasin->site->localisation,
+                        'valeur' => 0
+                    ];
+                }
+                $stockParSite[$idSite]['valeur'] += $valeurStock;
+            }
+            
             return [
                 'id' => $magasin->id_magasin,
                 'nom' => $magasin->nom,
@@ -240,10 +275,22 @@ class MagasinController extends Controller
                 'id_site' => $magasin->id_site,
                 'site_nom' => $magasin->site?->localisation,
                 'entite' => $entite?->nom,
-                'groupe' => $entite?->groupe?->nom,
+                'groupe' => $groupe?->nom,
                 'code_couleur' => $entite?->code_couleur ?? '#1a73e8',
+                'valeur_stock' => $valeurStock,
             ];
         });
+
+        // Trier les agrégations par valeur décroissante
+        uasort($stockParGroupe, fn($a, $b) => $b['valeur'] <=> $a['valeur']);
+        uasort($stockParEntite, fn($a, $b) => $b['valeur'] <=> $a['valeur']);
+        uasort($stockParSite, fn($a, $b) => $b['valeur'] <=> $a['valeur']);
+        
+        // Identifier les tops
+        $topGroupe = !empty($stockParGroupe) ? array_values($stockParGroupe)[0] : null;
+        $topEntite = !empty($stockParEntite) ? array_values($stockParEntite)[0] : null;
+        $topSite = !empty($stockParSite) ? array_values($stockParSite)[0] : null;
+        $topMagasin = $locations->sortByDesc('valeur_stock')->first();
 
         $totalMagasins = Magasin::count();
         $magasinsAffiches = $locations->count();
@@ -260,7 +307,15 @@ class MagasinController extends Controller
             'magasinsAffiches',
             'groupes',
             'entites',
-            'sites'
+            'sites',
+            'totalStockGlobal',
+            'stockParGroupe',
+            'stockParEntite',
+            'stockParSite',
+            'topGroupe',
+            'topEntite',
+            'topSite',
+            'topMagasin'
         ));
     }
 
