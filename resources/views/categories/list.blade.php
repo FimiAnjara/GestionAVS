@@ -7,7 +7,6 @@
     <!-- En-tête -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="bi bi-tag"></i> Gestion des Catégories</h2>
             <p class="text-muted">Consultez et gérez vos catégories d'articles</p>
         </div>
         <a href="{{ route('categories.create') }}" class="btn btn-primary btn-lg">
@@ -45,7 +44,14 @@
                             <td class="ps-4">
                                 <span class="badge bg-info text-dark" style="word-break: break-all;">{{ $categorie->id_categorie }}</span>
                             </td>
-                            <td><strong>{{ $categorie->libelle }}</strong></td>
+                            <td>
+                                <strong>{{ $categorie->libelle }}</strong>
+                                @if($categorie->est_perissable)
+                                    <span class="badge bg-danger ms-2" title="Périssable"><i class="bi bi-clock-history"></i> Périssable</span>
+                                @else
+                                    <span class="badge bg-light text-dark border ms-2" title="Non périssable">Non périssable</span>
+                                @endif
+                            </td>
                             <td><small class="text-muted">{{ $categorie->created_at->format('d/m/Y') }}</small></td>
                             <td class="text-center">
                                 <a href="{{ route('categories.show', $categorie->id_categorie) }}" class="btn btn-sm btn-info">

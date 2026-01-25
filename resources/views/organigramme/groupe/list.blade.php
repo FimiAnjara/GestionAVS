@@ -78,37 +78,17 @@
                                                 class="btn btn-warning" title="Modifier">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $groupe->id_groupe }}" title="Supprimer">
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('groupe.destroy', $groupe->id_groupe) }}"
+                                                data-bs-item="le groupe {{ $groupe->nom }}"
+                                                title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $groupe->id_groupe }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Êtes-vous sûr de vouloir supprimer le groupe <strong>{{ $groupe->nom }}</strong> ?</p>
-                                                <p class="text-danger"><small>Cette action est irréversible.</small></p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                                <form action="{{ route('groupe.destroy', $groupe->id_groupe) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             @endforeach
                         </tbody>
                     </table>

@@ -46,6 +46,19 @@
                 </div>
 
                 <div class="col-lg-2">
+                    <label for="id_magasin" class="form-label">Magasin</label>
+                    <select class="form-select form-select-sm" id="id_magasin" name="id_magasin">
+                        <option value="">-- Tous --</option>
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}"
+                                {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                {{ $magasin->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
                             <i class="bi bi-search me-2"></i>Rechercher
@@ -75,6 +88,7 @@
                                 <th>ID</th>
                                 <th>Date</th>
                                 <th>Bon Commande</th>
+                                <th>Magasin</th>
                                 <th>État</th>
                                 <th class="text-center">Actions</th>
                             </tr>
@@ -92,6 +106,15 @@
                                         <small>{{ $br->bonCommande->id_bonCommande }}</small>
                                     </td>
                                     <td>
+                                        <small class="text-muted">
+                                            @if($br->magasin)
+                                                <i class="bi bi-shop me-1 text-primary"></i>{{ $br->magasin->nom }}
+                                            @else
+                                                <span class="text-danger italic">Non spécifié</span>
+                                            @endif
+                                        </small>
+                                    </td>
+                                    <td>
                                         <span class="badge bg-{{ $br->etat_badge }}">{{ $br->etat_label }}</span>
                                     </td>
                                     <td class="text-center">
@@ -104,37 +127,17 @@
                                                 class="btn btn-success" title="Exporter PDF" target="_blank">
                                                 <i class="bi bi-file-pdf"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $br->id_bonReception }}"
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('bon-reception.destroy', $br->id_bonReception) }}"
+                                                data-bs-item="le bon de réception {{ $br->id_bonReception }}"
                                                 title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $br->id_bonReception }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer ce bon de réception ?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                                <form action="{{ route('bon-reception.destroy', $br->id_bonReception) }}" method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             @endforeach
                         </tbody>
                     </table>

@@ -117,15 +117,15 @@ class OrganigrammeSeeder extends Seeder
             }
         }
 
-        $this->command->info('Organigramme créé avec succès!');
-        $this->command->info('- 1 Groupe');
-        $this->command->info('- 3 Entités (Agrivet, NextSolution, DailyNeed)');
-        $this->command->info('- 12 Sites (4 par entité)');
-        $this->command->info('- 60 Magasins (5 par site)');
-        $this->command->info('');
-        $this->command->info('Localisation des sites:');
-        $this->command->info('  Agrivet: Antananarivo, Antsirabe, Fianarantsoa, Toamasina');
-        $this->command->info('  NextSolution: Mahajanga, Toliara, Antsiranana, Nosy Be');
-        $this->command->info('  DailyNeed: Analakely, Behoririka, Andraharo, Ivandry');
+        // $this->command->info('Organigramme créé avec succès!');
+        // $this->command->info('- 1 Groupe');
+        // $this->command->info('- 3 Entités (Agrivet, NextSolution, DailyNeed)');
+        // $this->command->info('- 12 Sites (4 par entité)');
+        // $this->command->info('- 60 Magasins (5 par site)');
+        // $this->command->info('');
+        // $this->command->info('Localisation des sites:');
+        // $this->command->info('  Agrivet: Antananarivo, Antsirabe, Fianarantsoa, Toamasina');
+        // $this->command->info('  NextSolution: Mahajanga, Toliara, Antsiranana, Nosy Be');
+        // $this->command->info('  DailyNeed: Analakely, Behoririka, Andraharo, Ivandry');
     }
 }

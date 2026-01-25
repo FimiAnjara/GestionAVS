@@ -14,10 +14,20 @@ class Categorie extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_categorie', 'libelle'];
+    protected $fillable = ['id_categorie', 'libelle', 'est_perissable'];
+
+    protected $casts = [
+        'est_perissable' => 'boolean',
+    ];
 
     public function article()
     {
         return $this->hasMany(Article::class, 'id_categorie', 'id_categorie');
+    }
+
+    public function getLibelleWithStatusAttribute()
+    {
+        $status = $this->est_perissable ? 'PERISSABLE' : 'NON PÉRISSABLE';
+        return "{$this->libelle} ({$status})";
     }
 }

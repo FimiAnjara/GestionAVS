@@ -25,27 +25,31 @@
                 </div>
 
                 <div class="col-lg-2">
-                    <label for="date_from" class="form-label">De</label>
-                    <input type="date" class="form-control form-control-sm" id="date_from" name="date_from"
-                        value="{{ request('date_from') }}">
-                </div>
-
-                <div class="col-lg-2">
-                    <label for="date_to" class="form-label">À</label>
-                    <input type="date" class="form-control form-control-sm" id="date_to" name="date_to"
-                        value="{{ request('date_to') }}">
-                </div>
-
-                <div class="col-lg-2">
-                    <label for="etat" class="form-label">État</label>
-                    <select class="form-select form-select-sm" id="etat" name="etat">
-                        <option value="">-- Tous les états --</option>
-                        <option value="1" {{ request('etat') == '1' ? 'selected' : '' }}>Créée</option>
-                        <option value="5" {{ request('etat') == '5' ? 'selected' : '' }}>Validée par Finance</option>
-                        <option value="11" {{ request('etat') == '11' ? 'selected' : '' }}>Validée par DG</option>
-                        <option value="0" {{ request('etat') == '0' ? 'selected' : '' }}>Annulée</option>
+                    <label for="id_magasin" class="form-label">Magasin</label>
+                    <select class="form-select form-select-sm" id="id_magasin" name="id_magasin">
+                        <option value="">-- Tous --</option>
+                        @foreach ($magasins as $magasin)
+                            <option value="{{ $magasin->id_magasin }}"
+                                {{ request('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                {{ $magasin->nom }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+
+                <div class="col-lg-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-search me-2"></i>Filtrer
+                        </button>
+                        <a href="{{ route('facture-fournisseur.list') }}" class="btn btn-secondary btn-sm" title="Réinitialiser">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Liste des Factures -->
     <div class="card border-0 shadow-sm">
@@ -62,6 +66,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Date</th>
+                                <th>Magasin</th>
                                 <th>Bon Commande</th>
                                 <th>Montant Total</th>
                                 <th>Montant Payé</th>
@@ -78,6 +83,14 @@
                                     </td>
                                     <td>
                                         <small>{{ $facture->date_->format('d/m/Y') }}</small>
+                                    </td>
+                                    <td>
+                                        @if($facture->magasin)
+                                            <span class="fw-bold">{{ $facture->magasin->nom }}</span><br>
+                                            <small class="text-muted">{{ $facture->magasin->site?->localisation }}</small>
+                                        @else
+                                            <small class="text-muted">N/A</small>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($facture->bonCommande)
@@ -117,8 +130,11 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             @endif
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $facture->id_factureFournisseur }}"
+                                            <button type="button" class="btn btn-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteConfirmModal"
+                                                data-bs-url="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
+                                                data-bs-item="la facture {{ $facture->id_factureFournisseur }}"
                                                 title="Supprimer">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -159,37 +175,6 @@
                                                     <button type="submit" class="btn btn-primary">Valider</button>
                                                 </div>
                                             </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Suppression -->
-                                <div class="modal fade" id="deleteModal{{ $facture->id_factureFournisseur }}"
-                                    tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer la facture
-                                                <strong>{{ $facture->id_factureFournisseur }}</strong> ?
-                                                Cette action est irréversible.
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Annuler</button>
-                                                <form action="{{ route('facture-fournisseur.destroy', $facture->id_factureFournisseur) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">
-                                                        <i class="bi bi-trash"></i> Supprimer
-                                                    </button>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

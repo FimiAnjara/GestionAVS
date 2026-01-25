@@ -175,6 +175,22 @@
                         <input type="text" class="form-control" id="nom" name="nom"
                             placeholder="Chercher par nom..." value="{{ request('nom') }}">
                     </div>
+
+                    <!-- Mode d'affichage -->
+                    <div class="col-lg-12">
+                        <label class="form-label">Mode d'affichage</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="view_mode" id="mode_magasin" value="magasin" checked>
+                            <label class="btn btn-outline-primary" for="mode_magasin">
+                                <i class="bi bi-shop me-2"></i>Vue Magasins (Points)
+                            </label>
+
+                            <input type="radio" class="btn-check" name="view_mode" id="mode_site" value="site">
+                            <label class="btn btn-outline-primary" for="mode_site">
+                                <i class="bi bi-pentagon me-2"></i>Vue Sites (Polygones)
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row mt-3">
@@ -211,7 +227,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const defaultCenter = [-18.8792, 47.5079];
-
+            const locations = @json($locations);
+            
             const map = L.map('map', {
                 zoom: 6,
                 center: defaultCenter
@@ -222,74 +239,171 @@
                 maxZoom: 19
             }).addTo(map);
 
-            const entiteCouleurs = {};
-            const locations = @json($locations);
             const markersGroup = L.featureGroup();
+            const polygonsGroup = L.featureGroup();
+            
+            /**
+             * Algorithme de calcul de l'enveloppe convexe (Convex Hull)
+             * Algorithme de Monotone Chain (Andrew) - O(n log n)
+             */
+            function getConvexHull(points) {
+                if (points.length <= 2) return points;
 
-            locations.forEach((location, index) => {
-                if (location.latitude && location.longitude) {
-                    const color = location.code_couleur || '#1a73e8';
-                    
-                    if (location.entite && !entiteCouleurs[location.entite]) {
-                        entiteCouleurs[location.entite] = color;
+                // Trier par x (longitude) puis y (latitude)
+                points.sort((a, b) => a[1] !== b[1] ? a[1] - b[1] : a[0] - b[0]);
+
+                const crossProduct = (o, a, b) => (a[1] - o[1]) * (b[0] - o[0]) - (a[0] - o[0]) * (b[1] - o[1]);
+
+                // Coquille inférieure
+                const lower = [];
+                for (const p of points) {
+                    while (lower.length >= 2 && crossProduct(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) {
+                        lower.pop();
                     }
-
-                    const markerHtml = '<div class="marker-icon" style="background-color: ' + color + ';"><i class="bi bi-shop" style="font-size: 14px;"></i></div>';
-
-                    const customMarker = L.divIcon({
-                        html: markerHtml,
-                        className: 'custom-marker',
-                        iconSize: [34, 34],
-                        iconAnchor: [17, 34],
-                        popupAnchor: [0, -34]
-                    });
-
-                    let popupContent = '<div class="popup-content">';
-                    popupContent += '<strong><a href="{{ url("magasin") }}/' + location.id + '" style="color: #1a73e8; text-decoration: none;">' + location.nom + '</a></strong>';
-                    if (location.entite) {
-                        popupContent += '<span class="popup-badge" style="background-color: ' + color + ';">' + location.entite + '</span>';
-                    }
-                    popupContent += '<div class="popup-item"><i class="bi bi-diagram-3 me-1"></i><small>' + (location.groupe || '-') + '</small></div>';
-                    popupContent += '<div class="popup-item"><i class="bi bi-geo-alt me-1"></i><small>' + (location.site || '-') + '</small></div>';
-                    popupContent += '<div class="popup-item"><i class="bi bi-crosshair me-1"></i><small style="color: #999;">' + location.latitude.toFixed(4) + ', ' + location.longitude.toFixed(4) + '</small></div>';
-                    popupContent += '<div class="popup-item mt-2"><a href="https://maps.google.com/?q=' + location.latitude + ',' + location.longitude + '" target="_blank" class="text-decoration-none"><i class="bi bi-link-45deg"></i> Google Maps</a></div>';
-                    popupContent += '</div>';
-
-                    const marker = L.marker([location.latitude, location.longitude], {
-                        icon: customMarker
-                    }).bindPopup(popupContent, {
-                        maxWidth: 300
-                    });
-
-                    markersGroup.addLayer(marker);
+                    lower.push(p);
                 }
-            });
 
-            markersGroup.addTo(map);
+                // Coquille supérieure
+                const upper = [];
+                for (let i = points.length - 1; i >= 0; i--) {
+                    const p = points[i];
+                    while (upper.length >= 2 && crossProduct(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) {
+                        upper.pop();
+                    }
+                    upper.push(p);
+                }
 
-            if (markersGroup.getLayers().length > 0) {
-                map.fitBounds(markersGroup.getBounds().pad(0.1));
+                upper.pop();
+                lower.pop();
+                return lower.concat(upper);
             }
 
-            const legend = L.control({ position: 'bottomright' });
-            
-            legend.onAdd = function() {
-                const div = L.DomUtil.create('div', 'map-legend');
-                let legendHtml = '<strong class="d-block mb-2">Légende par Entité</strong>';
+            function renderMarkers() {
+                markersGroup.clearLayers();
+                locations.forEach(location => {
+                    if (location.latitude && location.longitude) {
+                        const color = location.code_couleur || '#1a73e8';
+                        const markerHtml = `<div class="marker-icon" style="background-color: ${color};"><i class="bi bi-shop"></i></div>`;
+
+                        const customMarker = L.divIcon({
+                            html: markerHtml,
+                            className: 'custom-marker',
+                            iconSize: [34, 34],
+                            iconAnchor: [17, 34],
+                            popupAnchor: [0, -34]
+                        });
+
+                        let popupContent = `
+                            <div class="popup-content">
+                                <strong><a href="{{ url("magasin") }}/${location.id}">${location.nom}</a></strong>
+                                ${location.entite ? `<span class="popup-badge" style="background-color: ${color};">${location.entite}</span>` : ''}
+                                <div class="popup-item"><i class="bi bi-diagram-3 me-1"></i><small>${location.groupe || '-'}</small></div>
+                                <div class="popup-item"><i class="bi bi-geo-alt me-1"></i><small>${location.site_nom || '-'}</small></div>
+                                <div class="popup-item mt-2">
+                                    <a href="https://maps.google.com/?q=${location.latitude},${location.longitude}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-link-45deg"></i> Google Maps
+                                    </a>
+                                </div>
+                            </div>`;
+
+                        const marker = L.marker([location.latitude, location.longitude], { icon: customMarker })
+                            .bindPopup(popupContent);
+                        
+                        markersGroup.addLayer(marker);
+                    }
+                });
+            }
+
+            function renderPolygons() {
+                polygonsGroup.clearLayers();
                 
-                for (const [entite, couleur] of Object.entries(entiteCouleurs)) {
-                    legendHtml += '<div class="map-legend-item"><div class="legend-color" style="background-color: ' + couleur + ';"></div><small>' + entite + '</small></div>';
+                // Grouper par site
+                const sites = {};
+                locations.forEach(loc => {
+                    if (!loc.id_site) return;
+                    if (!sites[loc.id_site]) {
+                        sites[loc.id_site] = {
+                            nom: loc.site_nom,
+                            entite: loc.entite,
+                            couleur: loc.code_couleur || '#1a73e8',
+                            points: []
+                        };
+                    }
+                    sites[loc.id_site].points.push([loc.latitude, loc.longitude]);
+                });
+
+                for (const siteId in sites) {
+                    const site = sites[siteId];
+                    if (site.points.length === 0) continue;
+
+                    let layer;
+                    if (site.points.length === 1) {
+                        // Un seul magasin : un cercle ou un marqueur special
+                        layer = L.circle(site.points[0], {
+                            radius: 500,
+                            color: site.couleur,
+                            fillColor: site.couleur,
+                            fillOpacity: 0.4
+                        });
+                    } else if (site.points.length === 2) {
+                        // Deux magasins : une ligne epaisse
+                        layer = L.polyline(site.points, {
+                            color: site.couleur,
+                            weight: 8,
+                            opacity: 0.6
+                        });
+                    } else {
+                        // Plus de deux : Polygone Convex Hull
+                        const hullPoints = getConvexHull(site.points);
+                        layer = L.polygon(hullPoints, {
+                            color: site.couleur,
+                            fillColor: site.couleur,
+                            fillOpacity: 0.35,
+                            weight: 3
+                        });
+                    }
+
+                    layer.bindPopup(`
+                        <div class="popup-content">
+                            <strong style="color: ${site.couleur}">${site.nom}</strong>
+                            <span class="popup-badge" style="background-color: ${site.couleur}">${site.entite}</span>
+                            <div class="popup-item"><i class="bi bi-shop me-1"></i>${site.points.length} magasin(s)</div>
+                        </div>
+                    `);
+
+                    polygonsGroup.addLayer(layer);
                 }
+            }
 
-                if (Object.keys(entiteCouleurs).length === 0) {
-                    legendHtml += '<div class="map-legend-item"><small>Aucun magasin affiché</small></div>';
+            function updateView() {
+                const mode = document.querySelector('input[name="view_mode"]:checked').value;
+                
+                if (mode === 'magasin') {
+                    map.removeLayer(polygonsGroup);
+                    markersGroup.addTo(map);
+                    if (markersGroup.getLayers().length > 0) {
+                        map.fitBounds(markersGroup.getBounds().pad(0.1));
+                    }
+                } else {
+                    map.removeLayer(markersGroup);
+                    polygonsGroup.addTo(map);
+                    if (polygonsGroup.getLayers().length > 0) {
+                        map.fitBounds(polygonsGroup.getBounds().pad(0.1));
+                    }
                 }
+            }
 
-                div.innerHTML = legendHtml;
-                return div;
-            };
-            legend.addTo(map);
+            // Initialisation
+            renderMarkers();
+            renderPolygons();
+            updateView();
 
+            // Event Listeners
+            document.querySelectorAll('input[name="view_mode"]').forEach(radio => {
+                radio.addEventListener('change', updateView);
+            });
+
+            // Filtre Select dynamiques (existant)
             const groupeSelect = document.getElementById('id_groupe');
             const entiteSelect = document.getElementById('id_entite');
             const siteSelect = document.getElementById('id_site');
@@ -328,12 +442,24 @@
                 filterSelectOptions(siteSelect, 'data-entite', this.value);
             });
 
-            if (groupeSelect.value) {
-                filterSelectOptions(entiteSelect, 'data-groupe', groupeSelect.value);
-            }
-            if (entiteSelect.value) {
-                filterSelectOptions(siteSelect, 'data-entite', entiteSelect.value);
-            }
+            if (groupeSelect.value) filterSelectOptions(entiteSelect, 'data-groupe', groupeSelect.value);
+            if (entiteSelect.value) filterSelectOptions(siteSelect, 'data-entite', entiteSelect.value);
+
+            // Mise à jour de la légende
+            const legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function() {
+                const div = L.DomUtil.create('div', 'map-legend');
+                const entiteCouleurs = {};
+                locations.forEach(l => { if(l.entite) entiteCouleurs[l.entite] = l.code_couleur; });
+
+                let legendHtml = '<strong class="d-block mb-2">Légende par Entité</strong>';
+                for (const [entite, couleur] of Object.entries(entiteCouleurs)) {
+                    legendHtml += `<div class="map-legend-item"><div class="legend-color" style="background-color: ${couleur};"></div><small>${entite}</small></div>`;
+                }
+                div.innerHTML = legendHtml || '<small>Aucune donnée</small>';
+                return div;
+            };
+            legend.addTo(map);
         });
     </script>
 @endpush

@@ -14,13 +14,18 @@ class ProformaFournisseurController extends Controller
     // Affiche la liste des proformas
     public function list(Request $request)
     {
-        $query = ProformaFournisseur::with('fournisseur');
+        $query = ProformaFournisseur::with(['fournisseur', 'magasin.site.entite']);
         
         // Recherche par fournisseur
         if ($request->filled('fournisseur')) {
             $query->where('id_fournisseur', $request->fournisseur);
         }
         
+        // Filtre par magasin
+        if ($request->filled('id_magasin')) {
+            $query->where('id_magasin', $request->id_magasin);
+        }
+
         // Recherche par date
         if ($request->filled('date_from')) {
             $query->whereDate('date_', '>=', $request->date_from);
@@ -36,16 +41,26 @@ class ProformaFournisseurController extends Controller
         
         $proformas = $query->paginate(10);
         $fournisseurs = Fournisseur::all();
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
         
-        return view('proforma-fournisseur.list', compact('proformas', 'fournisseurs'));
+        return view('proforma-fournisseur.list', compact('proformas', 'fournisseurs', 'magasins'));
     }
 
     // Affiche le formulaire de création
     public function create()
     {
         $fournisseurs = Fournisseur::all();
-        $articles = Article::all();
-        return view('proforma-fournisseur.create', compact('fournisseurs', 'articles'));
+        $articles = Article::with('unite')->get();
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
+
+        $articlesJS = $articles->map(fn($a) => [
+            'id' => $a->id_article, 
+            'nom' => $a->nom,
+            'unite' => $a->unite?->libelle,
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+        ]);
+
+        return view('proforma-fournisseur.create', compact('fournisseurs', 'articles', 'magasins', 'articlesJS'));
     }
 
     // Stocke une nouvelle proforma
@@ -55,6 +70,7 @@ class ProformaFournisseurController extends Controller
             'date_' => 'required|date',
             'description' => 'nullable|string|max:500',
             'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
+            'id_magasin' => 'nullable|exists:magasin,id_magasin',
             'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
             'articles.*.quantite' => 'required|numeric|min:1',
@@ -77,6 +93,7 @@ class ProformaFournisseurController extends Controller
             'date_' => $request->date_,
             'description' => $request->description,
             'id_fournisseur' => $request->id_fournisseur,
+            'id_magasin' => $request->id_magasin,
             'etat' => 1, // Créée par défaut
         ]);
 
@@ -97,7 +114,7 @@ class ProformaFournisseurController extends Controller
     // Affiche une proforma spécifique
     public function show($id)
     {
-        $proforma = ProformaFournisseur::with('proformaFournisseurFille.article', 'fournisseur')->findOrFail($id);
+        $proforma = ProformaFournisseur::with(['proformaFournisseurFille.article.unite', 'fournisseur', 'magasin.site.entite'])->findOrFail($id);
         return view('proforma-fournisseur.show', compact('proforma'));
     }
 
@@ -126,7 +143,7 @@ class ProformaFournisseurController extends Controller
     // Exporte la proforma en PDF
     public function exportPdf($id)
     {
-        $proforma = ProformaFournisseur::with('proformaFournisseurFille.article', 'fournisseur')->findOrFail($id);
+        $proforma = ProformaFournisseur::with(['proformaFournisseurFille.article.unite', 'fournisseur'])->findOrFail($id);
         
         $totalMontant = $proforma->proformaFournisseurFille->sum(function($item) { 
             return ($item->quantite ?? 1) * ($item->prix_achat ?? 0); 
@@ -147,8 +164,17 @@ class ProformaFournisseurController extends Controller
         }
 
         $fournisseurs = Fournisseur::all();
-        $articles = Article::all();
-        return view('proforma-fournisseur.edit', compact('proforma', 'fournisseurs', 'articles'));
+        $articles = Article::with('unite')->get();
+        $magasins = \App\Models\Magasin::with('site.entite')->get();
+
+        $articlesJS = $articles->map(fn($a) => [
+            'id' => $a->id_article, 
+            'nom' => $a->nom,
+            'unite' => $a->unite?->libelle,
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+        ]);
+
+        return view('proforma-fournisseur.edit', compact('proforma', 'fournisseurs', 'articles', 'magasins', 'articlesJS'));
     }
 
     // Stocke les modifications
@@ -165,6 +191,7 @@ class ProformaFournisseurController extends Controller
             'date_' => 'required|date',
             'description' => 'nullable|string|max:500',
             'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
+            'id_magasin' => 'nullable|exists:magasin,id_magasin',
             'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
             'articles.*.quantite' => 'required|numeric|min:1',
@@ -176,6 +203,7 @@ class ProformaFournisseurController extends Controller
             'date_' => $request->date_,
             'description' => $request->description,
             'id_fournisseur' => $request->id_fournisseur,
+            'id_magasin' => $request->id_magasin,
         ]);
 
         // Supprimer les anciens articles

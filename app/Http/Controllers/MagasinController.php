@@ -17,15 +17,35 @@ class MagasinController extends Controller
      */
     public function list(Request $request)
     {
-        $query = Magasin::query();
+        $query = Magasin::with(['site.entite.groupe']);
 
         if ($request->filled('nom')) {
             $query->where('nom', 'like', '%' . $request->nom . '%');
         }
 
-        $magasins = $query->paginate(10);
+        if ($request->filled('id_groupe')) {
+            $query->whereHas('site.entite', function ($q) use ($request) {
+                $q->where('id_groupe', $request->id_groupe);
+            });
+        }
 
-        return view('organigramme.magasin.list', compact('magasins'));
+        if ($request->filled('id_entite')) {
+            $query->whereHas('site', function ($q) use ($request) {
+                $q->where('id_entite', $request->id_entite);
+            });
+        }
+
+        if ($request->filled('id_site')) {
+            $query->where('id_site', $request->id_site);
+        }
+
+        $magasins = $query->paginate(10);
+        
+        $groupes = Groupe::orderBy('nom')->get();
+        $entites = Entite::orderBy('nom')->get();
+        $sites = Site::orderBy('localisation')->get();
+
+        return view('organigramme.magasin.list', compact('magasins', 'groupes', 'entites', 'sites'));
     }
 
     /**
@@ -64,11 +84,43 @@ class MagasinController extends Controller
     /**
      * Afficher les détails d'un magasin
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $magasin = Magasin::findOrFail($id);
+        $magasin = Magasin::with('site.entite')->findOrFail($id);
         
-        return view('organigramme.magasin.show', compact('magasin'));
+        $query = \App\Models\MvtStockFille::whereHas('mvtStock', function($q) use ($id) {
+                $q->where('id_magasin', $id);
+            })
+            ->with(['mvtStock', 'article.typeEvaluation', 'article.unite']);
+
+        // Filtres
+        if ($request->filled('id_article')) {
+            $query->where('id_article', $request->id_article);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereHas('mvtStock', function($q) use ($request) {
+                $q->whereDate('date_', '>=', $request->date_from);
+            });
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereHas('mvtStock', function($q) use ($request) {
+                $q->whereDate('date_', '<=', $request->date_to);
+            });
+        }
+        
+        $mouvements = $query->orderByDesc(
+                \App\Models\MvtStock::select('date_')
+                    ->whereColumn('mvt_stock.id_mvt_stock', 'mvt_stock_fille.id_mvt_stock')
+            )
+            ->paginate(15);
+
+        $articles = \App\Models\Article::where('id_entite', $magasin->site->id_entite)
+            ->orderBy('nom')
+            ->get();
+        
+        return view('organigramme.magasin.show', compact('magasin', 'mouvements', 'articles'));
     }
 
     /**
@@ -157,7 +209,8 @@ class MagasinController extends Controller
                 'nom' => $magasin->nom,
                 'latitude' => floatval($magasin->latitude),
                 'longitude' => floatval($magasin->longitude),
-                'site' => $magasin->site?->localisation,
+                'id_site' => $magasin->id_site,
+                'site_nom' => $magasin->site?->localisation,
                 'entite' => $entite?->nom,
                 'groupe' => $entite?->groupe?->nom,
                 'code_couleur' => $entite?->code_couleur ?? '#1a73e8',
@@ -223,7 +276,8 @@ class MagasinController extends Controller
                 'nom' => $magasin->nom,
                 'latitude' => floatval($magasin->latitude),
                 'longitude' => floatval($magasin->longitude),
-                'site' => $magasin->site?->localisation,
+                'id_site' => $magasin->id_site,
+                'site_nom' => $magasin->site?->localisation,
                 'entite' => $entite?->nom,
                 'groupe' => $entite?->groupe?->nom,
                 'code_couleur' => $entite?->code_couleur ?? '#1a73e8',

@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="mb-4">
-        <h2><i class="bi bi-plus-circle"></i> Ajouter une Catégorie</h2>
         <p class="text-muted">Créez une nouvelle catégorie d'articles</p>
     </div>
 
@@ -21,6 +20,12 @@
                         <div class="mb-3">
                             <label for="libelle" class="form-label"><i class="bi bi-tag"></i> Libellé <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="libelle" name="libelle" required>
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="est_perissable" name="est_perissable" value="1">
+                                <label class="form-check-label" for="est_perissable">Est périssable (produit avec date d'expiration)</label>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg me-2">
                             <i class="bi bi-check-circle"></i> Ajouter

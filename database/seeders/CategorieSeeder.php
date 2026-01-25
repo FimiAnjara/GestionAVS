@@ -12,19 +12,21 @@ class CategorieSeeder extends Seeder
      */
     public function run(): void
     {
-        Categorie::create([
-            'id_categorie' => 'CAT-' . time() . '001',
-            'libelle' => 'Biscuits & Confiserie',
-        ]);
+        $categories = [
+            ['id' => 'CAT_PPN', 'libelle' => 'Produits de Première Nécessité', 'est_perissable' => false],
+            ['id' => 'CAT_ALIM', 'libelle' => 'Alimentation & Boissons', 'est_perissable' => true],
+            ['id' => 'CAT_AGRI', 'libelle' => 'Agriculture & Semences', 'est_perissable' => false],
+            ['id' => 'CAT_VET', 'libelle' => 'Vétérinaire & Animaux', 'est_perissable' => false],
+            ['id' => 'CAT_OUTIL', 'libelle' => 'Outillage & Matériel', 'est_perissable' => false],
+            ['id' => 'CAT_TECH', 'libelle' => 'Informatique & High-Tech', 'est_perissable' => false],
+            ['id' => 'CAT_TEL', 'libelle' => 'Téléphonie & Mobilité', 'est_perissable' => false],
+        ];
 
-        Categorie::create([
-            'id_categorie' => 'CAT-' . time() . '002',
-            'libelle' => 'Huiles & Condiments',
-        ]);
-
-        Categorie::create([
-            'id_categorie' => 'CAT-' . time() . '003',
-            'libelle' => 'Sucres & Produits Secs',
-        ]);
+        foreach ($categories as $cat) {
+            Categorie::updateOrCreate(
+                ['id_categorie' => $cat['id']],
+                ['libelle' => $cat['libelle'], 'est_perissable' => $cat['est_perissable']]
+            );
+        }
     }
 }

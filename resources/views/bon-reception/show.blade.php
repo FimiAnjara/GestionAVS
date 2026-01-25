@@ -24,7 +24,7 @@
             </button>
         </form>
     @elseif ($bonReception->etat == 11)
-        <a href="{{ route('mvt-stock.create', ['from_bon_reception' => $bonReception->id_bonReception]) }}" class="btn btn-info">
+        <a href="{{ route('mvt-stock.create', ['from_bon_reception' => $bonReception->id_bonReception, 'id_type_mvt' => 'E']) }}" class="btn btn-info">
             <i class="bi bi-arrow-repeat me-2"></i>Générer Mouvement de Stock
         </a>
         <form action="{{ route('bon-reception.annuler', $bonReception->id_bonReception) }}" method="POST" class="d-inline">
@@ -78,6 +78,19 @@
                             </p>
                         </div>
                     </div>
+
+                    @if($bonReception->magasin)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="form-label text-muted small">Magasin Destination</label>
+                            <p class="form-control-plaintext fw-bold">
+                                <i class="bi bi-shop me-2 text-primary"></i>{{ $bonReception->magasin->nom }}
+                                <br>
+                                <small class="text-muted fw-normal">{{ $bonReception->magasin->site?->localisation }}</small>
+                            </p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -116,6 +129,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th width="5%">Photo</th>
                                 <th>Article</th>
                                 <th class="text-center">Quantité</th>
                                 <th>Date Expiration</th>
@@ -125,6 +139,18 @@
                         <tbody>
                             @foreach ($bonReception->bonReceptionFille as $article)
                                 <tr>
+                                    <td class="text-center">
+                                        @if($article->article->photo)
+                                            <img src="{{ asset('storage/' . $article->article->photo) }}" 
+                                                 class="rounded shadow-sm" 
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div>
                                             <strong class="d-block">{{ $article->article->nom }}</strong>
@@ -133,7 +159,7 @@
                                     </td>
                                     <td class="text-center">
                                         <strong>{{ number_format($article->quantite, 2, ',', ' ') }}</strong>
-                                        <small class="text-muted">{{ $article->article->unite->libelle }}</small>
+                                        <span class="badge bg-success ms-1">{{ $article->article->unite->libelle }}</span>
                                     </td>
                                     <td>
                                         @if ($article->date_expiration)
