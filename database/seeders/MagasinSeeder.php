@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Magasin;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MagasinSeeder extends Seeder
 {
@@ -47,7 +48,17 @@ class MagasinSeeder extends Seeder
         ];
 
         foreach ($magasins as $magasin) {
-            Magasin::create($magasin);
+            // Insérer sans location d'abord
+            $id = $magasin['id_magasin'];
+            $nom = $magasin['nom'];
+            $lat = $magasin['latitude'];
+            $lng = $magasin['longitude'];
+            
+            DB::statement(
+                "INSERT INTO magasin (id_magasin, nom, location, created_at, updated_at) 
+                 VALUES (?, ?, ST_GeomFromText(?, 4326), NOW(), NOW())",
+                [$id, $nom, "POINT($lng $lat)"]
+            );
         }
     }
 }

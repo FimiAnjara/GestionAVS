@@ -14,7 +14,7 @@
 <body>
     @php
         use App\Helpers\PermissionHelper;
-        $userRole = session('user_role');
+        $userRole = session('user_role', null);
     @endphp
 
     <nav id="sidebar">
@@ -34,40 +34,27 @@
                     </a>
                 </li>
 
-                <!-- DASHBOARD GLOBAL - Directeur Général uniquement -->
-                @if($userRole === 'Directeur Général')
-                <li>
-                    <a href="{{ route('dashboard.global') }}" class="{{ request()->is('dashboard/global*') ? 'active' : '' }}">
-                        <i class="bi bi-bar-chart-line-fill"></i>
-                        <span class="menu-text">Dashboard Global</span>
-                    </a>
-                </li>
-                @endif
-
-                <!-- SECTION ACHATS -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'achats'))
+                {{-- =============== SECTION ACHATS =============== --}}
+                @if(PermissionHelper::hasModuleAccess($userRole, 'achats') || PermissionHelper::hasModuleAccess($userRole, 'all'))
                 <div class="menu-divider"></div>
                 <li class="menu-title">Achats</li>
-
-                <!-- PROFORMA FOURNISSEUR MENU -->
+                
+                {{-- PROFORMA FOURNISSEUR --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'proforma-fournisseur'))
                 <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-file-earmark-check"></i>
                         <span class="menu-text">Demande d'achat</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'proforma-fournisseur', 'create'))
-                        <a href="{{ route('proforma-fournisseur.create') }}"
-                            class="submenu-item {{ request()->is('proforma-fournisseur/create') ? 'active' : '' }}">
+                        <a href="{{ route('proforma-fournisseur.create') }}" class="submenu-item {{ request()->is('proforma-fournisseur/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'proforma-fournisseur', 'list'))
-                        <a href="{{ route('proforma-fournisseur.list') }}"
-                            class="submenu-item {{ request()->is('proforma-fournisseur/list') ? 'active' : '' }}">
+                        <a href="{{ route('proforma-fournisseur.list') }}" class="submenu-item {{ request()->is('proforma-fournisseur/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -76,25 +63,22 @@
                 </li>
                 @endif
 
-                <!-- BON DE COMMANDE MENU -->
+                {{-- BON DE COMMANDE --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande'))
                 <li class="has-submenu {{ request()->is('bon-commande*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-file-earmark-arrow-up"></i>
                         <span class="menu-text">Bon de Commande</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('bon-commande*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('bon-commande*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande', 'create'))
-                        <a href="{{ route('bon-commande.create') }}"
-                            class="submenu-item {{ request()->is('bon-commande/create') ? 'active' : '' }}">
+                        <a href="{{ route('bon-commande.create') }}" class="submenu-item {{ request()->is('bon-commande/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande', 'list'))
-                        <a href="{{ route('bon-commande.list') }}"
-                            class="submenu-item {{ request()->is('bon-commande/list') ? 'active' : '' }}">
+                        <a href="{{ route('bon-commande.list') }}" class="submenu-item {{ request()->is('bon-commande/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -103,25 +87,22 @@
                 </li>
                 @endif
 
-                <!-- FACTURE FOURNISSEUR MENU -->
+                {{-- FACTURE FOURNISSEUR --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'facture-fournisseur'))
                 <li class="has-submenu {{ request()->is('facture-fournisseur*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-receipt"></i>
                         <span class="menu-text">Facture Fournisseur</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('facture-fournisseur*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('facture-fournisseur*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'facture-fournisseur', 'create'))
-                        <a href="{{ route('facture-fournisseur.create') }}"
-                            class="submenu-item {{ request()->is('facture-fournisseur/create') ? 'active' : '' }}">
+                        <a href="{{ route('facture-fournisseur.create') }}" class="submenu-item {{ request()->is('facture-fournisseur/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'facture-fournisseur', 'list'))
-                        <a href="{{ route('facture-fournisseur.list') }}"
-                            class="submenu-item {{ request()->is('facture-fournisseur/list') ? 'active' : '' }}">
+                        <a href="{{ route('facture-fournisseur.list') }}" class="submenu-item {{ request()->is('facture-fournisseur/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -130,25 +111,22 @@
                 </li>
                 @endif
 
-                <!-- BON DE RECEPTION MENU -->
+                {{-- BON DE RECEPTION --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-reception'))
                 <li class="has-submenu {{ request()->is('bon-reception*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-file-earmark-check"></i>
                         <span class="menu-text">Bon de Réception</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('bon-reception*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('bon-reception*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'bon-reception', 'create'))
-                        <a href="{{ route('bon-reception.create') }}"
-                            class="submenu-item {{ request()->is('bon-reception/create') ? 'active' : '' }}">
+                        <a href="{{ route('bon-reception.create') }}" class="submenu-item {{ request()->is('bon-reception/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'bon-reception', 'list'))
-                        <a href="{{ route('bon-reception.list') }}"
-                            class="submenu-item {{ request()->is('bon-reception/list') ? 'active' : '' }}">
+                        <a href="{{ route('bon-reception.list') }}" class="submenu-item {{ request()->is('bon-reception/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -158,117 +136,27 @@
                 @endif
                 @endif
 
-                <!-- SECTION VENTES -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'ventes'))
-                <div class="menu-divider"></div>
-                <li class="menu-title">Ventes</li>
-
-                <!-- PROFORMA CLIENT MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'proforma'))
-                <li class="has-submenu {{ request()->is('proforma*') && !request()->is('proforma-fournisseur*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-file-earmark-text"></i>
-                        <span class="menu-text">Proforma Client</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('proforma*') && !request()->is('proforma-fournisseur*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'proforma', 'create'))
-                        <a href="{{ route('proforma.create') }}"
-                            class="submenu-item {{ request()->is('proforma/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'proforma', 'list'))
-                        <a href="{{ route('proforma.list') }}"
-                            class="submenu-item {{ request()->is('proforma/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-
-                <!-- COMMANDE CLIENT MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'commande'))
-                <li class="has-submenu {{ request()->is('commande*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-cart"></i>
-                        <span class="menu-text">Commande Client</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('commande*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'commande', 'create'))
-                        <a href="{{ route('commande.create') }}"
-                            class="submenu-item {{ request()->is('commande/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'commande', 'list'))
-                        <a href="{{ route('commande.list') }}"
-                            class="submenu-item {{ request()->is('commande/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-
-                <!-- BON DE LIVRAISON MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison'))
-                <li class="has-submenu {{ request()->is('bon-livraison*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-truck"></i>
-                        <span class="menu-text">Bon de Livraison</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('bon-livraison*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison', 'create'))
-                        <a href="{{ route('bon-livraison.create') }}"
-                            class="submenu-item {{ request()->is('bon-livraison/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison', 'list'))
-                        <a href="{{ route('bon-livraison.list') }}"
-                            class="submenu-item {{ request()->is('bon-livraison/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-                @endif
-
-                <!-- SECTION TIERS -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'tiers'))
+                {{-- =============== SECTION TIERS =============== --}}
+                @if(PermissionHelper::hasModuleAccess($userRole, 'tiers') || PermissionHelper::hasModuleAccess($userRole, 'vente') || PermissionHelper::hasModuleAccess($userRole, 'all'))
                 <div class="menu-divider"></div>
                 <li class="menu-title">Tiers</li>
-
-                <!-- CLIENT MENU -->
+                
+                {{-- CLIENTS --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'clients'))
                 <li class="has-submenu {{ request()->is('clients*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-people"></i>
                         <span class="menu-text">Clients</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('clients*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('clients*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'clients', 'create'))
-                        <a href="{{ route('clients.create') }}"
-                            class="submenu-item {{ request()->is('clients/create') ? 'active' : '' }}">
+                        <a href="{{ route('clients.create') }}" class="submenu-item {{ request()->is('clients/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'clients', 'list'))
-                        <a href="{{ route('clients.list') }}"
-                            class="submenu-item {{ request()->is('clients/list') ? 'active' : '' }}">
+                        <a href="{{ route('clients.list') }}" class="submenu-item {{ request()->is('clients/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -277,25 +165,22 @@
                 </li>
                 @endif
 
-                <!-- FOURNISSEUR MENU -->
+                {{-- FOURNISSEURS --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs'))
                 <li class="has-submenu {{ request()->is('fournisseurs*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-briefcase"></i>
                         <span class="menu-text">Fournisseurs</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('fournisseurs*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('fournisseurs*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs', 'create'))
-                        <a href="{{ route('fournisseurs.create') }}"
-                            class="submenu-item {{ request()->is('fournisseurs/create') ? 'active' : '' }}">
+                        <a href="{{ route('fournisseurs.create') }}" class="submenu-item {{ request()->is('fournisseurs/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs', 'list'))
-                        <a href="{{ route('fournisseurs.list') }}"
-                            class="submenu-item {{ request()->is('fournisseurs/list') ? 'active' : '' }}">
+                        <a href="{{ route('fournisseurs.list') }}" class="submenu-item {{ request()->is('fournisseurs/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -305,30 +190,27 @@
                 @endif
                 @endif
 
-                <!-- SECTION PRODUITS -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'produits'))
+                {{-- =============== SECTION PRODUITS =============== --}}
+                @if(PermissionHelper::hasModuleAccess($userRole, 'produits') || PermissionHelper::hasModuleAccess($userRole, 'stock') || PermissionHelper::hasModuleAccess($userRole, 'all'))
                 <div class="menu-divider"></div>
                 <li class="menu-title">Produits</li>
-
-                <!-- ARTICLE MENU -->
+                
+                {{-- ARTICLES --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'articles'))
                 <li class="has-submenu {{ request()->is('articles*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-box"></i>
                         <span class="menu-text">Articles</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('articles*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('articles*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'articles', 'create'))
-                        <a href="{{ route('articles.create') }}"
-                            class="submenu-item {{ request()->is('articles/create') ? 'active' : '' }}">
+                        <a href="{{ route('articles.create') }}" class="submenu-item {{ request()->is('articles/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'articles', 'list'))
-                        <a href="{{ route('articles.list') }}"
-                            class="submenu-item {{ request()->is('articles/list') ? 'active' : '' }}">
+                        <a href="{{ route('articles.list') }}" class="submenu-item {{ request()->is('articles/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -337,95 +219,34 @@
                 </li>
                 @endif
 
-                <!-- CATEGORIE MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'categories'))
-                <li class="has-submenu {{ request()->is('categories*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-tag"></i>
-                        <span class="menu-text">Catégories</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('categories*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'categories', 'create'))
-                        <a href="{{ route('categories.create') }}"
-                            class="submenu-item {{ request()->is('categories/create') ? 'active' : '' }}">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>Ajout</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'categories', 'list'))
-                        <a href="{{ route('categories.list') }}"
-                            class="submenu-item {{ request()->is('categories/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-
-                <!-- UNITE MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'unites'))
-                <li class="has-submenu {{ request()->is('unites*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
-                        <i class="bi bi-rulers"></i>
-                        <span class="menu-text">Unités</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('unites*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'unites', 'create'))
-                        <a href="{{ route('unites.create') }}"
-                            class="submenu-item {{ request()->is('unites/create') ? 'active' : '' }}">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>Ajout</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'unites', 'list'))
-                        <a href="{{ route('unites.list') }}"
-                            class="submenu-item {{ request()->is('unites/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-                @endif
-
-                <!-- SECTION STOCK -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'stock'))
-                <div class="menu-divider"></div>
-                <li class="menu-title">Stock</li>
-
-                <!-- MOUVEMENT DE STOCK MENU -->
+                {{-- MOUVEMENT DE STOCK --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock'))
                 <li class="has-submenu {{ request()->is('mvt-stock*') || request()->is('stock*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-arrow-left-right"></i>
                         <span class="menu-text">Gestion Stock</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('mvt-stock*') || request()->is('stock*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('mvt-stock*') || request()->is('stock*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'create'))
-                        <a href="{{ route('mvt-stock.create') }}"
-                            class="submenu-item {{ request()->is('mvt-stock/create') ? 'active' : '' }}">
+                        <a href="{{ route('mvt-stock.create') }}" class="submenu-item {{ request()->is('mvt-stock/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'list'))
-                        <a href="{{ route('mvt-stock.list') }}"
-                            class="submenu-item {{ request()->is('mvt-stock/list') ? 'active' : '' }}">
+                        <a href="{{ route('mvt-stock.list') }}" class="submenu-item {{ request()->is('mvt-stock/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
-                        <a href="{{ route('stock.details') }}"
-                            class="submenu-item {{ request()->is('stock/details') ? 'active' : '' }}">
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'details'))
+                        <a href="{{ route('stock.details') }}" class="submenu-item {{ request()->is('stock/details') ? 'active' : '' }}">
                             <i class="bi bi-list-check"></i>
                             <span>Détails</span>
                         </a>
-                        <a href="{{ route('stock.etat') }}"
-                            class="submenu-item {{ request()->is('stock/etat') || request()->is('stock*') ? 'active' : '' }}">
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'etat'))
+                        <a href="{{ route('stock.etat') }}" class="submenu-item {{ request()->is('stock/etat') || request()->is('stock*') ? 'active' : '' }}">
                             <i class="bi bi-boxes"></i>
                             <span>Etat</span>
                         </a>
@@ -434,30 +255,80 @@
                 </li>
                 @endif
 
-                <!-- MAGASIN MENU -->
+                {{-- CATEGORIES --}}
+                @if(PermissionHelper::hasMenuAccess($userRole, 'categories'))
+                <li class="has-submenu {{ request()->is('categories*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-tag"></i>
+                        <span class="menu-text">Catégories</span>
+                    </a>
+                    <div class="sidebar-submenu" style="{{ request()->is('categories*') ? 'display: block;' : 'display: none;' }}">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'categories', 'create'))
+                        <a href="{{ route('categories.create') }}" class="submenu-item {{ request()->is('categories/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'categories', 'list'))
+                        <a href="{{ route('categories.list') }}" class="submenu-item {{ request()->is('categories/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                        @endif
+                    </div>
+                </li>
+                @endif
+
+                {{-- UNITES --}}
+                @if(PermissionHelper::hasMenuAccess($userRole, 'unites'))
+                <li class="has-submenu {{ request()->is('unites*') ? 'active' : '' }}">
+                    <a href="javascript:void(0);" class="toggle-submenu">
+                        <i class="bi bi-rulers"></i>
+                        <span class="menu-text">Unités</span>
+                    </a>
+                    <div class="sidebar-submenu" style="{{ request()->is('unites*') ? 'display: block;' : 'display: none;' }}">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'unites', 'create'))
+                        <a href="{{ route('unites.create') }}" class="submenu-item {{ request()->is('unites/create') ? 'active' : '' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Ajout</span>
+                        </a>
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'unites', 'list'))
+                        <a href="{{ route('unites.list') }}" class="submenu-item {{ request()->is('unites/list') ? 'active' : '' }}">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Liste</span>
+                        </a>
+                        @endif
+                    </div>
+                </li>
+                @endif
+                @endif
+
+                {{-- =============== SECTION MAGASIN =============== --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'magasin'))
+                <div class="menu-divider"></div>
+                <li class="menu-title">Magasin</li>
+                
                 <li class="has-submenu {{ request()->is('magasin*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-shop-window"></i>
                         <span class="menu-text">Magasin</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'create'))
-                        <a href="{{ route('magasin.create') }}"
-                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
+                        <a href="{{ route('magasin.create') }}" class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'list'))
-                        <a href="{{ route('magasin.list') }}"
-                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
+                        <a href="{{ route('magasin.list') }}" class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
-                        <a href="{{ route('magasin.carte') }}"
-                            class="submenu-item {{ request()->is('magasin/carte') ? 'active' : '' }}">
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'carte'))
+                        <a href="{{ route('magasin.carte') }}" class="submenu-item {{ request()->is('magasin/carte') ? 'active' : '' }}">
                             <i class="bi bi-geo-alt"></i>
                             <span>Voir Carte</span>
                         </a>
@@ -465,32 +336,28 @@
                     </div>
                 </li>
                 @endif
-                @endif
 
-                <!-- SECTION FINANCE -->
-                @if(PermissionHelper::hasModuleAccess($userRole, 'finance'))
+                {{-- =============== SECTION FINANCE =============== --}}
+                @if(PermissionHelper::hasModuleAccess($userRole, 'finance') || PermissionHelper::hasModuleAccess($userRole, 'all'))
                 <div class="menu-divider"></div>
                 <li class="menu-title">Finance</li>
-
-                <!-- CAISSE MENU -->
+                
+                {{-- CAISSE --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'caisse'))
                 <li class="has-submenu {{ request()->is('caisse*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-safe2"></i>
                         <span class="menu-text">Caisse</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('caisse*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('caisse*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'caisse', 'create'))
-                        <a href="{{ route('caisse.create') }}"
-                            class="submenu-item {{ request()->is('caisse/create') ? 'active' : '' }}">
+                        <a href="{{ route('caisse.create') }}" class="submenu-item {{ request()->is('caisse/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'caisse', 'list'))
-                        <a href="{{ route('caisse.list') }}"
-                            class="submenu-item {{ request()->is('caisse/list') ? 'active' : '' }}">
+                        <a href="{{ route('caisse.list') }}" class="submenu-item {{ request()->is('caisse/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
@@ -499,30 +366,28 @@
                 </li>
                 @endif
 
-                <!-- MOUVEMENTS CAISSE MENU -->
+                {{-- MOUVEMENTS CAISSE --}}
                 @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse'))
                 <li class="has-submenu {{ request()->is('mvt-caisse*') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="toggle-submenu">
                         <i class="bi bi-arrow-left-right"></i>
                         <span class="menu-text">Mouvements</span>
                     </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('mvt-caisse*') ? 'display: block;' : 'display: none;' }}">
+                    <div class="sidebar-submenu" style="{{ request()->is('mvt-caisse*') ? 'display: block;' : 'display: none;' }}">
                         @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse', 'create'))
-                        <a href="{{ route('mvt-caisse.create') }}"
-                            class="submenu-item {{ request()->is('mvt-caisse/create') ? 'active' : '' }}">
+                        <a href="{{ route('mvt-caisse.create') }}" class="submenu-item {{ request()->is('mvt-caisse/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse', 'list'))
-                        <a href="{{ route('mvt-caisse.list') }}"
-                            class="submenu-item {{ request()->is('mvt-caisse/list') ? 'active' : '' }}">
+                        <a href="{{ route('mvt-caisse.list') }}" class="submenu-item {{ request()->is('mvt-caisse/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
-                        <a href="{{ route('mvt-caisse.etat') }}"
-                            class="submenu-item {{ request()->is('mvt-caisse/etat*') ? 'active' : '' }}">
+                        @endif
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse', 'etat'))
+                        <a href="{{ route('mvt-caisse.etat') }}" class="submenu-item {{ request()->is('mvt-caisse/etat*') ? 'active' : '' }}">
                             <i class="bi bi-graph-up"></i>
                             <span>Etat</span>
                         </a>
@@ -539,27 +404,26 @@
         <div class="sidebar-footer">
             <ul style="list-style: none; padding: 0; margin: 0;">
                 <li>
-                    <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}"
-                        title="Aide et support">
+                    <a href="{{ url('/aide') }}" class="{{ request()->is('aide*') ? 'active' : '' }}" title="Aide et support">
                         <i class="bi bi-question-circle"></i>
                         <span class="menu-text">Aide</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="event.preventDefault(); logout();" title="Se déconnecter">
+                    <a href="javascript:void(0);" onclick="handleLogout()" title="Se déconnecter">
                         <i class="bi bi-box-arrow-right"></i>
                         <span class="menu-text">Déconnexion</span>
                     </a>
                 </li>
             </ul>
             <div>
-                <p style="margin-bottom: 2px; font-weight: 600;">GestionAVS</p>
+                <p style="margin-bottom: 2px; font-weight: 600;">Gestion AVS</p>
                 <p style="font-size: 0.65rem; opacity: 0.7;">v1.0.0</p>
                 <p style="font-size: 0.65rem; margin-top: 5px; opacity: 0.6;">&copy; {{ date('Y') }}</p>
             </div>
         </div>
     </nav>
-
+    
     <div id="content">
         <button type="button" id="sidebarCollapse" class="d-lg-none">
             <i class="bi bi-list"></i>
@@ -572,48 +436,18 @@
                         {{ now()->format('d/m/Y H:i') }}
                     </span>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <!-- Affichage du magasin actuel -->
-                    @if(session('user_magasin_nom'))
-                    <div class="d-none d-md-flex align-items-center text-muted">
-                        <i class="bi bi-shop me-1"></i>
-                        <small>{{ session('user_magasin_nom') }}</small>
-                    </div>
-                    @endif
-                    
+                <div class="d-flex align-items-center">
                     <div class="dropdown">
-                        <a href="#"
-                            class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
-                            data-bs-toggle="dropdown">
+                        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
                             <div class="user-avatar">
                                 <i class="bi bi-person"></i>
                             </div>
                             <div class="ms-2 d-none d-md-block">
-                                <div class="fw-bold">{{ session('user_email', 'Utilisateur') }}</div>
-                                <div class="small text-muted">{{ $userRole ?? 'Non défini' }}</div>
+                                <div class="fw-bold" id="navbar-user-name">{{ session('user_email', 'Utilisateur') }}</div>
+                                <div class="small text-muted" id="navbar-user-role">{{ $userRole ?? 'Non défini' }}</div>
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <div class="dropdown-header">
-                                <small class="text-muted">Connecté en tant que</small>
-                                <div class="fw-bold">{{ session('user_email', 'Utilisateur') }}</div>
-                                <span class="badge bg-primary">{{ $userRole ?? 'Non défini' }}</span>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <div class="dropdown-header">
-                                <small class="text-muted">
-                                    <i class="bi bi-building me-1"></i> {{ session('user_entite_nom', 'Non défini') }}
-                                </small>
-                                <br>
-                                <small class="text-muted">
-                                    <i class="bi bi-geo-alt me-1"></i> {{ session('user_site_nom', 'Non défini') }}
-                                </small>
-                                <br>
-                                <small class="text-muted">
-                                    <i class="bi bi-shop me-1"></i> {{ session('user_magasin_nom', 'Non défini') }}
-                                </small>
-                            </div>
-                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ url('/profil') }}">
                                 <i class="bi bi-person me-2"></i> Mon profil
                             </a>
@@ -621,7 +455,7 @@
                                 <i class="bi bi-gear me-2"></i> Paramètres
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); logout();">
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="handleLogout()">
                                 <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
                             </a>
                         </div>
@@ -629,7 +463,6 @@
                 </div>
             </div>
         </nav>
-
         <main class="py-4">
             <div class="container-fluid px-4">
                 @if (session('success'))
@@ -646,7 +479,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 @if (session('warning'))
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         <i class="bi bi-exclamation-circle me-2"></i>
@@ -654,14 +486,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h2 class="mb-1 fw-bold">@yield('title')</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="{{ url('/') }}"
-                                        class="text-decoration-none">Accueil</a></li>
+                                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-decoration-none">Accueil</a></li>
                                 <li class="breadcrumb-item active">@yield('title')</li>
                             </ol>
                         </nav>
@@ -680,7 +510,6 @@
                     </div>
                 </div>
 
-                <!-- Affichage des erreurs de validation -->
                 @if ($errors->any())
                     <div class="alert alert-danger mt-4">
                         <h5 class="alert-heading">
@@ -696,14 +525,11 @@
             </div>
         </main>
 
-        <!-- Pied de page -->
         <footer class="border-top py-3 mt-4">
             <div class="container-fluid px-4">
                 <div class="row align-items-center">
                     <div class="col-md-6">
-                        <span class="text-muted">
-                            © {{ date('Y') }} GestionAVS
-                        </span>
+                        <span class="text-muted">© {{ date('Y') }} Gestion AVS</span>
                     </div>
                     <div class="col-md-6 text-end">
                         <span class="text-muted small">
@@ -716,31 +542,51 @@
         </footer>
     </div>
 
-    <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Scripts Sidebar -->
     <script>
-        // Fonction de déconnexion
-        function logout() {
-            localStorage.removeItem('jwt_token');
-            fetch('/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        // Gestion de la déconnexion
+        async function handleLogout() {
+            const token = localStorage.getItem('jwt_token');
+            
+            try {
+                if (token) {
+                    await fetch('/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json',
+                        }
+                    });
                 }
-            }).finally(() => {
-                window.location.href = '/login';
-            });
+            } catch (error) {
+                console.error('Erreur logout:', error);
+            }
+            
+            // Nettoyer le localStorage
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user');
+            
+            // Rediriger vers login
+            window.location.href = '/login';
         }
 
-        // Vérifier l'authentification
+        // Vérifier l'authentification au chargement
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('jwt_token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
             if (!token) {
                 window.location.href = '/login';
                 return;
+            }
+            
+            // Mettre à jour les infos utilisateur dans la navbar
+            if (user.email) {
+                const userNameEl = document.getElementById('navbar-user-name');
+                const userRoleEl = document.getElementById('navbar-user-role');
+                if (userNameEl) userNameEl.textContent = user.email;
+                if (userRoleEl) userRoleEl.textContent = user.role || 'Non défini';
             }
         });
 
@@ -751,7 +597,6 @@
                 const parent = this.closest('.has-submenu');
                 const submenu = parent.querySelector('.sidebar-submenu');
 
-                // Close other submenus
                 document.querySelectorAll('.has-submenu').forEach(function(menu) {
                     if (menu !== parent) {
                         menu.classList.remove('active');
@@ -759,7 +604,6 @@
                     }
                 });
 
-                // Toggle current submenu
                 if (submenu.style.display === 'none' || !submenu.style.display) {
                     submenu.style.display = 'block';
                     parent.classList.add('active');
@@ -770,7 +614,6 @@
             });
         });
 
-        // On page load, open active submenus
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.has-submenu.active').forEach(function(menu) {
                 const submenu = menu.querySelector('.sidebar-submenu');
@@ -780,21 +623,17 @@
             });
         });
 
-        // Prevent scroll propagation from sidebar to main
         const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.addEventListener('wheel', function(e) {
-                const scrollTop = sidebar.scrollTop;
-                const scrollHeight = sidebar.scrollHeight;
-                const clientHeight = sidebar.clientHeight;
+        sidebar.addEventListener('wheel', function(e) {
+            const scrollTop = sidebar.scrollTop;
+            const scrollHeight = sidebar.scrollHeight;
+            const clientHeight = sidebar.clientHeight;
 
-                if (scrollHeight > clientHeight) {
-                    e.stopPropagation();
-                }
-            }, { passive: false });
-        }
+            if (scrollHeight > clientHeight) {
+                e.stopPropagation();
+            }
+        }, { passive: false });
 
-        // Toggle sidebar on mobile
         document.getElementById('sidebarCollapse').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('content').classList.toggle('active');
@@ -803,7 +642,6 @@
             icon.classList.toggle('bi-x');
         });
 
-        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
                 const sidebar = document.getElementById('sidebar');
@@ -820,7 +658,6 @@
             }
         });
 
-        // Auto-hide alerts after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.alert').forEach(function(alert) {
                 const bsAlert = new bootstrap.Alert(alert);
@@ -828,7 +665,6 @@
             });
         }, 5000);
 
-        // Update time in real-time
         function updateTime() {
             const now = new Date();
             const timeElement = document.querySelector('.navbar-text');
@@ -844,16 +680,12 @@
             }
         }
 
-        // Update time every minute
         setInterval(updateTime, 60000);
-
-        // Run on load
         document.addEventListener('DOMContentLoaded', function() {
             updateTime();
         });
     </script>
 
-    <!-- Additional scripts -->
     @stack('scripts')
 </body>
 

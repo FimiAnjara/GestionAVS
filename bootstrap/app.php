@@ -11,7 +11,29 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'jwt' => \App\Http\Middleware\JwtMiddleware::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+        
+        // Exclure les routes API de la vérification CSRF
+        $middleware->validateCsrfTokens(except: [
+            'auth/*',
+            'clients/*',
+            'fournisseurs/*',
+            'articles/*',
+            'categories/*',
+            'unites/*',
+            'caisses/*',
+            'mvt-caisse/*',
+            'proformas-fournisseurs/*',
+            'bons-commande/*',
+            'factures-fournisseurs/*',
+            'bons-reception/*',
+            'mvt-stock/*',
+            'magasins/*',
+            'api/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

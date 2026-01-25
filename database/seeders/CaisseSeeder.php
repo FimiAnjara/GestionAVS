@@ -12,22 +12,19 @@ class CaisseSeeder extends Seeder
      */
     public function run(): void
     {
-        Caisse::create([
-            'id_caisse' => 'CAISSE_001',
-            'libelle' => 'Airtel Money',
-            'montant' => 0,
-        ]);
+        Caisse::updateOrCreate(
+            ['id_caisse' => 'CAISSE_001'],
+            ['libelle' => 'Airtel Money', 'montant' => 0]
+        );
 
-        Caisse::create([
-            'id_caisse' => 'CAISSE_002',
-            'libelle' => 'MVola',
-            'montant' => 0,
-        ]);
+        Caisse::updateOrCreate(
+            ['id_caisse' => 'CAISSE_002'],
+            ['libelle' => 'MVola', 'montant' => 0]
+        );
 
-        Caisse::create([
-            'id_caisse' => 'CAISSE_003',
-            'libelle' => 'Caisse Principale',
-            'montant' => 0,
-        ]);
+        Caisse::updateOrCreate(
+            ['id_caisse' => 'CAISSE_003'],
+            ['libelle' => 'Caisse Principale', 'montant' => 0]
+        );
     }
 }
