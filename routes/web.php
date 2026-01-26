@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\ArticleController;
@@ -16,11 +17,23 @@ use App\Http\Controllers\MagasinController;
 use App\Http\Controllers\GroupeController;
 use App\Http\Controllers\EntiteController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+// Routes d'authentification (sans middleware JWT)
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('jwt');
+    Route::post('/refresh', [AuthController::class, 'refresh'])->name('auth.refresh')->middleware('jwt');
+    Route::get('/me', [AuthController::class, 'me'])->name('auth.me')->middleware('jwt');
+});
 
 Route::get('/', function () {
     return view('dashboard.dashboard');
+    if (session('user_role')) {
+        return redirect('/dashboard');
+    }
+    return redirect('/login');
 })->name('home');
 
 // Routes Organigramme - Groupe
@@ -55,6 +68,20 @@ Route::prefix('site')->group(function () {
     Route::put('/{id}', [SiteController::class, 'update'])->name('site.update');
     Route::delete('/{id}', [SiteController::class, 'destroy'])->name('site.destroy');
 });
+
+// Page de login
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+// Dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+// Dashboard Global - Directeur Général
+Route::get('/dashboard/global', [DashboardController::class, 'global'])->name('dashboard.global');
+Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
 // Routes Clients
 Route::prefix('clients')->group(function () {

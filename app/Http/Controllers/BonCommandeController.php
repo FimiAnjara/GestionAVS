@@ -9,7 +9,8 @@ use App\Models\Fournisseur;
 use App\Models\Article;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
-use PDF;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BonCommandeController extends Controller
 {
@@ -120,7 +121,7 @@ class BonCommandeController extends Controller
         
         // Créer le bon de commande
         $id = 'BC_' . uniqid();
-        $userId = auth()->check() ? auth()->user()->id : (Utilisateur::first()?->id_utilisateur ?? 'UTIL-1');
+        $userId = Auth::guard('api')->check() ? Auth::guard('api')->user()->id_utilisateur : (Utilisateur::first()?->id_utilisateur ?? 'UTIL-1');
         
         $bonCommande = BonCommande::create([
             'id_bonCommande' => $id,
@@ -212,7 +213,7 @@ class BonCommandeController extends Controller
         $bonCommande = BonCommande::findOrFail($id);
         $articles = $bonCommande->bonCommandeFille()->with('article')->get();
         
-        $pdf = PDF::loadView('bon-commande.pdf', compact('bonCommande', 'articles'));
+        $pdf = Pdf::loadView('bon-commande.pdf', compact('bonCommande', 'articles'));
         return $pdf->download($bonCommande->id_bonCommande . '.pdf');
     }
     

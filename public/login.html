@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Gestion AVS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .info-text {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .demo-credentials {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        .demo-credentials h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .demo-credentials p {
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <div class="logo">
+                <h1>🏢 Gestion AVS</h1>
+                <p>Achat • Vente • Stock</p>
+            </div>
+
+            <div id="message"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="exemple@entreprise.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="mdp">Mot de passe</label>
+                    <input type="password" id="mdp" name="mdp" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    Connexion
+                </button>
+            </form>
+
+            <div class="info-text">
+                © 2026 Gestion AVS - Tous droits réservés
+            </div>
+
+            <div class="demo-credentials">
+                <h4>📋 Identifiants de test</h4>
+                <p><strong>Email :</strong> acheteur@example.com</p>
+                <p><strong>Mdp :</strong> password123</p>
+                <p style="margin-top: 10px; color: #999;">Les identifiants doivent être créés dans votre base de données</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/auth';
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const mdp = document.getElementById('mdp').value;
+            const btnLogin = document.getElementById('btnLogin');
+            const messageDiv = document.getElementById('message');
+
+            // Désactiver le bouton et afficher le spinner
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<span class="spinner"></span>Connexion en cours...';
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        mdp: mdp
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Stocker le token
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    showMessage('Connexion réussie! Redirection...', 'success');
+
+                    // Rediriger après 1.5 secondes
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    showMessage(data.message || 'Erreur de connexion', 'danger');
+                    btnLogin.disabled = false;
+                    btnLogin.innerHTML = 'Connexion';
+                }
+            } catch (error) {
+                showMessage('Erreur de connexion au serveur: ' + error.message, 'danger');
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = 'Connexion';
+                console.error('Erreur:', error);
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        // Vérifier si l'utilisateur est déjà connecté
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                window.location.href = '/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>
