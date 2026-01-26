@@ -857,17 +857,20 @@
                 document.querySelectorAll('.has-submenu').forEach(function(menu) {
                     if (menu !== parent) {
                         menu.classList.remove('active');
-                        menu.querySelector('.sidebar-submenu').style.display = 'none';
+                        const otherSubmenu = menu.querySelector('.sidebar-submenu');
+                        if (otherSubmenu) {
+                            otherSubmenu.style.display = 'none';
+                        }
                     }
                 });
 
                 // Toggle current submenu
-                if (submenu.style.display === 'none' || !submenu.style.display) {
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
                     submenu.style.display = 'block';
                     parent.classList.add('active');
                 } else {
                     submenu.style.display = 'none';
-                    parent.classList.add('active');
+                    parent.classList.remove('active');
                 }
             });
         });

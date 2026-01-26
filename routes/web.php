@@ -17,6 +17,7 @@ use App\Http\Controllers\GroupeController;
 use App\Http\Controllers\EntiteController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
 
 Route::prefix('auth')->group(function () {
@@ -42,6 +43,10 @@ Route::get('/login', function () {
 Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
 });
+
+Route::get('/dashboard/global', [DashboardController::class, 'global'])->name('dashboard.global');
+Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
+
 
 // Routes Organigramme - Groupe
 Route::prefix('groupe')->group(function () {
