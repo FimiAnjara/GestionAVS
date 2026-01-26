@@ -33,10 +33,13 @@ Route::get('/', function () {
     return redirect('/login');
 })->name('home');
 
-
-Route::get('/dashboard', function () {
+Route::get('/login', function () {
     return view('dashboard.dashboard');
 })->name('home');
+
+Route::get('/dashboard', function () {
+    return view('auth.login');
+})->name('login');
 
 // Routes Organigramme - Groupe
 Route::prefix('groupe')->group(function () {
