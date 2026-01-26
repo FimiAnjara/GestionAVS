@@ -17,6 +17,7 @@ use App\Http\Controllers\GroupeController;
 use App\Http\Controllers\EntiteController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');

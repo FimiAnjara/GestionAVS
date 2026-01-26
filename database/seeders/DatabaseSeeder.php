@@ -15,16 +15,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Charger tous les seeders
+        // Charger tous les seeders dans le bon ordre
         $this->call([
-            UtilisateurSeeder::class,
+            // 1. Tables de référence (sans dépendances)
+            RoleSeeder::class,
+            DepartementSeeder::class,
             CategorieSeeder::class,
             UniteSeeder::class,
-            ClientSeeder::class,
-            FournisseurSeeder::class,
-            OrganigrammeSeeder::class,
             TypeEvaluationStockSeeder::class,
             TypeMvtStockSeeder::class,
+            
+            // 2. Organigramme (Groupe -> Entite -> Site -> Magasin)
+            OrganigrammeSeeder::class,
+            
+            // 3. Utilisateurs (dépend de Role, Departement, Entite, Site, Magasin)
+            UtilisateurSeeder::class,
+            
+            // 4. Données métier
+            ClientSeeder::class,
+            FournisseurSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
         ]);
