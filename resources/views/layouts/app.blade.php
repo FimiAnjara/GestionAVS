@@ -248,7 +248,7 @@
                         @endif
                     </div>
                 </li>
-                @endif
+               
                 @endif
 
                 <!-- SECTION TIERS -->
