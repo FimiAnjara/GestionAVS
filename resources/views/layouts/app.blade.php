@@ -196,33 +196,6 @@
                 </li>
                 @endif
 
-                <!-- PROFORMA CLIENT MENU (pour compatibilité) -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'proforma'))
-                <li class="has-submenu {{ request()->is('proforma*') && !request()->is('proforma-fournisseur*') && !request()->is('proforma-client*') ? 'active' : '' }}">
-                    <a href="#" class="toggle-submenu">
-                        <i class="bi bi-file-earmark-text"></i>
-                        <span class="menu-text">Proforma Client</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('proforma*') && !request()->is('proforma-fournisseur*') && !request()->is('proforma-client*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'proforma', 'create'))
-                        <a href="{{ route('proforma.create') }}"
-                            class="submenu-item {{ request()->is('proforma/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'proforma', 'list'))
-                        <a href="{{ route('proforma.list') }}"
-                            class="submenu-item {{ request()->is('proforma/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-
                 <!-- COMMANDE CLIENT MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'commande'))
                 <li class="has-submenu {{ request()->is('commande*') ? 'active' : '' }}">
