@@ -196,33 +196,6 @@
                 </li>
                 @endif
 
-                <!-- COMMANDE CLIENT MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'commande'))
-                <li class="has-submenu {{ request()->is('commande*') ? 'active' : '' }}">
-                    <a href="#" class="toggle-submenu">
-                        <i class="bi bi-cart"></i>
-                        <span class="menu-text">Commande Client</span>
-                    </a>
-                    <div class="sidebar-submenu"
-                        style="{{ request()->is('commande*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'commande', 'create'))
-                        <a href="{{ route('commande.create') }}"
-                            class="submenu-item {{ request()->is('commande/create') ? 'active' : '' }}">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Saisie</span>
-                        </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'commande', 'list'))
-                        <a href="{{ route('commande.list') }}"
-                            class="submenu-item {{ request()->is('commande/list') ? 'active' : '' }}">
-                            <i class="bi bi-list-ul"></i>
-                            <span>Liste</span>
-                        </a>
-                        @endif
-                    </div>
-                </li>
-                @endif
-
                 <!-- BON DE COMMANDE CLIENT MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande-client'))
                 <li class="has-submenu {{ request()->is('bon-commande-client*') ? 'active' : '' }}">
@@ -277,25 +250,25 @@
                 </li>
                 @endif
 
-                <!-- BON DE LIVRAISON MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison'))
-                <li class="has-submenu {{ request()->is('bon-livraison*') ? 'active' : '' }}">
+                <!-- BON DE LIVRAISON CLIENT MENU -->
+                @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison-client'))
+                <li class="has-submenu {{ request()->is('bon-livraison-client*') ? 'active' : '' }}">
                     <a href="#" class="toggle-submenu">
                         <i class="bi bi-truck"></i>
                         <span class="menu-text">Bon de Livraison</span>
                     </a>
                     <div class="sidebar-submenu"
-                        style="{{ request()->is('bon-livraison*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison', 'create'))
-                        <a href="{{ route('bon-livraison.create') }}"
-                            class="submenu-item {{ request()->is('bon-livraison/create') ? 'active' : '' }}">
+                        style="{{ request()->is('bon-livraison-client*') ? 'display: block;' : 'display: none;' }}">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison-client', 'create'))
+                        <a href="{{ route('bon-livraison-client.create') }}"
+                            class="submenu-item {{ request()->is('bon-livraison-client/create') ? 'active' : '' }}">
                             <i class="bi bi-pencil-square"></i>
                             <span>Saisie</span>
                         </a>
                         @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison', 'list'))
-                        <a href="{{ route('bon-livraison.list') }}"
-                            class="submenu-item {{ request()->is('bon-livraison/list') ? 'active' : '' }}">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison-client', 'list'))
+                        <a href="{{ route('bon-livraison-client.list') }}"
+                            class="submenu-item {{ request()->is('bon-livraison-client/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>

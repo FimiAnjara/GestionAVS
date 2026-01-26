@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleFille;
 use App\Models\Categorie;
 use App\Models\Unite;
 use App\Models\Entite;
 use App\Models\TypeEvaluationStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
     public function index()
     {
-        $query = Article::with(['categorie', 'unite', 'entite'])
+        $query = Article::with(['categorie', 'unite', 'entite', 'articleFille'])
             ->whereNull('deleted_at');
         
         // Filtres
@@ -57,7 +59,7 @@ class ArticleController extends Controller
 
     public function edit($id)
     {
-        $article = Article::findOrFail($id);
+        $article = Article::with('articleFille')->findOrFail($id);
         $categories = Categorie::whereNull('deleted_at')->get();
         $unites = Unite::whereNull('deleted_at')->get();
         $entites = Entite::whereNull('deleted_at')->get();
@@ -73,10 +75,13 @@ class ArticleController extends Controller
             'id_unite' => 'required|exists:unite,id_unite',
             'id_entite' => 'required|exists:entite,id_entite',
             'id_type_evaluation_stock' => 'required|exists:type_evaluation_stock,id_type_evaluation_stock',
+            'prix_vente' => 'required|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         try {
+            DB::beginTransaction();
+
             $photoPath = null;
             if ($request->hasFile('photo')) {
                 $photoPath = $request->file('photo')->store('articles', 'public');
@@ -84,7 +89,7 @@ class ArticleController extends Controller
 
             $idArticle = 'ART-' . time();
             
-            Article::create([
+            $article = Article::create([
                 'id_article' => $idArticle,
                 'nom' => $validated['nom'],
                 'id_categorie' => $validated['id_categorie'],
@@ -94,21 +99,34 @@ class ArticleController extends Controller
                 'photo' => $photoPath,
             ]);
 
+            // Créer ArticleFille avec le prix de vente
+            ArticleFille::create([
+                'id_articleFille' => 'AF-' . time(),
+                'id_article' => $idArticle,
+                'prix' => $validated['prix_vente'],
+                'date_' => now(),
+                'quantite' => 0,
+                'id_unite' => $validated['id_unite'],
+            ]);
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Article ajouté avec succès'
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'ajout de l\'article'
+                'message' => 'Erreur lors de l\'ajout de l\'article: ' . $e->getMessage()
             ], 500);
         }
     }
 
     public function show($id)
     {
-        $article = Article::with(['categorie', 'unite', 'entite', 'typeEvaluation'])->findOrFail($id);
+        $article = Article::with(['categorie', 'unite', 'entite', 'typeEvaluation', 'articleFille'])->findOrFail($id);
         return view('articles.show', compact('article'));
     }
 
@@ -122,10 +140,13 @@ class ArticleController extends Controller
             'id_unite' => 'required|exists:unite,id_unite',
             'id_entite' => 'required|exists:entite,id_entite',
             'id_type_evaluation_stock' => 'required|exists:type_evaluation_stock,id_type_evaluation_stock',
+            'prix_vente' => 'required|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         try {
+            DB::beginTransaction();
+
             if ($request->hasFile('photo')) {
                 if ($article->photo) {
                     Storage::disk('public')->delete($article->photo);
@@ -133,16 +154,45 @@ class ArticleController extends Controller
                 $validated['photo'] = $request->file('photo')->store('articles', 'public');
             }
 
-            $article->update($validated);
+            $article->update([
+                'nom' => $validated['nom'],
+                'id_categorie' => $validated['id_categorie'],
+                'id_unite' => $validated['id_unite'],
+                'id_entite' => $validated['id_entite'],
+                'id_type_evaluation_stock' => $validated['id_type_evaluation_stock'],
+                'photo' => $validated['photo'] ?? $article->photo,
+            ]);
+
+            // Mettre à jour ou créer ArticleFille avec le prix de vente
+            $articleFille = ArticleFille::where('id_article', $id)->first();
+            if ($articleFille) {
+                $articleFille->update([
+                    'prix' => $validated['prix_vente'],
+                    'date_' => now(),
+                    'id_unite' => $validated['id_unite'],
+                ]);
+            } else {
+                ArticleFille::create([
+                    'id_articleFille' => 'AF-' . time(),
+                    'id_article' => $id,
+                    'prix' => $validated['prix_vente'],
+                    'date_' => now(),
+                    'quantite' => 0,
+                    'id_unite' => $validated['id_unite'],
+                ]);
+            }
+
+            DB::commit();
             
             return response()->json([
                 'success' => true,
                 'message' => 'Article modifié avec succès'
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la modification'
+                'message' => 'Erreur lors de la modification: ' . $e->getMessage()
             ], 500);
         }
     }

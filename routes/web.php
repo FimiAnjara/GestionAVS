@@ -195,6 +195,7 @@ Route::prefix('bon-commande')->group(function () {
     Route::get('/list', [BonCommandeController::class, 'list'])->name('bon-commande.list');
     Route::get('/create', [BonCommandeController::class, 'create'])->name('bon-commande.create');
     Route::get('/api/proforma/{id}', [BonCommandeController::class, 'getProformaData'])->name('bon-commande.api.proforma');
+    Route::get('/api/fournisseur/{id}', [BonCommandeController::class, 'getFournisseurData'])->name('bon-commande.api.fournisseur');
     Route::post('/', [BonCommandeController::class, 'store'])->name('bon-commande.store');
     Route::get('/{id}', [BonCommandeController::class, 'show'])->name('bon-commande.show');
     Route::get('/{id}/export-pdf', [BonCommandeController::class, 'exportPdf'])->name('bon-commande.exportPdf');
@@ -294,6 +295,7 @@ Route::prefix('bon-commande-client')->group(function () {
     Route::get('/list', [BonCommandeClientController::class, 'index'])->name('bon-commande-client.list');
     Route::get('/create', [BonCommandeClientController::class, 'create'])->name('bon-commande-client.create');
     Route::get('/api/proforma/{id}', [BonCommandeClientController::class, 'getProformaData'])->name('bon-commande-client.api.proforma');
+    Route::get('/api/client/{id}', [BonCommandeClientController::class, 'getClientData'])->name('bon-commande-client.api.client');
     Route::post('/', [BonCommandeClientController::class, 'store'])->name('bon-commande-client.store');
     Route::get('/{id}', [BonCommandeClientController::class, 'show'])->name('bon-commande-client.show');
     Route::get('/{id}/export-pdf', [BonCommandeClientController::class, 'exportPdf'])->name('bon-commande-client.exportPdf');

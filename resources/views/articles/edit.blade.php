@@ -118,6 +118,22 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
+                                <label for="prix_vente" class="form-label">
+                                    <i class="bi bi-currency-exchange"></i> Prix de Vente (Ar) <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control @error('prix_vente') is-invalid @enderror" 
+                                       id="prix_vente" name="prix_vente" 
+                                       value="{{ $article->articleFille->first()?->prix ?? 0 }}" 
+                                       placeholder="0.00" min="0" step="0.01" required>
+                                <small class="text-muted">Prix unitaire de vente</small>
+                                @error('prix_vente')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="photo" class="form-label">
                                     <i class="bi bi-image"></i> Photo
                                 </label>

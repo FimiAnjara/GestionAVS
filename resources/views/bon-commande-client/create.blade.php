@@ -33,21 +33,49 @@
                     </div>
                     
                     <div class="col-lg-5">
-                        <label for="id_proforma_client" class="form-label">
-                            <i class="bi bi-file-earmark-check me-2" style="color: #0056b3;"></i>
-                            Proforma Sourcée
-                        </label>
-                        <select class="form-select searchable-select @error('id_proforma_client') is-invalid @enderror" 
-                            id="id_proforma_client" name="id_proforma_client">
-                            <option value="">-- Sélectionner une proforma (optionnel) --</option>
-                            @foreach ($proformas as $proforma)
-                                <option value="{{ $proforma->id_proforma_client }}"
-                                    {{ old('id_proforma_client', $proformaClient?->id_proforma_client) == $proforma->id_proforma_client ? 'selected' : '' }}>
-                                    {{ $proforma->id_proforma_client }} - {{ $proforma->client->nom }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_proforma_client') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-proforma" data-bs-toggle="tab" data-bs-target="#panel-proforma" type="button" role="tab">Proforma</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-client" data-bs-toggle="tab" data-bs-target="#panel-client" type="button" role="tab">Client Direct</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content border border-top-0 p-2">
+                            <div class="tab-pane fade show active" id="panel-proforma" role="tabpanel">
+                                <label for="id_proforma_client" class="form-label">
+                                    <i class="bi bi-file-earmark-check me-2" style="color: #0056b3;"></i>
+                                    Proforma Sourcée
+                                </label>
+                                <select class="form-select searchable-select @error('id_proforma_client') is-invalid @enderror" 
+                                    id="id_proforma_client" name="id_proforma_client">
+                                    <option value="">-- Sélectionner une proforma (optionnel) --</option>
+                                    @foreach ($proformas as $proforma)
+                                        <option value="{{ $proforma->id_proforma_client }}"
+                                            {{ old('id_proforma_client', $proformaClient?->id_proforma_client) == $proforma->id_proforma_client ? 'selected' : '' }}>
+                                            {{ $proforma->id_proforma_client }} - {{ $proforma->client->nom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_proforma_client') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="tab-pane fade" id="panel-client" role="tabpanel">
+                                <label for="id_client_direct" class="form-label">
+                                    <i class="bi bi-person me-2" style="color: #0056b3;"></i>
+                                    Sélectionner un Client <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select searchable-select @error('id_client_direct') is-invalid @enderror" 
+                                    id="id_client_direct" name="id_client_direct">
+                                    <option value="">-- Sélectionner un client --</option>
+                                    @foreach ($clients as $client)
+                                        <option value="{{ $client->id_client }}">
+                                            {{ $client->nom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_client_direct') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-4 text-end d-flex align-items-end justify-content-end">
@@ -233,6 +261,15 @@
         $(document).ready(function() {
             initSelect2();
 
+            // Gérer le changement de tab
+            $('#tab-proforma, #tab-client').on('click', function() {
+                // Réinitialiser les sélections
+                $('#id_proforma_client').val('').trigger('change');
+                $('#id_client_direct').val('').trigger('change');
+                $('#client-display').text('---');
+                $('#id_client').val('');
+            });
+
             // Filter logic
             $('#id_magasin').on('change', function() {
                 const magasinId = $(this).val();
@@ -300,6 +337,33 @@
                                 });
                                 calculateGrandTotal();
                             }
+                        }
+                    });
+                }
+            });
+
+            // Écouter le changement du select client direct
+            $('#id_client_direct').on('change select2:select', function() {
+                const clientId = $(this).val();
+                
+                if (clientId) {
+                    $.ajax({
+                        url: '{{ route("bon-commande-client.api.client", ":id") }}'.replace(':id', clientId),
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            $('#client-display').text(data.client_nom);
+                            $('#id_client').val(data.client_id);
+                            
+                            // Vider les articles si le client change sans proforma
+                            const container = document.getElementById('articles-container');
+                            container.innerHTML = ''; 
+                            
+                            const magasinId = $('#id_magasin').val();
+                            const selectedMagasin = magasins.find(m => m.id === magasinId);
+                            const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+                            addArticleRow(null, 0, entiteId);
+                            calculateGrandTotal();
                         }
                     });
                 }

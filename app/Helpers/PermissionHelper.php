@@ -183,7 +183,7 @@ class PermissionHelper
                     'commande' => ['create', 'list'],
                     'bon-commande-client' => ['create', 'list'],
                     'facture-client' => ['create', 'list'],
-                    'bon-livraison' => ['create', 'list'],
+                    'bon-livraison-client' => ['create', 'list'],
                     'clients' => ['create', 'list'],
                     'fournisseurs' => ['create', 'list'],
                     'articles' => ['create', 'list'],

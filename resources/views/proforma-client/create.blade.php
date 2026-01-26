@@ -111,7 +111,8 @@
                                             @foreach ($articles as $article)
                                                 <option value="{{ $article->id_article }}"
                                                     data-unite="{{ $article->unite?->libelle }}"
-                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
+                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}"
+                                                    data-prix="{{ $article->articleFille->first()?->prix ?? 0 }}">
                                                     {{ $article->id_article }} - {{ $article->nom }}
                                                 </option>
                                             @endforeach
@@ -209,6 +210,7 @@ $(document).ready(function() {
                 <option value="${art.id}" 
                     data-unite="${art.unite}" 
                     data-photo="${art.photo}"
+                    data-prix="${art.prix_vente || 0}"
                     ${isSelected}>
                     ${art.id} - ${art.nom}
                 </option>
@@ -285,9 +287,11 @@ $(document).ready(function() {
         const selected = $(this).find(':selected');
         const photoUrl = selected.data('photo');
         const unit = selected.data('unite');
+        const prix = selected.data('prix') || 0;
         const row = $(this).closest('tr');
         const container = row.find('.article-photo-container');
         const unitDisplay = row.find('.article-unite');
+        const prixInput = row.find('.prix-input');
         
         if (photoUrl) {
             container.html(`<img src="${photoUrl}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">`);
@@ -296,6 +300,16 @@ $(document).ready(function() {
         }
 
         unitDisplay.text(unit || '-');
+        
+        // Pré-remplir le prix de vente
+        if (prix > 0) {
+            prixInput.val(prix);
+            // Recalculer le total de la ligne
+            const qty = parseFloat(row.find('.quantite-input').val()) || 0;
+            const total = qty * prix;
+            row.find('.row-total').text(total.toLocaleString('fr-FR'));
+            calculateGrandTotal();
+        }
     });
 
     $(document).on('input', '.quantite-input, .prix-input', function() {

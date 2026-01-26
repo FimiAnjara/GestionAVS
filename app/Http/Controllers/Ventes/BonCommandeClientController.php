@@ -56,17 +56,19 @@ class BonCommandeClientController extends Controller
         }
 
         $proformas = ProformaClient::where('etat', 11)->get(); // Validée
+        $clients = Client::all();
         $magasins = Magasin::with('site.entite')->get();
-        $articles = Article::with('unite')->get();
+        $articles = Article::with(['unite', 'articleFille'])->get();
         $articlesJS = $articles->map(fn($a) => [
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
             'id_entite' => $a->id_entite,
-            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : '',
+            'prix_vente' => $a->articleFille->first()?->prix ?? 0,
         ])->values();
 
-        return view('bon-commande-client.create', compact('proformas', 'magasins', 'articles', 'proformaClient', 'articlesProforma', 'descriptionProforma', 'idMagasinProforma', 'articlesJS'));
+        return view('bon-commande-client.create', compact('proformas', 'clients', 'magasins', 'articles', 'proformaClient', 'articlesProforma', 'descriptionProforma', 'idMagasinProforma', 'articlesJS'));
     }
 
     public function store(Request $request)
@@ -142,6 +144,20 @@ class BonCommandeClientController extends Controller
                     'prix' => $item->prix,
                 ];
             }),
+        ]);
+    }
+
+    public function getClientData($id)
+    {
+        $client = Client::find($id);
+        
+        if (!$client) {
+            return response()->json(['error' => 'Client non trouvé'], 404);
+        }
+        
+        return response()->json([
+            'client_id' => $client->id_client,
+            'client_nom' => $client->nom,
         ]);
     }
 

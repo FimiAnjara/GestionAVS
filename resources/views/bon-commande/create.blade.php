@@ -59,21 +59,49 @@
                     </div>
                     
                     <div class="col-lg-5">
-                        <label for="id_proformaFournisseur" class="form-label">
-                            <i class="bi bi-file-earmark-check me-2" style="color: #0056b3;"></i>
-                            Proforma Sourcée <span class="text-danger">*</span>
-                        </label>
-                        <select class="form-select searchable-select @error('id_proformaFournisseur') is-invalid @enderror" 
-                            id="id_proformaFournisseur" name="id_proformaFournisseur" required>
-                            <option value="">-- Sélectionner une proforma --</option>
-                            @foreach ($proformas as $proforma)
-                                <option value="{{ $proforma->id_proformaFournisseur }}"
-                                    {{ old('id_proformaFournisseur', $proformaFournisseur?->id_proformaFournisseur) == $proforma->id_proformaFournisseur ? 'selected' : '' }}>
-                                    {{ $proforma->id_proformaFournisseur }} - {{ $proforma->fournisseur->nom }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_proformaFournisseur') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-proforma" data-bs-toggle="tab" data-bs-target="#panel-proforma" type="button" role="tab">Proforma</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-fournisseur" data-bs-toggle="tab" data-bs-target="#panel-fournisseur" type="button" role="tab">Fournisseur Direct</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content border border-top-0 p-2">
+                            <div class="tab-pane fade show active" id="panel-proforma" role="tabpanel">
+                                <label for="id_proformaFournisseur" class="form-label">
+                                    <i class="bi bi-file-earmark-check me-2" style="color: #0056b3;"></i>
+                                    Proforma Sourcée <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select searchable-select @error('id_proformaFournisseur') is-invalid @enderror" 
+                                    id="id_proformaFournisseur" name="id_proformaFournisseur">
+                                    <option value="">-- Sélectionner une proforma --</option>
+                                    @foreach ($proformas as $proforma)
+                                        <option value="{{ $proforma->id_proformaFournisseur }}"
+                                            {{ old('id_proformaFournisseur', $proformaFournisseur?->id_proformaFournisseur) == $proforma->id_proformaFournisseur ? 'selected' : '' }}>
+                                            {{ $proforma->id_proformaFournisseur }} - {{ $proforma->fournisseur->nom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_proformaFournisseur') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="tab-pane fade" id="panel-fournisseur" role="tabpanel">
+                                <label for="id_fournisseur_direct" class="form-label">
+                                    <i class="bi bi-building me-2" style="color: #0056b3;"></i>
+                                    Sélectionner un Fournisseur <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select searchable-select @error('id_fournisseur_direct') is-invalid @enderror" 
+                                    id="id_fournisseur_direct" name="id_fournisseur_direct">
+                                    <option value="">-- Sélectionner un fournisseur --</option>
+                                    @foreach ($fournisseurs as $fournisseur)
+                                        <option value="{{ $fournisseur->id_fournisseur }}">
+                                            {{ $fournisseur->nom }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_fournisseur_direct') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-4 text-end d-flex align-items-end justify-content-end">
@@ -256,6 +284,15 @@
             // Initialiser Select2
             initSelect2();
             
+            // Gérer le changement de tab
+            $('#tab-proforma, #tab-fournisseur').on('click', function() {
+                // Réinitialiser les sélections
+                $('#id_proformaFournisseur').val('').trigger('change');
+                $('#id_fournisseur_direct').val('').trigger('change');
+                $('#fournisseur-display').text('---');
+                $('#id_fournisseur').val('');
+            });
+            
             // Écouter le changement du select proforma (et select2:select)
             $('#id_proformaFournisseur').on('change select2:select', function() {
                 const proformaId = $(this).val();
@@ -291,6 +328,29 @@
                                 });
                                 calculateGrandTotal();
                             }
+                        }
+                    });
+                }
+            });
+
+            // Écouter le changement du select fournisseur direct
+            $('#id_fournisseur_direct').on('change select2:select', function() {
+                const fournisseurId = $(this).val();
+                
+                if (fournisseurId) {
+                    $.ajax({
+                        url: '{{ route("bon-commande.api.fournisseur", ":id") }}'.replace(':id', fournisseurId),
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            $('#fournisseur-display').text(data.fournisseur_nom);
+                            $('#id_fournisseur').val(data.fournisseur_id);
+                            
+                            // Vider les articles si le fournisseur change sans proforma
+                            const container = document.getElementById('articles-container');
+                            container.innerHTML = ''; 
+                            addArticleRow(null, 0);
+                            calculateGrandTotal();
                         }
                     });
                 }

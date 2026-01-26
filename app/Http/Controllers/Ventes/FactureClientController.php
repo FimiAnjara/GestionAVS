@@ -47,13 +47,14 @@ class FactureClientController extends Controller
             }
         }
 
-        $articles = Article::with('unite')->get();
+        $articles = Article::with(['unite', 'articleFille'])->get();
         $articlesJS = $articles->map(fn($a) => [
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
             'id_entite' => $a->id_entite,
-            'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
+            'photo' => $a->photo ? asset('storage/' . $a->photo) : '',
+            'prix_vente' => $a->articleFille->first()?->prix ?? 0,
         ])->values();
 
         return view('facture-client.create', compact('bonCommande', 'articles', 'articlesJS'));

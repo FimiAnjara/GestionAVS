@@ -203,6 +203,21 @@ class BonCommandeController extends Controller
             }),
         ]);
     }
+
+    public function getFournisseurData($id)
+    {
+        $fournisseur = Fournisseur::find($id);
+        
+        if (!$fournisseur) {
+            return response()->json(['error' => 'Fournisseur non trouvé'], 404);
+        }
+        
+        return response()->json([
+            'fournisseur_id' => $fournisseur->id_fournisseur,
+            'fournisseur_nom' => $fournisseur->nom,
+        ]);
+    }
+
     
     /**
      * Exporter en PDF
