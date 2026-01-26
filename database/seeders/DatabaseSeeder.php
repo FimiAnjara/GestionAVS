@@ -36,6 +36,12 @@ class DatabaseSeeder extends Seeder
             FournisseurSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
+            
+            // 5. Prix des articles
+            ArticleFillePrixSeeder::class,
+            
+            // 6. Ventes et achats
+            VentesSeeder::class,
         ]);
     }
 }

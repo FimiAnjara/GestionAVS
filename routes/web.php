@@ -9,6 +9,7 @@ use App\Http\Controllers\CaisseController;
 use App\Http\Controllers\MvtCaisseController;
 use App\Http\Controllers\ProformaFournisseurController;
 use App\Http\Controllers\BonCommandeController;
+use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\FactureFournisseurController;
 use App\Http\Controllers\BonReceptionController;
 use App\Http\Controllers\MvtStockController;
@@ -188,6 +189,13 @@ Route::prefix('proforma-fournisseur')->group(function () {
     Route::get('/{id}/export-pdf', [ProformaFournisseurController::class, 'exportPdf'])->name('proforma-fournisseur.exportPdf');
     Route::post('/{id}/etat', [ProformaFournisseurController::class, 'changerEtat'])->name('proforma-fournisseur.etat');
     Route::delete('/{id}', [ProformaFournisseurController::class, 'destroy'])->name('proforma-fournisseur.destroy');
+});
+
+// Routes Commande Client (simple)
+Route::prefix('commande')->group(function () {
+    Route::get('/list', [CommandeController::class, 'list'])->name('commande.list');
+    Route::get('/{id}', [CommandeController::class, 'show'])->name('commande.show');
+    Route::delete('/{id}', [CommandeController::class, 'destroy'])->name('commande.destroy');
 });
 
 // Routes Bon de Commande

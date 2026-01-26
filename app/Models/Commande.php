@@ -15,6 +15,10 @@ class Commande extends Model
     public $incrementing = false;
 
     protected $fillable = ['id_commande', 'date_', 'etat', 'id_utilisateur', 'id_client'];
+    
+    protected $casts = [
+        'date_' => 'datetime',
+    ];
 
     public function utilisateur()
     {

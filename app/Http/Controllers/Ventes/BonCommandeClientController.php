@@ -85,7 +85,7 @@ class BonCommandeClientController extends Controller
         try {
             DB::beginTransaction();
 
-            $bc = BonCommandeClient::create([
+            $bc = BonCommandeClient::create([ 
                 'date_' => $request->date_,
                 'id_client' => $request->id_client,
                 'id_proforma_client' => $request->id_proforma_client,
