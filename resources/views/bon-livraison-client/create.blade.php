@@ -54,8 +54,8 @@
                     <div class="col-lg-4 text-end d-flex align-items-end justify-content-end">
                         <div class="bg-light p-2 rounded border w-100 text-start">
                             <small class="text-muted d-block">Client :</small>
-                            <strong id="client-display">---</strong>
-                            <input type="hidden" name="id_client" id="id_client" value="{{ old('id_client') }}">
+                            <strong id="client-display">{{ $bonCommandePreselected->client->nom ?? '---' }}</strong>
+                            <input type="hidden" name="id_client" id="id_client" value="{{ old('id_client', $bonCommandePreselected?->id_client) }}">
                         </div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@
                             id="id_magasin" name="id_magasin" required>
                             <option value="">-- Sélectionner un magasin --</option>
                             @foreach ($magasins as $mag)
-                                <option value="{{ $mag->id_magasin }}" {{ old('id_magasin') == $mag->id_magasin ? 'selected' : '' }}>
+                                <option value="{{ $mag->id_magasin }}" {{ old('id_magasin', $bonCommandePreselected?->id_magasin) == $mag->id_magasin ? 'selected' : '' }}>
                                     [{{ $mag->site?->entite?->nom ?? 'N/A' }}] {{ $mag->site?->localisation ?? 'N/A' }} - {{ $mag->nom ?? $mag->designation }}
                                 </option>
                             @endforeach
@@ -80,7 +80,7 @@
                     <div class="col-lg-6 text-end d-flex align-items-end justify-content-end">
                         <div class="bg-light p-2 rounded border w-100 text-start">
                             <small class="text-muted d-block">Description (optionnel) :</small>
-                            <textarea class="form-control" name="description" rows="1">{{ old('description') }}</textarea>
+                            <textarea class="form-control" id="description" name="description" rows="1">{{ old('description', $bonCommandePreselected?->description) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -103,36 +103,78 @@
                                 </tr>
                             </thead>
                             <tbody id="articles-container">
-                                <tr class="article-row">
-                                    <td class="text-center article-photo-container">
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-image text-muted"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm searchable-select article-select" name="articles[0][id_article]" required>
-                                            <option value="">-- Sélectionner --</option>
-                                            @foreach ($articles as $article)
-                                                <option value="{{ $article->id_article }}"
-                                                    data-unite="{{ $article->unite?->libelle }}"
-                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
-                                                    {{ $article->id_article }} - {{ $article->nom }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success article-unite">-</span>
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm" name="articles[0][quantite]" placeholder="0" min="0.01" step="any" required>
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-danger btn-remove-article" style="display: none;">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                @if($bonCommandePreselected && $bonCommandePreselected->bonCommandeClientFille->count() > 0)
+                                    @foreach($bonCommandePreselected->bonCommandeClientFille as $index => $item)
+                                        <tr class="article-row">
+                                            <td class="text-center article-photo-container">
+                                                @if($item->article?->photo)
+                                                    <img src="{{ asset('storage/' . $item->article->photo) }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <select class="form-select form-select-sm searchable-select article-select @error('articles.'.$index.'.id_article') is-invalid @enderror"
+                                                    name="articles[{{ $index }}][id_article]" required>
+                                                    <option value="">-- Sélectionner --</option>
+                                                    @foreach ($articles as $article)
+                                                        <option value="{{ $article->id_article }}"
+                                                            data-unite="{{ $article->unite?->libelle }}"
+                                                            data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}"
+                                                            {{ old('articles.'.$index.'.id_article', $item->id_article) == $article->id_article ? 'selected' : '' }}>
+                                                            {{ $article->id_article }} - {{ $article->nom }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success article-unite">{{ $item->article?->unite?->libelle ?? '-' }}</span>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm" name="articles[{{ $index }}][quantite]" 
+                                                    value="{{ old('articles.'.$index.'.quantite', $item->quantite) }}" placeholder="0" min="0.01" step="any" required>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-danger btn-remove-article">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr class="article-row">
+                                        <td class="text-center article-photo-container">
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm searchable-select article-select" name="articles[0][id_article]" required>
+                                                <option value="">-- Sélectionner --</option>
+                                                @foreach ($articles as $article)
+                                                    <option value="{{ $article->id_article }}"
+                                                        data-unite="{{ $article->unite?->libelle }}"
+                                                        data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
+                                                        {{ $article->id_article }} - {{ $article->nom }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success article-unite">-</span>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" name="articles[0][quantite]" placeholder="0" min="0.01" step="any" required>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-danger btn-remove-article" style="display: none;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -166,10 +208,49 @@
 @endpush
     
     <script>
-        const articlesData = @json($articlesJS);
+        const articlesJS = @json($articlesJS);
+        const magasins = @json($magasins->map(fn($m) => ['id' => $m->id_magasin, 'id_entite' => $m->site?->id_entite]));
         
         $(document).ready(function() {
             initSelect2();
+
+            // Filter logic
+            $('#id_magasin').on('change', function() {
+                const magasinId = $(this).val();
+                const selectedMagasin = magasins.find(m => m.id === magasinId);
+                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+                
+                $('.article-select').each(function() {
+                    filterArticleDropdown($(this), entiteId);
+                });
+            });
+
+            function filterArticleDropdown(selectElement, entiteId) {
+                const currentValue = selectElement.val();
+                selectElement.empty().append('<option value="">-- Sélectionner --</option>');
+                
+                const filteredArticles = entiteId 
+                    ? articlesJS.filter(a => a.id_entite === entiteId)
+                    : articlesJS;
+
+                filteredArticles.forEach(art => {
+                    const isSelected = art.id === currentValue ? 'selected' : '';
+                    selectElement.append(`
+                        <option value="${art.id}" 
+                            data-unite="${art.unite}" 
+                            data-photo="${art.photo}"
+                            ${isSelected}>
+                            ${art.id} - ${art.nom}
+                        </option>
+                    `);
+                });
+
+                if (currentValue && !filteredArticles.find(a => a.id === currentValue)) {
+                    selectElement.val('').trigger('change');
+                } else {
+                    selectElement.trigger('change.select2');
+                }
+            }
             
             // Écouter le changement du bon de commande
             $('#id_bon_commande_client').on('change select2:select', function() {
@@ -182,12 +263,24 @@
                         success: function(data) {
                             $('#client-display').text(data.client_nom);
                             $('#id_client').val(data.client_id);
-                            if (data.id_magasin) $('#id_magasin').val(data.id_magasin).trigger('change');
+                            
+                            if (data.id_magasin) {
+                                $('#id_magasin').val(data.id_magasin).trigger('change');
+                            }
+
+                            if (data.description) {
+                                $('#description').val(data.description);
+                            }
                             
                             const container = document.getElementById('articles-container');
                             container.innerHTML = ''; 
                             if (data.articles && data.articles.length > 0) {
-                                data.articles.forEach((article, index) => { addArticleRow(article, index); });
+                                const selectedMagasin = magasins.find(m => m.id === data.id_magasin);
+                                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+
+                                data.articles.forEach((article, index) => {
+                                    addArticleRow(article, index, entiteId);
+                                });
                             }
                         }
                     });
@@ -196,7 +289,10 @@
 
             $('#btn-add-article').on('click', function() {
                 const index = $('.article-row').length;
-                addArticleRow(null, index);
+                const magasinId = $('#id_magasin').val();
+                const selectedMagasin = magasins.find(m => m.id === magasinId);
+                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+                addArticleRow(null, index, entiteId);
             });
 
             $(document).on('click', '.btn-remove-article', function() { $(this).closest('tr').remove(); updateRemoveButtons(); });
@@ -209,25 +305,32 @@
                 row.find('.article-photo-container').html(photo ? `<img src="${photo}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`);
             });
 
-            function addArticleRow(data = null, index) {
+            function addArticleRow(data = null, index, entiteId = null) {
                 const container = document.getElementById('articles-container');
-                let options = '<option value="">-- Sélectionner --</option>';
-                articlesData.forEach(art => {
-                    const selected = data && art.id === data.id_article ? 'selected' : '';
-                    options += `<option value="${art.id}" ${selected} data-unite="${art.unite}" data-photo="${art.photo}">${art.id} - ${art.nom}</option>`;
-                });
-                const photoHtml = data && data.photo ? `<img src="${data.photo}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`;
                 const rowHtml = `
                     <tr class="article-row">
-                        <td class="text-center article-photo-container">${photoHtml}</td>
-                        <td><select class="form-select form-select-sm searchable-select article-select" name="articles[${index}][id_article]" required>${options}</select></td>
+                        <td class="text-center article-photo-container">
+                            ${data && data.photo ? `<img src="${data.photo}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`}
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm searchable-select article-select" name="articles[${index}][id_article]" required>
+                                <option value="">-- Sélectionner --</option>
+                            </select>
+                        </td>
                         <td class="text-center"><span class="badge bg-success article-unite">${data ? (data.unite || '-') : '-'}</span></td>
                         <td><input type="number" class="form-control form-control-sm" name="articles[${index}][quantite]" value="${data ? data.quantite : ''}" placeholder="0" min="0.01" step="any" required></td>
                         <td class="text-center"><button type="button" class="btn btn-sm btn-danger btn-remove-article"><i class="bi bi-trash"></i></button></td>
                     </tr>
                 `;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                initSelect2($(container).find('.searchable-select:last'));
+                
+                const newSelect = $(container).find('.article-select:last');
+                filterArticleDropdown(newSelect, entiteId);
+                if (data) {
+                    newSelect.val(data.id_article).trigger('change.select2');
+                }
+                
+                initSelect2(newSelect);
                 updateRemoveButtons();
             }
 

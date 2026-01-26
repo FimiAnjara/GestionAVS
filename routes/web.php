@@ -259,6 +259,8 @@ Route::prefix('proforma-client')->group(function () {
     Route::get('/{id}', [ProformaClientController::class, 'show'])->name('proforma-client.show');
     Route::get('/{id}/export-pdf', [ProformaClientController::class, 'exportPdf'])->name('proforma-client.exportPdf');
     Route::post('/{id}/etat', [ProformaClientController::class, 'changeEtat'])->name('proforma-client.etat');
+    Route::get('/{id}/edit', [ProformaClientController::class, 'edit'])->name('proforma-client.edit');
+    Route::put('/{id}', [ProformaClientController::class, 'update'])->name('proforma-client.update');
     Route::delete('/{id}', [ProformaClientController::class, 'destroy'])->name('proforma-client.destroy');
 });
 

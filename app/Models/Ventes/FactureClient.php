@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Ventes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Client;
 
 class FactureClient extends Model
 {
@@ -15,6 +16,17 @@ class FactureClient extends Model
     public $incrementing = false;
 
     protected $fillable = ['id_facture_client', 'date_', 'description', 'id_client', 'id_bon_commande_client', 'etat'];
+    protected $casts = ['date_' => 'date'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->id_facture_client) {
+                $model->id_facture_client = 'FACT_' . strtoupper(uniqid());
+            }
+        });
+    }
 
     public function client()
     {

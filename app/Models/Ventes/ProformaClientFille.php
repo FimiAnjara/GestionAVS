@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Ventes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Article;
 
 class ProformaClientFille extends Model
 {
@@ -15,6 +16,16 @@ class ProformaClientFille extends Model
     public $incrementing = false;
 
     protected $fillable = ['id_proforma_client_fille', 'id_proforma_client', 'id_article', 'quantite', 'prix'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->id_proforma_client_fille) {
+                $model->id_proforma_client_fille = 'PROFF_' . strtoupper(uniqid());
+            }
+        });
+    }
 
     public function proformaClient()
     {

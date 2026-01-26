@@ -31,8 +31,9 @@ class FactureClientController extends Controller
 
         $factures = $query->latest()->paginate(10);
         $clients = Client::all();
+        $magasins = Magasin::all();
 
-        return view('facture-client.list', compact('factures', 'clients'));
+        return view('facture-client.list', compact('factures', 'clients', 'magasins'));
     }
 
     public function create(Request $request)
@@ -51,6 +52,7 @@ class FactureClientController extends Controller
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
+            'id_entite' => $a->id_entite,
             'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
         ])->values();
 

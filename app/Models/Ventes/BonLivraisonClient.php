@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Ventes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Client;
+use App\Models\Magasin;
 
 class BonLivraisonClient extends Model
 {
@@ -14,7 +16,23 @@ class BonLivraisonClient extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id_bon_livraison_client', 'date_', 'description', 'id_bon_commande_client', 'id_magasin', 'id_mvt_stock', 'etat'];
+    protected $fillable = ['id_bon_livraison_client', 'date_', 'description', 'id_client', 'id_bon_commande_client', 'id_magasin', 'etat'];
+    protected $casts = ['date_' => 'date'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->id_bon_livraison_client) {
+                $model->id_bon_livraison_client = 'BLC_' . strtoupper(uniqid());
+            }
+        });
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'id_client', 'id_client');
+    }
 
     public function bonCommandeClient()
     {

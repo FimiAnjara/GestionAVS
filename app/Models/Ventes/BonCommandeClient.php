@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Ventes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Client;
+use App\Models\Magasin;
 
 class BonCommandeClient extends Model
 {
@@ -15,6 +17,17 @@ class BonCommandeClient extends Model
     public $incrementing = false;
 
     protected $fillable = ['id_bon_commande_client', 'date_', 'description', 'id_client', 'id_magasin', 'id_proforma_client', 'etat'];
+    protected $casts = ['date_' => 'date'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->id_bon_commande_client) {
+                $model->id_bon_commande_client = 'BCC_' . strtoupper(uniqid());
+            }
+        });
+    }
 
     public function client()
     {

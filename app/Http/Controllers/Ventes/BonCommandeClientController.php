@@ -62,6 +62,7 @@ class BonCommandeClientController extends Controller
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
+            'id_entite' => $a->id_entite,
             'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
         ])->values();
 

@@ -53,14 +53,21 @@ class BonLivraisonClientController extends Controller
         $bonCommandes = BonCommandeClient::where('etat', 11)->with('client', 'bonCommandeClientFille.article')->get();
         $magasins = Magasin::with('site.entite')->get();
         $articles = Article::with('unite')->get();
+        
+        $bonCommandePreselected = null;
+        if ($request->has('bon_commande_id')) {
+            $bonCommandePreselected = BonCommandeClient::with(['client', 'bonCommandeClientFille.article.unite'])->find($request->bon_commande_id);
+        }
+
         $articlesJS = $articles->map(fn($a) => [
             'id' => $a->id_article, 
             'nom' => $a->nom,
             'unite' => $a->unite?->libelle,
+            'id_entite' => $a->id_entite,
             'photo' => $a->photo ? asset('storage/' . $a->photo) : ''
         ])->values();
 
-        return view('bon-livraison-client.create', compact('bonCommandes', 'magasins', 'articles', 'articlesJS'));
+        return view('bon-livraison-client.create', compact('bonCommandes', 'magasins', 'articles', 'articlesJS', 'bonCommandePreselected'));
     }
 
     public function store(Request $request)
@@ -77,9 +84,7 @@ class BonLivraisonClientController extends Controller
         try {
             DB::beginTransaction();
 
-            $id_bl = 'BLC_' . uniqid();
             $bl = BonLivraisonClient::create([
-                'id_bon_livraison_client' => $id_bl,
                 'date_' => $request->date_,
                 'id_bon_commande_client' => $request->id_bon_commande_client,
                 'id_client' => $request->id_client,
@@ -90,7 +95,7 @@ class BonLivraisonClientController extends Controller
 
             foreach ($request->articles as $art) {
                 BonLivraisonClientFille::create([
-                    'id_bon_livraison_client' => $id_bl,
+                    'id_bon_livraison_client' => $bl->id_bon_livraison_client,
                     'id_article' => $art['id_article'],
                     'quantite' => $art['quantite'],
                 ]);
@@ -100,10 +105,10 @@ class BonLivraisonClientController extends Controller
             // Pour ce projet, on va le faire via une étape séparée ou automatique.
             // Le user a dit : "L'enregistrement de ce bon générera une Sortie de Stock automatique."
             
-            $this->validerEtSortirStock($id_bl);
+            $this->validerEtSortirStock($bl->id_bon_livraison_client);
 
             DB::commit();
-            return redirect()->route('bon-livraison-client.show', $id_bl)->with('success', 'Bon de livraison enregistré et stock sorti.');
+            return redirect()->route('bon-livraison-client.show', $bl->id_bon_livraison_client)->with('success', 'Bon de livraison enregistré et stock sorti.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Erreur : ' . $e->getMessage());
@@ -169,6 +174,7 @@ class BonLivraisonClientController extends Controller
             'client_id' => $bc->id_client,
             'client_nom' => $bc->client->nom,
             'id_magasin' => $bc->id_magasin,
+            'description' => $bc->description,
             'articles' => $bc->bonCommandeClientFille->map(function($item) {
                 return [
                     'id_article' => $item->id_article,

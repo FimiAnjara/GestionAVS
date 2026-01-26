@@ -227,10 +227,49 @@
     @endpush
 
     <script>
-        const articlesData = @json($articlesJS);
+        const articlesJS = @json($articlesJS);
+        const magasins = @json($magasins->map(fn($m) => ['id' => $m->id_magasin, 'id_entite' => $m->site?->id_entite]));
         
         $(document).ready(function() {
             initSelect2();
+
+            // Filter logic
+            $('#id_magasin').on('change', function() {
+                const magasinId = $(this).val();
+                const selectedMagasin = magasins.find(m => m.id === magasinId);
+                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+                
+                $('.article-select').each(function() {
+                    filterArticleDropdown($(this), entiteId);
+                });
+            });
+
+            function filterArticleDropdown(selectElement, entiteId) {
+                const currentValue = selectElement.val();
+                selectElement.empty().append('<option value="">-- Sélectionner --</option>');
+                
+                const filteredArticles = entiteId 
+                    ? articlesJS.filter(a => a.id_entite === entiteId)
+                    : articlesJS;
+
+                filteredArticles.forEach(art => {
+                    const isSelected = art.id === currentValue ? 'selected' : '';
+                    selectElement.append(`
+                        <option value="${art.id}" 
+                            data-unite="${art.unite}" 
+                            data-photo="${art.photo}"
+                            ${isSelected}>
+                            ${art.id} - ${art.nom}
+                        </option>
+                    `);
+                });
+
+                if (currentValue && !filteredArticles.find(a => a.id === currentValue)) {
+                    selectElement.val('').trigger('change');
+                } else {
+                    selectElement.trigger('change.select2');
+                }
+            }
             
             $('#id_proforma_client').on('change select2:select', function() {
                 const proformaId = $(this).val();
@@ -242,14 +281,22 @@
                         success: function(data) {
                             $('#client-display').text(data.client_nom);
                             $('#id_client').val(data.client_id);
-                            if (data.id_magasin) $('#id_magasin').val(data.id_magasin).trigger('change');
+                            
+                            // Trigger magasin change to filter articles
+                            if (data.id_magasin) {
+                                $('#id_magasin').val(data.id_magasin).trigger('change');
+                            }
+                            
                             if (data.description) $('#description').val(data.description);
                             
                             const container = document.getElementById('articles-container');
                             container.innerHTML = ''; 
                             if (data.articles && data.articles.length > 0) {
+                                const selectedMagasin = magasins.find(m => m.id === $('#id_magasin').val());
+                                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+
                                 data.articles.forEach((article, index) => {
-                                    addArticleRow(article, index);
+                                    addArticleRow(article, index, entiteId);
                                 });
                                 calculateGrandTotal();
                             }
@@ -260,7 +307,10 @@
 
             $('#btn-add-article').on('click', function() {
                 const index = $('.article-row').length;
-                addArticleRow(null, index);
+                const magasinId = $('#id_magasin').val();
+                const selectedMagasin = magasins.find(m => m.id === magasinId);
+                const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+                addArticleRow(null, index, entiteId);
             });
 
             $(document).on('click', '.btn-remove-article', function() {
@@ -289,24 +339,16 @@
                 calculateGrandTotal();
             });
 
-            function addArticleRow(data = null, index) {
+            function addArticleRow(data = null, index, entiteId = null) {
                 const container = document.getElementById('articles-container');
-                let options = '<option value="">-- Sélectionner --</option>';
-                articlesData.forEach(art => {
-                    const selected = data && art.id === data.id_article ? 'selected' : '';
-                    options += `<option value="${art.id}" ${selected} data-unite="${art.unite}" data-photo="${art.photo}">${art.id} - ${art.nom}</option>`;
-                });
-
-                const photoHtml = data && data.photo 
-                    ? `<img src="${data.photo}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">`
-                    : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`;
-
                 const rowHtml = `
                     <tr class="article-row">
-                        <td class="text-center article-photo-container">${photoHtml}</td>
+                        <td class="text-center article-photo-container">
+                            ${data && data.photo ? `<img src="${data.photo}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>`}
+                        </td>
                         <td>
                             <select class="form-select form-select-sm searchable-select article-select" name="articles[${index}][id_article]" required>
-                                ${options}
+                                <option value="">-- Sélectionner --</option>
                             </select>
                         </td>
                         <td class="text-center article-unite text-muted small">${data ? (data.unite || '-') : '-'}</td>
@@ -327,7 +369,14 @@
                     </tr>
                 `;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                initSelect2($(container).find('.article-select:last'));
+                
+                const newSelect = $(container).find('.article-select:last');
+                filterArticleDropdown(newSelect, entiteId);
+                if (data) {
+                    newSelect.val(data.id_article).trigger('change.select2');
+                }
+                
+                initSelect2(newSelect);
                 updateRemoveButtons();
             }
 

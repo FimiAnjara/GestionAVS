@@ -219,12 +219,55 @@
 
 <script>
 $(document).ready(function() {
+    const articlesJS = @json($articlesJS);
+    const bonCommande = @json($bonCommande);
+    
+    // In Facture create, id_magasin is usually implicit from BC but not explicitly selectable in the form shown.
+    // However, the user request says "in each entry page". 
+    // If id_magasin is not a select in this specific view but comes from BC, we filter based on BC's magasin.
+    
     initSelect2();
     let articleCount = {{ isset($bonCommande) ? $bonCommande->bonCommandeClientFille->count() : 0 }};
 
+    function filterArticleDropdown(selectElement, entiteId) {
+        const currentValue = selectElement.val();
+        selectElement.empty().append('<option value="">-- Sélectionner --</option>');
+        
+        const filteredArticles = entiteId 
+            ? articlesJS.filter(a => a.id_entite === entiteId)
+            : articlesJS;
+
+        filteredArticles.forEach(art => {
+            const isSelected = art.id === currentValue ? 'selected' : '';
+            selectElement.append(`
+                <option value="${art.id}" 
+                    data-unite="${art.unite}" 
+                    data-photo="${art.photo}"
+                    ${isSelected}>
+                    ${art.id} - ${art.nom}
+                </option>
+            `);
+        });
+
+        if (currentValue && !filteredArticles.find(a => a.id === currentValue)) {
+            selectElement.val('').trigger('change');
+        } else {
+            selectElement.trigger('change.select2');
+        }
+    }
+
+    // Initial filter if BC is present
+    if (bonCommande && bonCommande.magasin && bonCommande.magasin.site) {
+        const entiteId = bonCommande.magasin.site.id_entite;
+        $('.article-select').each(function() {
+            filterArticleDropdown($(this), entiteId);
+        });
+    }
+
     $('#btnAddArticle').on('click', function() {
         const container = document.getElementById('articlesContainer');
-        const articles = @json($articlesJS);
+        const entiteId = (bonCommande && bonCommande.magasin && bonCommande.magasin.site) ? bonCommande.magasin.site.id_entite : null;
+
         const html = `
             <tr class="article-row">
                 <td class="text-center article-photo-container">
@@ -233,7 +276,6 @@ $(document).ready(function() {
                 <td>
                     <select class="form-select form-select-sm searchable-select article-select" name="articles[${articleCount}][id_article]" required>
                         <option value="">-- Sélectionner --</option>
-                        ${articles.map(art => `<option value="${art.id}" data-unite="${art.unite}" data-photo="${art.photo}">${art.id} - ${art.nom}</option>`).join('')}
                     </select>
                 </td>
                 <td class="text-center article-unite text-muted small">-</td>
@@ -244,7 +286,11 @@ $(document).ready(function() {
             </tr>
         `;
         container.insertAdjacentHTML('beforeend', html);
-        initSelect2($(container).find('.article-select:last'));
+        
+        const newSelect = $(container).find('.article-select:last');
+        filterArticleDropdown(newSelect, entiteId);
+        
+        initSelect2(newSelect);
         articleCount++;
         updateRemoveButtons();
     });

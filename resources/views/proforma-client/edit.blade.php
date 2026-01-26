@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Saisir une Proforma Client')
+@section('title', 'Modifier la Proforma Client')
 
-@section('content')
 @section('content')
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3">
             <h5 class="mb-0">
-                <i class="bi bi-file-earmark-plus me-2" style="color: #0056b3;"></i>
-                Nouvelle Proforma de Vente
+                <i class="bi bi-pencil-square me-2" style="color: #0056b3;"></i>
+                Modifier la Proforma : {{ $proforma->id_proforma_client }}
             </h5>
         </div>
         <div class="card-body p-4">
-            <form action="{{ route('proforma-client.store') }}" method="POST" id="proformaForm">
+            <form action="{{ route('proforma-client.update', $proforma->id_proforma_client) }}" method="POST" id="proformaForm">
                 @csrf
+                @method('PUT')
 
                 <div class="row mb-4">
                     <div class="col-lg-4">
@@ -22,7 +22,7 @@
                             Date
                         </label>
                         <input type="date" class="form-control @error('date_') is-invalid @enderror" id="date_"
-                            name="date_" value="{{ old('date_', date('Y-m-d')) }}" required>
+                            name="date_" value="{{ old('date_', $proforma->date_->format('Y-m-d')) }}" required>
                         @error('date_')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -37,7 +37,7 @@
                             <option value="">-- Sélectionner un client --</option>
                             @foreach ($clients as $client)
                                 <option value="{{ $client->id_client }}"
-                                    {{ old('id_client') == $client->id_client ? 'selected' : '' }}>
+                                    {{ old('id_client', $proforma->id_client) == $client->id_client ? 'selected' : '' }}>
                                     {{ $client->nom }}
                                 </option>
                             @endforeach
@@ -55,7 +55,7 @@
                             id="id_magasin" name="id_magasin">
                             <option value="">-- Sélectionner un magasin --</option>
                             @foreach ($magasins as $magasin)
-                                <option value="{{ $magasin->id_magasin }}" {{ old('id_magasin') == $magasin->id_magasin ? 'selected' : '' }}>
+                                <option value="{{ $magasin->id_magasin }}" {{ old('id_magasin', $proforma->id_magasin) == $magasin->id_magasin ? 'selected' : '' }}>
                                     [{{ $magasin->site?->entite?->nom ?? 'N/A' }}] {{ $magasin->site?->localisation ?? 'N/A' }} - {{ $magasin->nom ?? $magasin->designation }}
                                 </option>
                             @endforeach
@@ -72,7 +72,7 @@
                         Description (optionnel)
                     </label>
                     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
-                        rows="2" placeholder="Détails ou notes sur cette proforma">{{ old('description') }}</textarea>
+                        rows="2" placeholder="Détails ou notes sur cette proforma">{{ old('description', $proforma->description) }}</textarea>
                     @error('description')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -98,48 +98,57 @@
                                 </tr>
                             </thead>
                             <tbody id="articlesContainer">
+                                @foreach ($proforma->proformaClientFille as $index => $line)
                                 <tr class="article-row">
                                     <td class="text-center article-photo-container">
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-image text-muted"></i>
-                                        </div>
+                                        @if($line->article?->photo)
+                                            <img src="{{ asset('storage/' . $line->article->photo) }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        @endif
                                     </td>
                                     <td>
-                                        <select class="form-select form-select-sm searchable-select article-select @error('articles.0.id_article') is-invalid @enderror"
-                                            name="articles[0][id_article]" required>
+                                        <select class="form-select form-select-sm searchable-select article-select @error('articles.'.$index.'.id_article') is-invalid @enderror"
+                                            name="articles[{{ $index }}][id_article]" required>
                                             <option value="">-- Sélectionner --</option>
                                             @foreach ($articles as $article)
                                                 <option value="{{ $article->id_article }}"
                                                     data-unite="{{ $article->unite?->libelle }}"
-                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}">
+                                                    data-photo="{{ $article->photo ? asset('storage/' . $article->photo) : '' }}"
+                                                    {{ old('articles.'.$index.'.id_article', $line->id_article) == $article->id_article ? 'selected' : '' }}>
                                                     {{ $article->id_article }} - {{ $article->nom }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="text-center article-unite text-muted small">-</td>
+                                    <td class="text-center article-unite text-muted small">{{ $line->article?->unite?->libelle ?? '-' }}</td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm quantite-input @error('articles.0.quantite') is-invalid @enderror"
-                                            name="articles[0][quantite]" placeholder="0" min="0.01" step="0.01" required>
+                                        <input type="number" class="form-control form-control-sm quantite-input @error('articles.'.$index.'.quantite') is-invalid @enderror"
+                                            name="articles[{{ $index }}][quantite]" value="{{ old('articles.'.$index.'.quantite', $line->quantite) }}" placeholder="0" min="0.01" step="0.01" required>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm prix-input @error('articles.0.prix') is-invalid @enderror"
-                                            name="articles[0][prix]" placeholder="0" min="0" step="0.01" required>
+                                        <input type="number" class="form-control form-control-sm prix-input @error('articles.'.$index.'.prix') is-invalid @enderror"
+                                            name="articles[{{ $index }}][prix]" value="{{ old('articles.'.$index.'.prix', $line->prix) }}" placeholder="0" min="0" step="0.01" required>
                                     </td>
                                     <td class="text-end fw-bold text-primary">
-                                        <span class="row-total">0</span>
+                                        <span class="row-total">{{ number_format($line->quantite * $line->prix, 0, ',', ' ') }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-danger btn-remove-article" style="display: none;">
+                                        <button type="button" class="btn btn-sm btn-danger btn-remove-article">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
+                                @endforeach
                             </tbody>
                             <tfoot>
                                 <tr class="bg-light fw-bold">
                                     <td colspan="5" class="text-end">Montant Total :</td>
-                                    <td class="text-end text-primary" id="grandTotalDisplay">0</td>
+                                    <td class="text-end text-primary" id="grandTotalDisplay">
+                                        {{ number_format($proforma->proformaClientFille->sum(fn($l) => $l->quantite * $l->prix), 0, ',', ' ') }}
+                                    </td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -160,7 +169,7 @@
                             <i class="bi bi-x-lg me-2"></i>Annuler
                         </a>
                         <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
-                            <i class="bi bi-check-circle me-2"></i>Enregistrer la Proforma
+                            <i class="bi bi-check-circle me-2"></i>Mettre à jour la Proforma
                         </button>
                     </div>
                 </div>
@@ -182,7 +191,17 @@ $(document).ready(function() {
     
     initSelect2();
     
-    let articleCount = 1;
+    let articleCount = {{ $proforma->proformaClientFille->count() }};
+
+    // Initial filtering
+    const initialMagasinId = $('#id_magasin').val();
+    if (initialMagasinId) {
+        const selectedMagasin = magasins.find(m => m.id === initialMagasinId);
+        const entiteId = selectedMagasin ? selectedMagasin.id_entite : null;
+        $('.article-select').each(function() {
+            filterArticleDropdown($(this), entiteId, false);
+        });
+    }
 
     // Filter logic
     $('#id_magasin').on('change', function() {
@@ -195,7 +214,7 @@ $(document).ready(function() {
         });
     });
 
-    function filterArticleDropdown(selectElement, entiteId) {
+    function filterArticleDropdown(selectElement, entiteId, resetIfInvalid = true) {
         const currentValue = selectElement.val();
         selectElement.empty().append('<option value="">-- Sélectionner --</option>');
         
@@ -215,9 +234,8 @@ $(document).ready(function() {
             `);
         });
 
-        // Trigger change to update photo/unit if the value still exists but might have changed
         if (currentValue && !filteredArticles.find(a => a.id === currentValue)) {
-            selectElement.val('').trigger('change');
+            if (resetIfInvalid) selectElement.val('').trigger('change');
         } else {
             selectElement.trigger('change.select2');
         }
