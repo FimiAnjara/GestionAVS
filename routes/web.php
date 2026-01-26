@@ -76,7 +76,7 @@ Route::get('/login', function () {
 
 // Dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('dashboard.dashboard');
 })->name('dashboard');
 
 // Dashboard Global - Directeur Général

@@ -58,7 +58,7 @@
                 <!-- PROFORMA FOURNISSEUR MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'proforma-fournisseur'))
                 <li class="has-submenu {{ request()->is('proforma-fournisseur*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-file-earmark-check"></i>
                         <span class="menu-text">Demande d'achat</span>
                     </a>
@@ -85,7 +85,7 @@
                 <!-- BON DE COMMANDE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande'))
                 <li class="has-submenu {{ request()->is('bon-commande*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-file-earmark-arrow-up"></i>
                         <span class="menu-text">Bon de Commande</span>
                     </a>
@@ -112,7 +112,7 @@
                 <!-- FACTURE FOURNISSEUR MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'facture-fournisseur'))
                 <li class="has-submenu {{ request()->is('facture-fournisseur*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-receipt"></i>
                         <span class="menu-text">Facture Fournisseur</span>
                     </a>
@@ -139,7 +139,7 @@
                 <!-- BON DE RECEPTION MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-reception'))
                 <li class="has-submenu {{ request()->is('bon-reception*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-file-earmark-check"></i>
                         <span class="menu-text">Bon de Réception</span>
                     </a>
@@ -172,7 +172,7 @@
                 <!-- PROFORMA CLIENT MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'proforma'))
                 <li class="has-submenu {{ request()->is('proforma*') && !request()->is('proforma-fournisseur*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-file-earmark-text"></i>
                         <span class="menu-text">Proforma Client</span>
                     </a>
@@ -199,7 +199,7 @@
                 <!-- COMMANDE CLIENT MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'commande'))
                 <li class="has-submenu {{ request()->is('commande*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-cart"></i>
                         <span class="menu-text">Commande Client</span>
                     </a>
@@ -226,7 +226,7 @@
                 <!-- BON DE LIVRAISON MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'bon-livraison'))
                 <li class="has-submenu {{ request()->is('bon-livraison*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-truck"></i>
                         <span class="menu-text">Bon de Livraison</span>
                     </a>
@@ -258,7 +258,7 @@
                 <li class="menu-title">Organigramme</li>
                 <!-- GROUPE MENU -->
                 <li class="has-submenu {{ request()->is('groupe*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-diagram-3"></i>
                         <span class="menu-text">Groupes</span>
                     </a>
@@ -279,7 +279,7 @@
 
                 <!-- ENTITE MENU -->
                 <li class="has-submenu {{ request()->is('entite*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-grid-3x3"></i>
                         <span class="menu-text">Entités</span>
                     </a>
@@ -300,7 +300,7 @@
 
                 <!-- SITE MENU -->
                 <li class="has-submenu {{ request()->is('site*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-geo-alt"></i>
                         <span class="menu-text">Sites</span>
                     </a>
@@ -321,7 +321,7 @@
 
                 <!-- MAGASIN MENU (Organigramme) -->
                 <li class="has-submenu {{ request()->is('magasin*') && !request()->is('magasin/carte') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-shop-window"></i>
                         <span class="menu-text">Magasins</span>
                     </a>
@@ -353,7 +353,7 @@
                 <!-- CLIENT MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'clients'))
                 <li class="has-submenu {{ request()->is('clients*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-people"></i>
                         <span class="menu-text">Clients</span>
                     </a>
@@ -380,7 +380,7 @@
                 <!-- FOURNISSEUR MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'fournisseurs'))
                 <li class="has-submenu {{ request()->is('fournisseurs*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-briefcase"></i>
                         <span class="menu-text">Fournisseurs</span>
                     </a>
@@ -413,7 +413,7 @@
                 <!-- ARTICLE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'articles'))
                 <li class="has-submenu {{ request()->is('articles*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-box"></i>
                         <span class="menu-text">Articles</span>
                     </a>
@@ -440,7 +440,7 @@
                 <!-- CATEGORIE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'categories'))
                 <li class="has-submenu {{ request()->is('categories*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-tag"></i>
                         <span class="menu-text">Catégories</span>
                     </a>
@@ -467,7 +467,7 @@
                 <!-- UNITE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'unites'))
                 <li class="has-submenu {{ request()->is('unites*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-rulers"></i>
                         <span class="menu-text">Unités</span>
                     </a>
@@ -500,7 +500,7 @@
                 <!-- MOUVEMENT DE STOCK MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock'))
                 <li class="has-submenu {{ request()->is('mvt-stock*') || request()->is('stock*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-arrow-left-right"></i>
                         <span class="menu-text">Gestion Stock</span>
                     </a>
@@ -534,41 +534,25 @@
                 </li>
                 @endif
 
-                <!-- MAGASIN MENU -->
-                @if(PermissionHelper::hasMenuAccess($userRole, 'magasin'))
-                <li class="has-submenu {{ request()->is('magasin*') ? 'active' : '' }}">
                 <!-- TYPE EVALUATION STOCK MENU -->
+                @if(PermissionHelper::hasMenuAccess($userRole, 'type-evaluation-stock'))
                 <li class="has-submenu {{ request()->is('type-evaluation-stock*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-calculator"></i>
                         <span class="menu-text">Évaluation Stock</span>
                     </a>
                     <div class="sidebar-submenu"
-                        style="{{ request()->is('magasin*') ? 'display: block;' : 'display: none;' }}">
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'create'))
-                        <a href="{{ route('magasin.create') }}"
-                            class="submenu-item {{ request()->is('magasin/create') ? 'active' : '' }}">
                         style="{{ request()->is('type-evaluation-stock*') ? 'display: block;' : 'display: none;' }}">
                         <a href="{{ route('type-evaluation-stock.create') }}"
                             class="submenu-item {{ request()->is('type-evaluation-stock/create') ? 'active' : '' }}">
                             <i class="bi bi-plus-circle"></i>
                             <span>Ajout</span>
                         </a>
-                        @endif
-                        @if(PermissionHelper::hasMenuAccess($userRole, 'magasin', 'list'))
-                        <a href="{{ route('magasin.list') }}"
-                            class="submenu-item {{ request()->is('magasin/list') ? 'active' : '' }}">
                         <a href="{{ route('type-evaluation-stock.list') }}"
                             class="submenu-item {{ request()->is('type-evaluation-stock/list') ? 'active' : '' }}">
                             <i class="bi bi-list-ul"></i>
                             <span>Liste</span>
                         </a>
-                        <a href="{{ route('magasin.carte') }}"
-                            class="submenu-item {{ request()->is('magasin/carte') ? 'active' : '' }}">
-                            <i class="bi bi-geo-alt"></i>
-                            <span>Voir Carte</span>
-                        </a>
-                        @endif
                     </div>
                 </li>
                 @endif
@@ -582,7 +566,7 @@
                 <!-- CAISSE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'caisse'))
                 <li class="has-submenu {{ request()->is('caisse*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-safe2"></i>
                         <span class="menu-text">Caisse</span>
                     </a>
@@ -609,7 +593,7 @@
                 <!-- MOUVEMENTS CAISSE MENU -->
                 @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-caisse'))
                 <li class="has-submenu {{ request()->is('mvt-caisse*') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="toggle-submenu">
+                    <a href="#" class="toggle-submenu">
                         <i class="bi bi-arrow-left-right"></i>
                         <span class="menu-text">Mouvements</span>
                     </a>
@@ -866,7 +850,7 @@
                     parent.classList.add('active');
                 } else {
                     submenu.style.display = 'none';
-                    parent.classList.add('active');
+                    parent.classList.remove('active');
                 }
             });
         });

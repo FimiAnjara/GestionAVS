@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TypeMvtStockSeeder::class,
             ArticleSeeder::class,
             CaisseSeeder::class,
+            ChiffresAffairesSeeder::class, // Données de chiffres d'affaires
         ]);
     }
 }

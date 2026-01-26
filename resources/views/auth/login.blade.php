@@ -6,10 +6,8 @@
 <div class="login-container">
     <div class="login-card">
         <div class="login-header">
-            <div class="logo">
-                <i class="bi bi-shop"></i>
-            </div>
-            <h1>GROSSISTE</h1>
+            <img src="{{ asset('assets/logo/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px; max-width: 300px;">
+
             <p class="subtitle">Système de Gestion AVS</p>
         </div>
 
@@ -72,6 +70,18 @@
 
 @push('styles')
 <style>
+    :root {
+        --primary-blue: #0056b3;
+        --dark-blue: #003d82;
+        --white: #ffffff;
+        --text-dark: #333333;
+        --text-light: #666666;
+        --border-gray: #e0e0e0;
+        --light-gray: #f5f5f5;
+        --light-blue: #e8f0fd;
+        --transition: all 0.3s ease;
+    }
+
     body {
         background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         min-height: 100vh;
@@ -79,11 +89,7 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-    }
-
-    .login-container {
-        width: 100%;
-        max-width: 420px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     .login-card {
@@ -92,6 +98,7 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         padding: 40px;
         animation: slideUp 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     @keyframes slideUp {
@@ -105,32 +112,25 @@
         }
     }
 
+    .login-container {
+        width: 100%;
+        max-width: 420px;
+    }
+
     .login-header {
         text-align: center;
         margin-bottom: 30px;
     }
 
-    .login-header .logo {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 15px;
-        box-shadow: 0 8px 20px rgba(0, 86, 179, 0.3);
-    }
-
-    .login-header .logo i {
-        font-size: 36px;
-        color: var(--white);
+    .login-header img {
+        margin-bottom: 15px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
     }
 
     .login-header h1 {
         color: var(--primary-blue);
-        font-size: 28px;
-        font-weight: 700;
+        font-size: 32px;
+        font-weight: 800;
         margin-bottom: 5px;
         letter-spacing: 1px;
     }
@@ -138,6 +138,7 @@
     .login-header .subtitle {
         color: var(--text-light);
         font-size: 14px;
+        margin: 0;
     }
 
     .form-group {
@@ -166,6 +167,12 @@
         font-size: 14px;
         transition: var(--transition);
         background: var(--light-gray);
+        color: var(--text-dark);
+        font-family: inherit;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-light);
     }
 
     .form-control:focus {
@@ -216,19 +223,23 @@
         justify-content: center;
         gap: 10px;
         margin-top: 10px;
+        position: relative;
+        z-index: 10;
+        min-height: 50px;
+        box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
     }
 
-    .btn-login:hover {
-        transform: translateY(-2px);
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(0, 86, 179, 0.4);
     }
 
-    .btn-login:active {
-        transform: translateY(0);
+    .btn-login:active:not(:disabled) {
+        transform: translateY(-1px);
     }
 
     .btn-login:disabled {
-        opacity: 0.7;
+        opacity: 0.8;
         cursor: not-allowed;
         transform: none;
     }
@@ -293,11 +304,11 @@
     }
 
     .demo-credentials {
-        background: var(--light-blue);
+        background: linear-gradient(135deg, var(--light-blue) 0%, rgba(0, 86, 179, 0.05) 100%);
         padding: 15px;
         border-radius: 10px;
         margin-top: 20px;
-        border: 1px solid rgba(0, 86, 179, 0.2);
+        border: 1px solid rgba(0, 86, 179, 0.3);
     }
 
     .demo-credentials h4 {
@@ -307,6 +318,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        font-weight: 600;
     }
 
     .credentials-list {
@@ -321,36 +333,44 @@
         justify-content: space-between;
         align-items: center;
         font-size: 12px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 6px;
     }
 
     .credential-item .role {
-        background: var(--primary-blue);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         color: white;
-        padding: 2px 8px;
+        padding: 4px 12px;
         border-radius: 12px;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 11px;
     }
 
     .credential-item .email {
         color: var(--text-dark);
-        font-family: monospace;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
     }
 
     .password-hint {
         font-size: 12px;
-        color: var(--text-light);
+        color: var(--text-dark);
         margin-top: 10px;
         display: flex;
         align-items: center;
         gap: 5px;
+        font-weight: 500;
     }
 
     .password-hint code {
         background: var(--white);
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 4px;
-        font-family: monospace;
+        font-family: 'Courier New', monospace;
         color: var(--primary-blue);
+        font-weight: 600;
+        border: 1px solid var(--border-gray);
     }
 </style>
 @endpush

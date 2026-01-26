@@ -165,6 +165,31 @@
 
     <!-- Graphiques principaux -->
     <div class="row mb-4">
+        <!-- Chiffre d'Affaires Mensuel -->
+        <div class="col-xl-12 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-currency-dollar text-success"></i> Chiffre d'Affaires Mensuel (12 derniers mois)
+                        </h5>
+                        <div>
+                            <span class="badge bg-success me-2">Total: {{ number_format($chiffreAffairesTotal, 0, '.', ' ') }}</span>
+                            <span class="badge bg-info">Moyenne: {{ number_format($chiffreAffairesMoyen, 0, '.', ' ') }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="chiffreAffairesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques principaux -->
+    <div class="row mb-4">
         <!-- Évolution Achats/Ventes -->
         <div class="col-xl-8 mb-4">
             <div class="card border-0 shadow-sm h-100">
@@ -602,6 +627,152 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // 6. Graphique Chiffre d'Affaires Mensuel
+    const caCtx = document.getElementById('chiffreAffairesChart').getContext('2d');
+    new Chart(caCtx, {
+        type: 'line',
+        data: {
+            labels: @json($chiffreAffairesLabels),
+            datasets: [{
+                label: 'Chiffre d\'Affaires',
+                data: @json($chiffreAffairesData),
+                borderColor: colors.success,
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: colors.success,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('fr-FR', {
+                                    style: 'currency',
+                                    currency: 'XOF',
+                                    minimumFractionDigits: 0
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('fr-FR', {
+                                notation: 'compact',
+                                compactDisplay: 'short',
+                                maximumFractionDigits: 0
+                            }).format(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 7. Graphique Stock par Entité
+    const entiteStockCtx = document.getElementById('entiteStockChart').getContext('2d');
+    const entiteStockData = @json($stockParEntite);
+    new Chart(entiteStockCtx, {
+        type: 'doughnut',
+        data: {
+            labels: entiteStockData.map(d => d.libelle),
+            datasets: [{
+                data: entiteStockData.map(d => d.stock),
+                backgroundColor: [colors.primary, colors.success, colors.warning, colors.info, colors.danger],
+                borderColor: '#fff',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + ' articles';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 8. Graphique Chiffre d'Affaires par Entité
+    const entiteCACtx = document.getElementById('entiteCAChart').getContext('2d');
+    const entiteCAData = @json($caParEntite);
+    new Chart(entiteCACtx, {
+        type: 'bar',
+        data: {
+            labels: entiteCAData.map(d => d.libelle),
+            datasets: [{
+                label: 'Chiffre d\'Affaires',
+                data: entiteCAData.map(d => d.ca),
+                backgroundColor: [colors.success, colors.info, colors.warning, colors.primary, colors.danger],
+                borderRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: true,
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return new Intl.NumberFormat('fr-FR', {
+                                style: 'currency',
+                                currency: 'XOF',
+                                minimumFractionDigits: 0
+                            }).format(context.parsed.x);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('fr-FR', {
+                                notation: 'compact',
+                                compactDisplay: 'short',
+                                maximumFractionDigits: 0
+                            }).format(value);
+                        }
                     }
                 }
             }
