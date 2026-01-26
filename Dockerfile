@@ -7,10 +7,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
     libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo pdo_mysql gd zip \
     && rm -rf /var/lib/apt/lists/*
 
