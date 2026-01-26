@@ -250,6 +250,7 @@
                 </li>
                
                 @endif
+                @endif
 
                 <!-- SECTION TIERS -->
                 @if(PermissionHelper::hasModuleAccess($userRole, 'tiers'))
