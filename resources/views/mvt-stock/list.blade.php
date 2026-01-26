@@ -145,7 +145,7 @@
                                                     </td>
                                                     <td class="text-center">{{ number_format($fille->prix_unitaire, 0) }} Ar</td>
                                                     <td class="text-end">
-                                                        <strong>{{ number_format($fille->entree * $fille->prix_unitaire, 0) }} Ar</strong>
+                                                        <strong>{{ number_format($fille->getMontantAttribute(), 0) }} Ar</strong>
                                                     </td>
                                                     <td>
                                                         @if($fille->date_expiration)

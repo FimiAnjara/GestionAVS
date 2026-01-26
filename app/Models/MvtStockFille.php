@@ -41,7 +41,7 @@ class MvtStockFille extends Model
 
     public function getMontantAttribute()
     {
-        $total_entree = (($this->entree ?? 0) - ($this->sortie ?? 0)) * ($this->prix_unitaire ?? 0);
-        return $total_entree;
+        $vrai_quantite = ($this->entree ?? 0) + ($this->sortie ?? 0);
+        return $vrai_quantite * ($this->prix_unitaire ?? 0);
     }
 }
