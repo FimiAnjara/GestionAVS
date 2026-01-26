@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Departement;
 use Illuminate\Database\Seeder;
+use App\Models\Departement;
 
 class DepartementSeeder extends Seeder
 {
@@ -13,19 +13,20 @@ class DepartementSeeder extends Seeder
     public function run(): void
     {
         $departements = [
-            ['id_departement' => 'dept_001', 'libelle' => 'Achat'],
-            ['id_departement' => 'dept_002', 'libelle' => 'Stock'],
-            ['id_departement' => 'dept_003', 'libelle' => 'Vente'],
-            ['id_departement' => 'dept_004', 'libelle' => 'Finance'],
-            ['id_departement' => 'dept_005', 'libelle' => 'Direction'],
-            ['id_departement' => 'dept_006', 'libelle' => 'Administration'],
+            ['id_departement' => 'dept_001', 'libelle' => 'Département Achats'],
+            ['id_departement' => 'dept_002', 'libelle' => 'Département Stock Logistique'],
+            ['id_departement' => 'dept_003', 'libelle' => 'Département Vente'],
+            ['id_departement' => 'dept_004', 'libelle' => 'Département Finance'],
+            ['id_departement' => 'dept_005', 'libelle' => 'Direction Générale'],
+            ['id_departement' => 'dept_006', 'libelle' => 'Administration Système'],
         ];
 
         foreach ($departements as $departement) {
             Departement::updateOrCreate(
                 ['id_departement' => $departement['id_departement']],
-                $departement
+                ['libelle' => $departement['libelle']]
             );
         }
+        
     }
 }

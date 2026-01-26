@@ -34,10 +34,14 @@ Route::get('/', function () {
     return redirect('/login');
 })->name('home');
 
+// Route de login
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
 
 Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
-})->name('home');
+});
 
 // Routes Organigramme - Groupe
 Route::prefix('groupe')->group(function () {
