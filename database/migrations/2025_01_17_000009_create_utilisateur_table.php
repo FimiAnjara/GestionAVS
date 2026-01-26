@@ -20,9 +20,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('id_departement')->references('id_departement')->on('departement');
             $table->foreign('id_role')->references('id_role')->on('role');
-            $table->foreign('id_entite')->references('id_entite')->on('entite')->onDelete('set null');
-            $table->foreign('id_site')->references('id_site')->on('site')->onDelete('set null');
-            $table->foreign('id_magasin')->references('id_magasin')->on('magasin')->onDelete('set null');
+            // Foreign keys vers entite, site, magasin ajoutées dans une migration ultérieure
         });
     }
 
