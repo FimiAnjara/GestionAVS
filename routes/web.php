@@ -18,8 +18,23 @@ use App\Http\Controllers\EntiteController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('jwt');
+    Route::post('/refresh', [AuthController::class, 'refresh'])->name('auth.refresh')->middleware('jwt');
+    Route::get('/me', [AuthController::class, 'me'])->name('auth.me')->middleware('jwt');
+});
 
 Route::get('/', function () {
+    // return view('dashboard.dashboard');
+    if (session('user_role')) {
+        return redirect('/dashboard');
+    }
+    return redirect('/login');
+})->name('home');
+
+
+Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
 })->name('home');
 
