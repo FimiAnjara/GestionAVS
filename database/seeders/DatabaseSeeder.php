@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
             
             // 6. Ventes et achats
             VentesSeeder::class,
+            BonCommandeAchatSeeder::class,
         ]);
     }
 }

@@ -187,7 +187,7 @@ class PermissionHelper
                     'clients' => ['create', 'list'],
                     'fournisseurs' => ['create', 'list'],
                     'articles' => ['create', 'list'],
-                    'mvt-stock' => ['create', 'list', 'details', 'etat'],
+                    'mvt-stock' => ['create', 'list', 'details', 'etat financier'],
                     'categories' => ['create', 'list'],
                     'unites' => ['create', 'list'],
                     'magasin' => ['create', 'list', 'carte'],

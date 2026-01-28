@@ -45,7 +45,7 @@ Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
 });
 
-Route::get('/dashboard/global', [DashboardController::class, 'global'])->name('dashboard.global');
+Route::get('/dashboard/global', [DashboardController::class, 'globalSimple'])->name('dashboard.global');
 Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
 
@@ -239,6 +239,7 @@ Route::prefix('bon-reception')->group(function () {
 
 // Routes Mouvement de Stock
 Route::prefix('mvt-stock')->group(function () {
+    Route::get('/dashboard', [MvtStockController::class, 'dashboard'])->name('mvt-stock.dashboard');
     Route::get('/list', [MvtStockController::class, 'list'])->name('mvt-stock.list');
     Route::get('/create', [MvtStockController::class, 'create'])->name('mvt-stock.create');
     Route::get('/api/prix-actuel', [MvtStockController::class, 'getPrixActuel'])->name('mvt-stock.api.prix-actuel');

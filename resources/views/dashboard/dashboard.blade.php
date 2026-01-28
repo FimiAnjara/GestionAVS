@@ -295,6 +295,107 @@
         </div>
         @endif
     </div>
+
+    <!-- Tableaux Bons de Commande -->
+    <div class="row">
+        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande', 'list'))
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-cart text-success"></i> Derniers Bons de Commande (Achat)
+                    </h5>
+                    <a href="{{ route('bon-commande.list') }}" class="btn btn-sm btn-outline-success">
+                        Voir tout <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Fournisseur</th>
+                                <th>Date</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(\App\Models\BonCommande::with(['proformaFournisseur.fournisseur'])->whereNull('deleted_at')->latest()->limit(5)->get() as $bc)
+                                <tr>
+                                    <td><strong>{{ $bc->id_bonCommande }}</strong></td>
+                                    <td><small>{{ $bc->proformaFournisseur?->fournisseur?->nom ?? 'N/A' }}</small></td>
+                                    <td><small class="text-muted">{{ $bc->date_?->format('d/m/Y') ?? '-' }}</small></td>
+                                    <td>
+                                        @if($bc->etat == 1)
+                                            <span class="badge bg-warning text-dark">Créée</span>
+                                        @elseif($bc->etat == 2)
+                                            <span class="badge bg-info">En cours</span>
+                                        @else
+                                            <span class="badge bg-success">Reçue</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Aucun bon de commande</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if(PermissionHelper::hasMenuAccess($userRole, 'bon-commande-client', 'list'))
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-bag-check text-primary"></i> Derniers Bons de Commande (Vente)
+                    </h5>
+                    <a href="{{ route('bon-commande-client.list') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tout <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(\App\Models\Ventes\BonCommandeClient::with('client')->whereNull('deleted_at')->latest()->limit(5)->get() as $bcc)
+                                <tr>
+                                    <td><strong>{{ $bcc->id_bon_commande_client }}</strong></td>
+                                    <td><small>{{ $bcc->client?->nom ?? 'N/A' }}</small></td>
+                                    <td><small class="text-muted">{{ $bcc->date_?->format('d/m/Y') ?? '-' }}</small></td>
+                                    <td>
+                                        @if($bcc->etat == 1)
+                                            <span class="badge bg-warning text-dark">Créée</span>
+                                        @elseif($bcc->etat == 2)
+                                            <span class="badge bg-info">Confirmée</span>
+                                        @else
+                                            <span class="badge bg-success">Expédiée</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Aucun bon de commande client</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
 </div>
 
 @push('scripts')

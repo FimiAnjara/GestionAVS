@@ -7,10 +7,119 @@ use App\Models\MvtStockFille;
 use App\Models\Article;
 use App\Models\Magasin;
 use App\Models\BonReception;
+use App\Services\MagasinService;
+use App\Services\MvtStockService;
 use Illuminate\Http\Request;
 
 class MvtStockController extends Controller
 {
+    protected $magasinService;
+    protected $mvtStockService;
+
+    public function __construct(MagasinService $magasinService, MvtStockService $mvtStockService)
+    {
+        $this->magasinService = $magasinService;
+        $this->mvtStockService = $mvtStockService;
+    }
+
+    /**
+     * Dashboard du stock avec valorisation par entité et magasin
+     */
+    public function dashboard()
+    {
+        try {
+            // Valeur du stock par entité
+            $stockParEntite = $this->magasinService->getValeurStockParEntite();
+            
+            // Valeur du stock par magasin
+            $valeursStock = $this->magasinService->getValeurStockTousMagasins();
+            $stockParMagasin = array_map(function($item) {
+                return [
+                    'magasin' => $item['magasin'],
+                    'valeur' => $item['valeur'],
+                    'nb_articles' => $item['nb_articles'],
+                ];
+            }, $valeursStock);
+
+            // Valeur totale
+            $valeurTotaleStock = array_sum(array_column($stockParMagasin, 'valeur'));
+            
+            // Total articles en stock
+            $totalArticlesEnStock = array_sum(array_column($stockParMagasin, 'nb_articles'));
+
+            // Top 10 articles par valeur de stock
+            $topArticles = $this->getTopArticlesParValeur(10);
+
+            return view('mvt-stock.dashboard', compact(
+                'stockParEntite',
+                'stockParMagasin',
+                'valeurTotaleStock',
+                'totalArticlesEnStock',
+                'topArticles'
+            ));
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur dashboard stock: ' . $e->getMessage());
+            
+            return view('mvt-stock.dashboard', [
+                'stockParEntite' => [],
+                'stockParMagasin' => [],
+                'valeurTotaleStock' => 0,
+                'totalArticlesEnStock' => 0,
+                'topArticles' => [],
+                'error' => 'Une erreur est survenue lors du chargement du dashboard.'
+            ]);
+        }
+    }
+
+    /**
+     * Récupérer les top articles par valeur de stock
+     */
+    protected function getTopArticlesParValeur(int $limit = 10): array
+    {
+        $articles = Article::with(['typeEvaluation', 'unite'])->whereNull('deleted_at')->get();
+        $articlesValeur = [];
+
+        foreach ($articles as $article) {
+            // Récupérer tous les lots disponibles pour cet article (tous magasins)
+            $batches = MvtStockFille::whereHas('mvtStock', function($q) {
+                    $q->whereNull('deleted_at');
+                })
+                ->where('id_article', $article->id_article)
+                ->where('entree', '>', 0)
+                ->where('reste', '>', 0)
+                ->whereNull('deleted_at')
+                ->get();
+
+            $quantiteTotale = $batches->sum('reste');
+            
+            if ($quantiteTotale <= 0) continue;
+
+            // Calculer la valeur (somme de reste * prix_unitaire)
+            $valeurTotale = $batches->sum(function($batch) {
+                return floatval($batch->reste) * floatval($batch->prix_unitaire);
+            });
+
+            $methode = $article->typeEvaluation->id_type_evaluation_stock ?? 'CMUP';
+            $prixUnitaire = $quantiteTotale > 0 ? $valeurTotale / $quantiteTotale : 0;
+
+            $articlesValeur[] = [
+                'article' => $article,
+                'methode' => $methode,
+                'quantite' => $quantiteTotale,
+                'prix_unitaire' => $prixUnitaire,
+                'valeur' => $valeurTotale,
+            ];
+        }
+
+        // Trier par valeur décroissante et limiter
+        usort($articlesValeur, function($a, $b) {
+            return $b['valeur'] <=> $a['valeur'];
+        });
+
+        return array_slice($articlesValeur, 0, $limit);
+    }
+
     /**
      * Afficher la liste des mouvements de stock
      */
@@ -103,13 +212,6 @@ class MvtStockController extends Controller
         return view('mvt-stock.create', compact('articles', 'magasins', 'bonReception', 'prefilledArticles', 'prefilledMagasin', 'typeMvts', 'prefilledTypeMvt'));
     }
 
-    protected $mvtStockService;
-
-    public function __construct(\App\Services\MvtStockService $mvtStockService)
-    {
-        $this->mvtStockService = $mvtStockService;
-    }
-
     /**
      * Enregistrer un nouveau mouvement avec ses articles
      */
@@ -154,53 +256,48 @@ class MvtStockController extends Controller
      */
     public function etat(Request $request)
     {
-        $magasins = Magasin::where('deleted_at', null)->get();
+        // Récupérer toutes les entités pour le filtre
+        $entites = \App\Models\Entite::where('deleted_at', null)->get();
         
-        $etatStock = [];
+        // Construire la requête des magasins avec filtres
+        $magasinsQuery = Magasin::where('deleted_at', null)
+            ->with(['site.entite']);
         
-        foreach ($magasins as $magasin) {
-            // Récupérer tous les mouvements de ce magasin
-            $mouvements = MvtStock::where('id_magasin', $magasin->id_magasin)
-                ->with('mvtStockFille.article')
-                ->get();
-            
-            $articles = [];
-            
-            foreach ($mouvements as $mvt) {
-                foreach ($mvt->mvtStockFille as $fille) {
-                    $idArticle = $fille->id_article;
-                    
-                    if (!isset($articles[$idArticle])) {
-                        $articles[$idArticle] = [
-                            'id_article' => $idArticle,
-                            'designation' => $fille->article?->designation ?? 'Inconnu',
-                            'entree' => 0,
-                            'sortie' => 0,
-                        ];
-                    }
-                    
-                    $articles[$idArticle]['entree'] += $fille->entree;
-                    $articles[$idArticle]['sortie'] += $fille->sortie;
-                }
-            }
-            
-            // Calculer les quantités restantes
-            foreach ($articles as &$article) {
-                $article['quantite_restante'] = $article['entree'] - $article['sortie'];
-            }
-            
-            // Trier par designation
-            usort($articles, function($a, $b) {
-                return strcmp($a['designation'], $b['designation']);
+        // Filtre par entité
+        if ($request->filled('entite_id')) {
+            $magasinsQuery->whereHas('site', function($q) use ($request) {
+                $q->where('id_entite', $request->entite_id);
             });
-            
-            $etatStock[$magasin->id_magasin] = [
-                'magasin' => $magasin,
-                'articles' => $articles,
-            ];
         }
         
-        return view('mvt-stock.etat', compact('etatStock', 'magasins'));
+        // Filtre par magasin
+        if ($request->filled('magasin_id')) {
+            $magasinsQuery->where('id_magasin', $request->magasin_id);
+        }
+        
+        $magasins = $magasinsQuery->get();
+        $allMagasins = Magasin::where('deleted_at', null)->with(['site.entite'])->get();
+        
+        // Récupérer les 10 derniers mouvements avec les filtres
+        $mouvementsQuery = MvtStockFille::with(['mvtStock.magasin.site.entite', 'article.unite'])
+            ->orderBy('created_at', 'desc');
+        
+        // Appliquer les filtres
+        if ($request->filled('entite_id')) {
+            $mouvementsQuery->whereHas('mvtStock.magasin.site', function($q) use ($request) {
+                $q->where('id_entite', $request->entite_id);
+            });
+        }
+        
+        if ($request->filled('magasin_id')) {
+            $mouvementsQuery->whereHas('mvtStock', function($q) use ($request) {
+                $q->where('id_magasin', $request->magasin_id);
+            });
+        }
+        
+        $derniersMovements = $mouvementsQuery->take(10)->get();
+        
+        return view('mvt-stock.etat', compact('derniersMovements', 'allMagasins', 'entites'));
     }
 
     /**

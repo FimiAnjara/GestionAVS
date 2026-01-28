@@ -533,6 +533,13 @@
                     </a>
                     <div class="sidebar-submenu"
                         style="{{ request()->is('mvt-stock*') || request()->is('stock*') ? 'display: block;' : 'display: none;' }}">
+                        @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'etat financier'))
+                        <a href="{{ route('mvt-stock.dashboard') }}"
+                            class="submenu-item {{ request()->is('mvt-stock/dashboard') ? 'active' : '' }}">
+                            <i class="bi bi-graph-up"></i>
+                            <span>État Financier</span>
+                        </a>
+                        @endif
                         @if(PermissionHelper::hasMenuAccess($userRole, 'mvt-stock', 'create'))
                         <a href="{{ route('mvt-stock.create') }}"
                             class="submenu-item {{ request()->is('mvt-stock/create') ? 'active' : '' }}">

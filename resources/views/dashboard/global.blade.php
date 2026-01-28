@@ -48,15 +48,22 @@
 @endphp
 
 <div class="container-fluid">
+    @if(isset($error))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle"></i> Erreur :</strong> {{ $error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Header -->
     <div class="row mb-4">
-            <!-- Stock par Entité -->
+            <!-- Valeur du Stock par Entité -->
             <div class="row mb-4">
                 <div class="col-xl-6 mb-4">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-header bg-white border-0 py-3">
                             <h5 class="card-title mb-0 fw-bold">
-                                <i class="bi bi-diagram-3 text-primary"></i> Stock par Entité
+                                <i class="bi bi-diagram-3 text-primary"></i> Valeur du Stock par Entité
                             </h5>
                         </div>
                         <div class="card-body">
@@ -100,6 +107,7 @@
     </div>
 
     <!-- Statistiques principales -->
+    @if(isset($stats) && !isset($error))
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-3">
             <div class="card stat-card border-0 shadow-sm h-100">
@@ -110,7 +118,7 @@
                         </div>
                         <div class="ms-3">
                             <h6 class="text-muted mb-1">Clients</h6>
-                            <h3 class="fw-bold mb-0">{{ number_format($stats['clients']) }}</h3>
+                            <h3 class="fw-bold mb-0">{{ number_format($stats['clients'] ?? 0) }}</h3>
                         </div>
                     </div>
                 </div>
@@ -284,6 +292,119 @@
         </div>
     </div>
 
+    <!-- Bons de Commande Récents -->
+    <div class="row mb-4">
+        <!-- Bons d'Achat Récents -->
+        <div class="col-xl-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-receipt text-danger"></i> Bons d'Achat Récents
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dashboard table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">N° Bon</th>
+                                    <th>Fournisseur</th>
+                                    <th>Date</th>
+                                    <th class="text-center pe-4">État</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($bonsAchatRecents as $bon)
+                                <tr>
+                                    <td class="ps-4">
+                                        <small class="text-monospace">{{ substr($bon->id_bon_commande, -8) }}</small>
+                                    </td>
+                                    <td>
+                                        {{ $bon->proformaFournisseur?->fournisseur?->nom ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $bon->date_?->format('d/m/Y') ?? 'N/A' }}
+                                    </td>
+                                    <td class="text-center pe-4">
+                                        @if($bon->etat == 1)
+                                            <span class="badge bg-warning">Créée</span>
+                                        @elseif($bon->etat == 5)
+                                            <span class="badge bg-info">Validée</span>
+                                        @elseif($bon->etat == 11)
+                                            <span class="badge bg-success">Reçue</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $bon->etat }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Aucun bon d'achat</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bons de Vente Récents -->
+        <div class="col-xl-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-bag-check text-success"></i> Bons de Vente Récents
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dashboard table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">N° Bon</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th class="text-center pe-4">État</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($bonsVenteRecents as $bon)
+                                <tr>
+                                    <td class="ps-4">
+                                        <small class="text-monospace">{{ substr($bon->id_bon_commande_client, -8) }}</small>
+                                    </td>
+                                    <td>
+                                        {{ $bon->client?->nom ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $bon->date_?->format('d/m/Y') ?? 'N/A' }}
+                                    </td>
+                                    <td class="text-center pe-4">
+                                        @if($bon->etat == 1)
+                                            <span class="badge bg-warning">Créée</span>
+                                        @elseif($bon->etat == 5)
+                                            <span class="badge bg-info">Confirmée</span>
+                                        @elseif($bon->etat == 11)
+                                            <span class="badge bg-success">Expédiée</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $bon->etat }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Aucun bon de vente</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Mouvements Caisse et Stock par Magasin -->
     <div class="row mb-4">
         <!-- Mouvements Caisse -->
@@ -407,6 +528,8 @@
         </div>
     </div>
 </div>
+@endif
+@endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -574,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 5. Graphique Stock par Magasin
+    // 5. Graphique Stock par Magasin (Valeur en Ariary)
     const magasinCtx = document.getElementById('magasinChart').getContext('2d');
     const magasinData = @json($stockParMagasin);
     new Chart(magasinCtx, {
@@ -582,8 +705,8 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: magasinData.map(d => d.nom),
             datasets: [{
-                label: 'Mouvements',
-                data: magasinData.map(d => d.articles),
+                label: 'Valeur Stock (Ar)',
+                data: magasinData.map(d => d.valeur),
                 backgroundColor: [colors.primary, colors.success, colors.warning, colors.info, colors.danger],
                 borderRadius: 5,
             }]
@@ -595,19 +718,111 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw || 0;
+                            return 'Valeur: ' + value.toLocaleString('fr-FR') + ' Ar';
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
                     beginAtZero: true,
                     ticks: {
-                        stepSize: 1
+                        callback: function(value) {
+                            return value.toLocaleString('fr-FR') + ' Ar';
+                        }
                     }
                 }
             }
         }
     });
+
+    // 6. Graphique Valeur du Stock par Entité
+    const entiteStockCtx = document.getElementById('entiteStockChart').getContext('2d');
+    const stockEntiteData = @json($stockParEntite);
+    console.log('Stock par entité:', stockEntiteData);
+    new Chart(entiteStockCtx, {
+        type: 'doughnut',
+        data: {
+            labels: stockEntiteData.map(d => d.libelle),
+            datasets: [{
+                label: 'Valeur Stock (Ar)',
+                data: stockEntiteData.map(d => d.valeur),
+                backgroundColor: [
+                    colors.primary,
+                    colors.success,
+                    colors.warning,
+                    colors.info,
+                    colors.danger
+                ],
+                borderWidth: 2,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw || 0;
+                            return context.label + ': ' + value.toLocaleString('fr-FR') + ' Ar';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 7. Graphique Chiffre d'affaires par Entité
+    const caEntiteData = @json($caParEntite);
+    console.log('CA par entité:', caEntiteData);
+    const entiteCACtx = document.getElementById('entiteCAChart');
+    if (entiteCACtx) {
+        new Chart(entiteCACtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: caEntiteData.map(d => d.libelle),
+                datasets: [{
+                    label: 'CA (Ar)',
+                    data: caEntiteData.map(d => d.ca),
+                    backgroundColor: colors.success,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('fr-FR') + ' Ar';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 });
 </script>
 @endpush
-@endsection

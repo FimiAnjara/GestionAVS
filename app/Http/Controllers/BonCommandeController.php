@@ -9,7 +9,8 @@ use App\Models\Fournisseur;
 use App\Models\Article;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
-use PDF;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BonCommandeController extends Controller
 {
@@ -105,22 +106,24 @@ class BonCommandeController extends Controller
             'date_' => 'required|date',
             'description' => 'nullable|string',
             'id_fournisseur' => 'required|exists:fournisseur,id_fournisseur',
-            'id_proformaFournisseur' => 'required|exists:proformaFournisseur,id_proformaFournisseur',
+            'id_proformaFournisseur' => 'nullable|exists:proformaFournisseur,id_proformaFournisseur',
             'articles' => 'required|array|min:1',
             'articles.*.id_article' => 'required|exists:article,id_article',
-            'articles.*.quantite' => 'required|numeric|min:1',
+            'articles.*.quantite' => 'required|numeric|min:0.01',
             'articles.*.prix' => 'required|numeric|min:0',
         ]);
         
-        // Vérifier que la proforma a l'état >= 5
-        $proforma = ProformaFournisseur::find($request->id_proformaFournisseur);
-        if ($proforma->etat < 5) {
-            return back()->withErrors(['id_proformaFournisseur' => 'La proforma doit être validée par Finance']);
+        // Vérifier que la proforma a l'état >= 5 (si une proforma est sélectionnée)
+        if ($request->filled('id_proformaFournisseur')) {
+            $proforma = ProformaFournisseur::find($request->id_proformaFournisseur);
+            if (!$proforma || $proforma->etat < 5) {
+                return back()->withErrors(['id_proformaFournisseur' => 'La proforma doit être validée par Finance']);
+            }
         }
         
         // Créer le bon de commande
         $id = 'BC_' . uniqid();
-        $userId = auth()->check() ? auth()->user()->id : (Utilisateur::first()?->id_utilisateur ?? 'UTIL-1');
+        $userId = Auth::user()?->id_utilisateur ?? Utilisateur::first()?->id_utilisateur ?? 'UTIL-1';
         
         $bonCommande = BonCommande::create([
             'id_bonCommande' => $id,
@@ -128,20 +131,22 @@ class BonCommandeController extends Controller
             'etat' => 1, // Créée
             'id_utilisateur' => $userId,
             'id_proformaFournisseur' => $request->id_proformaFournisseur,
-            'id_magasin' => $request->id_magasin,
+            'id_magasin' => $request->id_magasin ?? null,
             'description' => $request->description,
         ]);
         
         // Ajouter les articles
-        foreach ($request->articles as $article) {
-            if (!empty($article['id_article'])) {
-                BonCommandeFille::create([
-                    'id_bonCommandeFille' => 'BCF_' . uniqid(),
-                    'quantite' => $article['quantite'],
-                    'prix_achat' => $article['prix'],
-                    'id_bonCommande' => $id,
-                    'id_article' => $article['id_article'],
-                ]);
+        if ($request->has('articles') && is_array($request->articles)) {
+            foreach ($request->articles as $article) {
+                if (!empty($article['id_article']) && !empty($article['quantite']) && isset($article['prix'])) {
+                    BonCommandeFille::create([
+                        'id_bonCommandeFille' => 'BCF_' . uniqid(),
+                        'quantite' => (float) $article['quantite'],
+                        'prix_achat' => (float) $article['prix'],
+                        'id_bonCommande' => $id,
+                        'id_article' => $article['id_article'],
+                    ]);
+                }
             }
         }
         
@@ -227,7 +232,7 @@ class BonCommandeController extends Controller
         $bonCommande = BonCommande::findOrFail($id);
         $articles = $bonCommande->bonCommandeFille()->with('article')->get();
         
-        $pdf = PDF::loadView('bon-commande.pdf', compact('bonCommande', 'articles'));
+        $pdf = Pdf::loadView('bon-commande.pdf', compact('bonCommande', 'articles'));
         return $pdf->download($bonCommande->id_bonCommande . '.pdf');
     }
     

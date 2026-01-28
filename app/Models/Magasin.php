@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Magasin extends Model
 {
@@ -35,5 +36,21 @@ class Magasin extends Model
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class, 'id_site', 'id_site');
+    }
+
+    /**
+     * Get les mouvements de stock du magasin
+     */
+    public function mvtStocks(): HasMany
+    {
+        return $this->hasMany(MvtStock::class, 'id_magasin', 'id_magasin');
+    }
+
+    /**
+     * Get les bons de commande clients du magasin
+     */
+    public function bonCommandeClients(): HasMany
+    {
+        return $this->hasMany(Ventes\BonCommandeClient::class, 'id_magasin', 'id_magasin');
     }
 }

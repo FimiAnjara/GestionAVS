@@ -34,4 +34,9 @@ class MvtStock extends Model
     {
         return $this->hasMany(MvtStockFille::class, 'id_mvt_stock', 'id_mvt_stock');
     }
+
+    public function mvtStockFilles()
+    {
+        return $this->hasMany(MvtStockFille::class, 'id_mvt_stock', 'id_mvt_stock');
+    }
 }
